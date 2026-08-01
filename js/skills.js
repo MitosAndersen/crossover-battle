@@ -28,7 +28,7 @@ const SKILL_DATA = {
   // -- 未来のトランクス --
   trunks_basic:        { name:'剣撃',                      icon:'🗡️', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
   trunks_burn:         { name:'バーニングアタック',        icon:'🔥', spCost:1,   power:37, type:'magic',    target:'single', hits:1, animation:'explosion' },
-  trunks_finish:       { name:'ファイナルホープスラッシュ',icon:'💥', spCost:2,   power:53, type:'magic',    target:'single', hits:1, animation:'explosion', execute:true },
+  trunks_finish:       { name:'ファイナルホープスラッシュ',icon:'💥', spCost:2,   power:62, type:'magic',    target:'single', hits:1, animation:'explosion', execute:true },
   // -- クリリン --
   krillin_basic:       { name:'格闘',              icon:'👊', noSP:true,  power:4,  type:'physical', target:'single', hits:3, animation:'punch' },
   krillin_disc:        { name:'気円斬',            icon:'💿', spCost:1,    power:30, type:'physical', target:'single', hits:1, animation:'slash_heavy', execute:true },
@@ -48,7 +48,7 @@ const SKILL_DATA = {
   // -- はたけカカシ --
   kakashi_basic:           { name:'体術',                  icon:'👁️', noSP:true,  power:4, type:'physical', target:'single', hits:3, animation:'punch' },
   kakashi_summon:          { name:'雷切',                  icon:'⚡', spCost:1,    power:38, type:'magic',    target:'single', hits:1, animation:'thunder', effect:'paralyze', effectChance:1, effectTurns:3 },
-  kakashi_lightning_blade: { name:'神威',                  icon:'💥', spCost:2,    power:55, type:'magic',    target:'single', hits:1, animation:'dark', effect:'atk_down', effectChance:1, effectTurns:3, shieldBreak:true },
+  kakashi_lightning_blade: { name:'神威',                  icon:'💥', spCost:2,    power:64, type:'magic',    target:'single', hits:1, animation:'dark', effect:'atk_down', effectChance:1, effectTurns:3, shieldBreak:true },
   // -- うちはサスケ --
   sasuke_basic:            { name:'体術',              icon:'🌑', noSP:true,  power:4,  type:'physical', target:'single', hits:3, animation:'punch' },
   sasuke_chidori:          { name:'千鳥',              icon:'⚡', spCost:1,    power:38, type:'magic',    target:'single', hits:1, animation:'thunder', effect:'paralyze', effectChance:1, effectTurns:3 },
@@ -56,7 +56,7 @@ const SKILL_DATA = {
   // -- うちはイタチ --
   itachi_basic:            { name:'手裏剣投げ',        icon:'🪶', noSP:true,  power:4,  type:'physical', target:'single', hits:3, animation:'slash' },
   itachi_tsukuyomi:        { name:'月読',              icon:'🌙', spCost:1,    power:33, type:'magic',    target:'single', hits:1, animation:'dark', effect:'stun', effectChance:1, effectTurns:1 },
-  itachi_amaterasu:        { name:'天照',              icon:'🔥', spCost:2,    power:53, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:4, alsoEffect2:'curse' },
+  itachi_amaterasu:        { name:'天照',              icon:'🔥', spCost:2,    power:62, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:4, alsoEffect2:'curse' },
   // -- 綱手 --
   tsunade_basic:           { name:'体術',                  icon:'💥', noSP:true,  power:13,  type:'physical', target:'single', hits:1, animation:'punch' },
   tsunade_heal_all:        { name:'医療忍術',              icon:'💚', spCost:1,    power:0,   type:'heal',     target:'single', healPower:30, animation:'heal' },
@@ -80,11 +80,11 @@ const SKILL_DATA = {
   // -- ロロノア・ゾロ --
   three_sword_basic:  { name:'三刀流斬撃',            icon:'⚔️', noSP:true,  power:4,  type:'physical', target:'single', hits:3, animation:'slash' },
   oni_giri:           { name:'鬼斬り',                icon:'⚔️', spCost:1,    power:34, type:'physical', target:'single', hits:1, animation:'slash_heavy', execute:true },
-  asura:              { name:'三刀流奥義・三千世界',  icon:'💥', spCost:2,    power:17, type:'physical', target:'single', hits:3, animation:'explosion', effect:'def_down', effectChance:1, effectTurns:2 },
+  asura:              { name:'三刀流奥義・三千世界',  icon:'💥', spCost:2,    power:20, type:'physical', target:'single', hits:3, animation:'explosion', effect:'def_down', effectChance:1, effectTurns:2 },
   // -- ヴィンスモーク・サンジ --
   sanji_basic:        { name:'蹴り技',                          icon:'🦵', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'punch' },
   sanji_diable:       { name:'悪魔風脚（ディアブルジャンブ）',    icon:'🔥', spCost:1,    power:33, type:'physical', target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:2 },
-  sanji_ifrit:        { name:'魔神風脚（イフリートジャンブ）',    icon:'💥', spCost:2,    power:53, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:3 },
+  sanji_ifrit:        { name:'魔神風脚（イフリートジャンブ）',    icon:'💥', spCost:2,    power:62, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:3 },
   // -- ポートガス・D・エース --
   ace_basic:          { name:'火銃',                  icon:'🔥', noSP:true,  power:10,  type:'physical', target:'single', hits:1, animation:'punch' },
   ace_hiken:          { name:'火拳',                  icon:'🔥', spCost:1,    power:33, type:'magic',     target:'single', hits:1, animation:'punch', effect:'burn', effectChance:1, effectTurns:2 },
@@ -96,11 +96,11 @@ const SKILL_DATA = {
   // -- ニコ・ロビン --
   robin_basic:        { name:'トレス・フルール・クラッチ',     icon:'🌺', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'punch' },
   robin_cien:         { name:'シエン・フルール・フリップ',     icon:'🌸', spCost:1,    power:24, type:'physical', target:'all',    hits:1, animation:'punch', effect:'atk_down', effectChance:1, effectTurns:1 },
-  robin_mil:          { name:'ヒガンテスコ・マーノ・ストンプ', icon:'💥', spCost:2,    power:45, type:'physical', target:'single', hits:1, animation:'explosion', effect:'def_down', effectChance:1, effectTurns:2 },
+  robin_mil:          { name:'ヒガンテスコ・マーノ・ストンプ', icon:'💥', spCost:2,    power:53, type:'physical', target:'single', hits:1, animation:'explosion', effect:'def_down', effectChance:1, effectTurns:2 },
   // -- シャンクス --
   shanks_basic:       { name:'斬撃',                 icon:'🍶', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
   shanks_haki:        { name:'覇王色の覇気',         icon:'👑', spCost:1,    power:0,   type:'support',  target:'all',    effect:'atk_down', effectChance:1, effectTurns:4, animation:'dark' },
-  shanks_kamusari:    { name:'神避',                 icon:'💥', spCost:2,    power:56, type:'physical', target:'single', hits:1, animation:'slash_heavy', execute:true, shieldBreak:true },
+  shanks_kamusari:    { name:'神避',                 icon:'💥', spCost:2,    power:66, type:'physical', target:'single', hits:1, animation:'slash_heavy', execute:true, shieldBreak:true },
 
   // ============================================================
   // ワンパンマン
@@ -128,7 +128,7 @@ const SKILL_DATA = {
   // -- 音速のソニック --
   sonic_basic:         { name:'音速の蹴撃',           icon:'🌀', noSP:true,  power:6, type:'physical', target:'single', hits:2, animation:'punch' },
   sonic_kunai:         { name:'爆破手裏剣',           icon:'🌀', spCost:1,    power:30, type:'physical', target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:1 },
-  sonic_juuretsu:      { name:'奥義・十影葬',         icon:'💥', spCost:2,    power:5,  type:'physical', target:'single', hits:10, animation:'slash_heavy', bossKiller:true },
+  sonic_juuretsu:      { name:'奥義・十影葬',         icon:'💥', spCost:2,    power:6,  type:'physical', target:'single', hits:10, animation:'slash_heavy', bossKiller:true },
 
   // ============================================================
   // 鬼滅の刃
@@ -136,11 +136,11 @@ const SKILL_DATA = {
   // -- 煉獄杏寿郎 --
   flame_basic:        { name:'日輪刀',                   icon:'🔥', noSP:true,  power:12,  type:'physical', target:'single', hits:1, animation:'slash' },
   flame_breath_1:     { name:'炎の呼吸・壱ノ型・不知火', icon:'🔥', spCost:1,    power:32, type:'physical', target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:2 },
-  flame_breath_9:     { name:'炎の呼吸・玖ノ型・煉獄',   icon:'💥', spCost:2,    power:54, type:'physical', target:'single', hits:1, animation:'slash_heavy', effect:'burn', effectChance:1, effectTurns:3, bossKiller:true },
+  flame_breath_9:     { name:'炎の呼吸・玖ノ型・煉獄',   icon:'💥', spCost:2,    power:63, type:'physical', target:'single', hits:1, animation:'slash_heavy', effect:'burn', effectChance:1, effectTurns:3, bossKiller:true },
   // -- 竈門炭治郎 --
   tanjiro_basic:      { name:'日輪刀',                          icon:'🌸', noSP:true,  power:11,  type:'physical', target:'single', hits:1, animation:'slash' },
   tanjiro_water_12:   { name:'水の呼吸・漆ノ型 雫波紋突き・曲', icon:'💧', spCost:1,    power:35, type:'magic',     target:'single', hits:1, animation:'ice', effect:'atk_down', effectChance:1, effectTurns:2 },
-  tanjiro_sun_breath: { name:'ヒノカミ神楽・円舞一閃',           icon:'💥', spCost:2,    power:56, type:'physical',  target:'single', hits:1, animation:'slash_heavy', effect:'burn', effectChance:1, effectTurns:4, bossKiller:true },
+  tanjiro_sun_breath: { name:'ヒノカミ神楽・円舞一閃',           icon:'💥', spCost:2,    power:66, type:'physical',  target:'single', hits:1, animation:'slash_heavy', effect:'burn', effectChance:1, effectTurns:4, bossKiller:true },
   // -- 竈門禰豆子 --
   nezuko_basic:       { name:'爪撃',                  icon:'🎀', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
   nezuko_kick:        { name:'飛び蹴り',              icon:'🦵', spCost:1,    power:34, type:'physical', target:'single', hits:1, animation:'punch', effect:'def_down', effectChance:1, effectTurns:1 },
@@ -148,7 +148,7 @@ const SKILL_DATA = {
   // -- 我妻善逸 --
   zenitsu_basic:      { name:'日輪刀',                icon:'⚡', noSP:true,  power:11,  type:'physical', target:'single', hits:1, animation:'slash' },
   zenitsu_thunder:    { name:'雷の呼吸・壱ノ型・霹靂一閃',      icon:'⚡', spCost:1,    power:32, type:'physical', target:'single', hits:1, animation:'thunder', effect:'paralyze', effectChance:1, effectTurns:2 },
-  zenitsu_seventh:    { name:'雷の呼吸・漆ノ型・火雷神',  icon:'💥', spCost:2,    power:51, type:'magic',    target:'single', hits:1, animation:'explosion', bossKiller:true },
+  zenitsu_seventh:    { name:'雷の呼吸・漆ノ型・火雷神',  icon:'💥', spCost:2,    power:60, type:'magic',    target:'single', hits:1, animation:'explosion', bossKiller:true },
   // -- 冨岡義勇 --
   water_basic:        { name:'日輪刀',                icon:'💧', noSP:true,  power:12,  type:'physical', target:'single', hits:1, animation:'slash' },
   water_breath_4:     { name:'水の呼吸・肆ノ型・打ち潮', icon:'💧', spCost:1,    power:34, type:'magic',    target:'single', hits:1, animation:'ice' },
@@ -156,7 +156,7 @@ const SKILL_DATA = {
   // -- 嘴平伊之助 --
   inosuke_basic:      { name:'日輪刀',                   icon:'🐗', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'slash' },
   inosuke_double:     { name:'獣の呼吸・弐ノ牙・切り裂き', icon:'🐗', spCost:1,    power:17,  type:'physical', target:'single', hits:2, animation:'slash' },
-  inosuke_beast:      { name:'獣の呼吸・捌ノ型・爆裂猛進', icon:'💥', spCost:2,   power:52, type:'physical', target:'single', hits:1, animation:'slash_heavy', effect:'def_down', effectChance:1, effectTurns:2, recoilPct:0.10 },
+  inosuke_beast:      { name:'獣の呼吸・捌ノ型・爆裂猛進', icon:'💥', spCost:2,   power:61, type:'physical', target:'single', hits:1, animation:'slash_heavy', effect:'def_down', effectChance:1, effectTurns:2, recoilPct:0.10 },
   // -- 甘露寺蜜璃 --
   mitsuri_basic:      { name:'日輪刀',                         icon:'💞', noSP:true,  power:11,  type:'physical', target:'single', hits:1, animation:'slash' },
   mitsuri_five:       { name:'恋の呼吸・伍ノ型・揺らめく恋情', icon:'💞', spCost:1,    power:4,   type:'physical', target:'all', hits:8, animation:'slash' },
@@ -172,15 +172,15 @@ const SKILL_DATA = {
   // -- アスナ --
   rapier_basic:           { name:'リニアー',                     icon:'✨', noSP:true,  power:12, type:'physical', target:'single', hits:1, animation:'slash' },
   healing_asuna:          { name:'カドラプル・ペイン',           icon:'✨', spCost:1,    power:8,  type:'physical', target:'single', hits:4, animation:'slash', effect:'def_down', effectChance:1, effectTurns:1 },
-  mother_rosario:         { name:'フラッシング・ペネトレイター', icon:'💥', spCost:2,    power:55, type:'physical', target:'single', hits:1, animation:'slash_heavy', shieldBreak:true },
+  mother_rosario:         { name:'フラッシング・ペネトレイター', icon:'💥', spCost:2,    power:64, type:'physical', target:'single', hits:1, animation:'slash_heavy', shieldBreak:true },
   // -- シノン --
   sinon_basic:        { name:'グロック18C',          icon:'🎯', noSP:true,  power:1,  type:'physical', target:'single', hits:13, animation:'slash' },
   sinon_rifle:        { name:'ファントム・バレット', icon:'🎯', spCost:1,    power:0,   type:'support',  target:'all',    effect:'atk_down', effectChance:1, effectTurns:3, animation:'dark' },
-  sinon_bullet:       { name:'ヘカートII',           icon:'💥', spCost:2,    power:56, type:'physical',  target:'single', hits:1, animation:'explosion', execute:true, shieldBreak:true },
+  sinon_bullet:       { name:'ヘカートII',           icon:'💥', spCost:2,    power:66, type:'physical',  target:'single', hits:1, animation:'explosion', execute:true, shieldBreak:true },
   // -- ユウキ --
   yuuki_basic:        { name:'スラント',             icon:'🗡️', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'slash' },
   yuuki_11hit:        { name:'ホリゾンタル・スクエア', icon:'🗡️', spCost:1,    power:9, type:'physical', target:'all',    hits:4, animation:'slash' },
-  yuuki_sword:        { name:'マザーズ・ロザリオ',     icon:'💥', spCost:2,    power:5, type:'physical', target:'single', hits:11, animation:'slash_heavy', execute:true },
+  yuuki_sword:        { name:'マザーズ・ロザリオ',     icon:'💥', spCost:2,    power:6, type:'physical', target:'single', hits:11, animation:'slash_heavy', execute:true },
   // -- リーファ --
   leafa_basic:        { name:'ソニックリープ',     icon:'🌿', noSP:true,  power:13,  type:'physical', target:'single', hits:1, animation:'slash' },
   leafa_heal:         { name:'フェアリィ・ダンス', icon:'🍃', spCost:1,    power:0,   type:'support',  target:'all_ally', effect:'atk_up', effectChance:1, effectTurns:3, animation:'buff' },
@@ -196,7 +196,7 @@ const SKILL_DATA = {
   // -- レム --
   maid_punch:             { name:'モーニングスター',       icon:'💙', noSP:true,  power:14, type:'physical', target:'single', hits:1, animation:'slash' },
   oni_form:               { name:'振り回し',               icon:'💙', spCost:1,    power:18, type:'physical', target:'all',    hits:2, animation:'slash', shieldBreak:true },
-  morning_star:           { name:'アル・ヒューマ',         icon:'💥', spCost:2,    power:13, type:'physical', target:'single', hits:4, animation:'ice', effect:'freeze', effectChance:1, effectTurns:3 },
+  morning_star:           { name:'アル・ヒューマ',         icon:'💥', spCost:2,    power:15, type:'physical', target:'single', hits:4, animation:'ice', effect:'freeze', effectChance:1, effectTurns:3 },
   // -- 菜月昴 --
   subaru_basic:       { name:'拳打',              icon:'🖤', noSP:true,  power:7,  type:'physical', target:'single', hits:1, animation:'punch' },
   subaru_return:      { name:'死に戻り',          icon:'🖤', spCost:1,    power:0,   type:'heal',     target:'self',   healPower:30, animation:'heal' },
@@ -204,15 +204,15 @@ const SKILL_DATA = {
   // -- ベアトリス --
   beatrice_basic:         { name:'ミーニャ',              icon:'📚', noSP:true,  power:5,  type:'magic',    target:'single', hits:1, animation:'beam' },
   beatrice_shamak:        { name:'エル・ミーニャ',        icon:'📚', spCost:1,    power:4, type:'magic',    target:'single', hits:8, animation:'dark' },
-  beatrice_spirit:        { name:'アル・シャマク',        icon:'🌑', spCost:2,    power:52, type:'magic',   target:'single', hits:1, animation:'explosion', effect:'def_down', effectChance:1, effectTurns:2 },
+  beatrice_spirit:        { name:'アル・シャマク',        icon:'🌑', spCost:2,    power:61, type:'magic',   target:'single', hits:1, animation:'explosion', effect:'def_down', effectChance:1, effectTurns:2 },
   // -- ラム --
   ram_basic:              { name:'フーラ',                icon:'🌸', noSP:true,  power:10,  type:'magic',    target:'single', hits:1, animation:'beam' },
   ram_senrigan:           { name:'千里眼',                icon:'👁️', spCost:1,    power:0,   type:'support',  target:'all_ally', effect:'atk_up', effectChance:1, effectTurns:3, animation:'buff' },
-  ram_last:               { name:'エル・フーラ',          icon:'💥', spCost:2,    power:52, type:'magic',    target:'single', hits:1, animation:'explosion' },
+  ram_last:               { name:'エル・フーラ',          icon:'💥', spCost:2,    power:61, type:'magic',    target:'single', hits:1, animation:'explosion' },
   // -- ラインハルト --
   reinhard_basic:  { name:'剣聖の一閃',           icon:'🦁', noSP:true,  power:14, type:'physical', target:'single', hits:1, animation:'slash' },
   reinhard_guard:  { name:'剣聖の加護',           icon:'⬆️', spCost:1,    power:0,   type:'support',  target:'self',   effect:'atk_up', effectChance:1, effectTurns:4, animation:'buff', alsoEffect2:'def_up' },
-  reinhard_dragon: { name:'龍剣レイド・抜剣',     icon:'💥', spCost:2,    power:55, type:'physical', target:'single', hits:1, animation:'slash_heavy', execute:true },
+  reinhard_dragon: { name:'龍剣レイド・抜剣',     icon:'💥', spCost:2,    power:64, type:'physical', target:'single', hits:1, animation:'slash_heavy', execute:true },
 
   // ============================================================
   // ポケモン
@@ -220,11 +220,11 @@ const SKILL_DATA = {
   // -- ピカチュウ --
   quick_attack:           { name:'でんこうせっか',        icon:'💥', noSP:true,  power:11,  type:'physical', target:'single', hits:1, animation:'punch' },
   thunderbolt:            { name:'10まんボルト',          icon:'⚡', spCost:1,    power:35,  type:'magic',    target:'single', hits:1, animation:'thunder', effect:'stun', effectChance:1, effectTurns:1, shieldBreak:true },
-  volt_tackle:            { name:'ボルテッカー',          icon:'💥', spCost:2,    power:58,  type:'physical', target:'single', hits:1, animation:'explosion', effect:'paralyze', effectChance:1, effectTurns:2, recoilPct:0.15, execute:true },
+  volt_tackle:            { name:'ボルテッカー',          icon:'💥', spCost:2,    power:68,  type:'physical', target:'single', hits:1, animation:'explosion', effect:'paralyze', effectChance:1, effectTurns:2, recoilPct:0.15, execute:true },
   // -- ミュウツー --
   mewtwo_basic:       { name:'ねんりき',          icon:'🔮', noSP:true,  power:13, type:'magic',    target:'single', hits:1, animation:'beam' },
   mewtwo_psycho:      { name:'バリアー',          icon:'🛡️', spCost:2,    power:0,  type:'support',  target:'all_ally', effect:'shield', shieldPower:15, effectChance:1, animation:'buff' },
-  mewtwo_psystrike:   { name:'サイコブレイク',    icon:'💥', spCost:2,    power:54, type:'magic',    target:'single', hits:1, animation:'beam', effect:'def_down', effectChance:1, effectTurns:2, shieldBreak:true },
+  mewtwo_psystrike:   { name:'サイコブレイク',    icon:'💥', spCost:2,    power:63, type:'magic',    target:'single', hits:1, animation:'beam', effect:'def_down', effectChance:1, effectTurns:2, shieldBreak:true },
   // -- ルカリオ --
   lucario_basic:      { name:'はっけい',          icon:'🔵', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
   lucario_aura:       { name:'はどうだん',        icon:'🔵', spCost:1,    power:37, type:'magic',    target:'single', hits:1, animation:'beam' },
@@ -236,11 +236,11 @@ const SKILL_DATA = {
   // -- ゲンガー --
   gengar_basic:       { name:'おどろかす',        icon:'👻', noSP:true,  power:11, type:'magic',    target:'single', hits:1, animation:'dark' },
   gengar_lick:        { name:'したでなめる',      icon:'💀', spCost:1,    power:33, type:'magic',    target:'single', hits:1, animation:'dark', effect:'paralyze', effectChance:1, effectTurns:3 },
-  gengar_hex:         { name:'シャドーボール',    icon:'💥', spCost:2,    power:51, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'curse', effectChance:1, effectTurns:2 },
+  gengar_hex:         { name:'シャドーボール',    icon:'💥', spCost:2,    power:60, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'curse', effectChance:1, effectTurns:2 },
 
   goodra_basic:       { name:'みずてっぽう',      icon:'💧', noSP:true,  power:10, type:'magic',    target:'single', hits:1, animation:'beam' },
   goodra_mud:         { name:'マッドショット',    icon:'🟤', spCost:1,    power:28, type:'magic',    target:'single', hits:1, animation:'beam', effect:'atk_down', effectChance:1, effectTurns:1 },
-  goodra_pulse:       { name:'りゅうのはどう',    icon:'💥', spCost:2,    power:48, type:'magic',    target:'single', hits:1, animation:'beam' },
+  goodra_pulse:       { name:'りゅうのはどう',    icon:'💥', spCost:2,    power:56, type:'magic',    target:'single', hits:1, animation:'beam' },
 
   ampharos_basic:     { name:'でんきショック',    icon:'⚡', noSP:true,  power:12, type:'magic',    target:'single', hits:1, animation:'thunder' },
   ampharos_parabola:  { name:'パラボラチャージ',  icon:'⚡', spCost:1,    power:32, type:'magic',    target:'all',    hits:1, animation:'thunder', healSelf:0.2 },
@@ -252,7 +252,7 @@ const SKILL_DATA = {
   // -- エドワード・エルリック --
   alchemy_fist:           { name:'義手のブレード化',      icon:'⚗️', noSP:true,   power:13, type:'physical', target:'single', hits:1, animation:'punch' },
   alchemy_spear:          { name:'壁の錬成',              icon:'🛡️', spCost:2,    power:0,  type:'support',  target:'all_ally', effect:'shield', shieldPower:20, effectChance:1, animation:'buff' },
-  alchemy_bomb:           { name:'真理の扉',              icon:'💥', spCost:2,    power:56, type:'magic',    target:'single', hits:1, animation:'explosion', recoilPct:0.10, selfEffect:'atk_up', selfEffectTurns:3 },
+  alchemy_bomb:           { name:'真理の扉',              icon:'💥', spCost:2,    power:66, type:'magic',    target:'single', hits:1, animation:'explosion', recoilPct:0.10, selfEffect:'atk_up', selfEffectTurns:3 },
   // -- ロイ・マスタング --
   flame_snap:             { name:'指鳴らし',              icon:'🔥', noSP:true,   power:12, type:'magic',    target:'single', hits:1, animation:'beam' },
   flame_sniper:           { name:'ピンポイント',          icon:'🔥', spCost:1,    power:31, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:2 },
@@ -260,7 +260,7 @@ const SKILL_DATA = {
   // -- アルフォンス・エルリック --
   alphonse_basic:     { name:'鎧の拳',            icon:'🛡️', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'punch' },
   alphonse_trap:      { name:'鉄の茨道',          icon:'⚗️', spCost:2,    power:30, type:'physical', target:'all',    hits:1, animation:'explosion', effect:'atk_down', effectChance:1, effectTurns:2 },
-  alphonse_bind:      { name:'撃鉄靠掌',          icon:'💥', spCost:2,    power:48, type:'physical', target:'single', hits:1, animation:'punch_heavy', effect:'stun', effectChance:1, effectTurns:1, shieldBreak:true },
+  alphonse_bind:      { name:'撃鉄靠掌',          icon:'💥', spCost:2,    power:56, type:'physical', target:'single', hits:1, animation:'punch_heavy', effect:'stun', effectChance:1, effectTurns:1, shieldBreak:true },
 
   // ============================================================
   // 呪術廻戦
@@ -268,7 +268,7 @@ const SKILL_DATA = {
   // -- 五条悟 --
   jujutsu_basic:          { name:'術式順転・蒼',          icon:'🔮', noSP:true,  power:13,  type:'physical', target:'single', hits:1, animation:'beam' },
   mugen:                  { name:'無下限呪術',            icon:'🛡️', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:15, effectChance:1, animation:'buff' },
-  murasaki:               { name:'虚式・茈',              icon:'💥', spCost:2,    power:57,  type:'magic',    target:'single',    hits:1, animation:'explosion', execute:true },
+  murasaki:               { name:'虚式・茈',              icon:'💥', spCost:2,    power:67,  type:'magic',    target:'single',    hits:1, animation:'explosion', execute:true },
   // -- 両面宿儺 --
   sukuna_basic:           { name:'解（カイ）',            icon:'👹', noSP:true,  power:13,  type:'physical', target:'single', hits:1, animation:'slash' },
   sukuna_dismantle:       { name:'捌（ハチ）',            icon:'👹', spCost:1,    power:36, type:'physical', target:'single', hits:1, animation:'slash_heavy', shieldBreak:true },
@@ -280,7 +280,7 @@ const SKILL_DATA = {
   // -- 虎杖悠仁 --
   itadori_basic:      { name:'逕庭拳',            icon:'🥊', noSP:true,  power:7, type:'physical', target:'single', hits:2, animation:'punch' },
   itadori_black:      { name:'黒閃',              icon:'⚡', spCost:1,    power:35, type:'magic',    target:'single', hits:1, animation:'explosion', execute:true },
-  itadori_shrine:     { name:'赤血操術・穿血',    icon:'💥', spCost:2,    power:52, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'cruse', effectChance:1, effectTurns:4, alsoEffect2:'poison' },
+  itadori_shrine:     { name:'赤血操術・穿血',    icon:'💥', spCost:2,    power:61, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'cruse', effectChance:1, effectTurns:4, alsoEffect2:'poison' },
   // -- 七海建人 --
   nanami_basic:           { name:'なまくらの一撃',        icon:'👔', noSP:true,  power:10,  type:'physical', target:'single', hits:1, animation:'slash' },
   nanami_ratio:           { name:'十劃呪法',              icon:'👔', spCost:1,    power:31, type:'physical', target:'single', hits:1, animation:'slash', effect:'def_down', effectChance:1, effectTurns:1, shieldBreak:true },
@@ -288,11 +288,11 @@ const SKILL_DATA = {
   // -- 釘崎野薔薇 --
   nobara_basic:           { name:'五寸釘',                icon:'🔨', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'slash' },
   nobara_doll:            { name:'芻霊呪法・簪',          icon:'🔨', spCost:1,    power:29, type:'magic',    target:'single', hits:1, animation:'dark', shieldBreak:true },
-  nobara_elim:            { name:'芻霊呪法・共鳴り',      icon:'💥', spCost:2,    power:49, type:'magic',    target:'single', hits:1, animation:'dark', effect:'atk_down', effectChance:1, effectTurns:2, alsoEffect2:'curse' },
+  nobara_elim:            { name:'芻霊呪法・共鳴り',      icon:'💥', spCost:2,    power:57, type:'magic',    target:'single', hits:1, animation:'dark', effect:'atk_down', effectChance:1, effectTurns:2, alsoEffect2:'curse' },
   // -- 乙骨憂太 --
   yuta_basic:      { name:'剣撃',                 icon:'💍', noSP:true,  power:12,  type:'physical', target:'single', hits:1, animation:'slash' },
   yuta_copy:       { name:'模倣',                 icon:'💍', spCost:1,    power:0,   type:'support',  target:'self',   effect:'atk_up', effectChance:1, effectTurns:4, animation:'buff', alsoEffect2:'def_up' },
-  yuta_rika:       { name:'領域展開・真贋相愛',   icon:'💥', spCost:2,    power:55, type:'magic',    target:'single',    hits:1, animation:'dark', recoilPct:0.10, execute:true },
+  yuta_rika:       { name:'領域展開・真贋相愛',   icon:'💥', spCost:2,    power:64, type:'magic',    target:'single',    hits:1, animation:'dark', recoilPct:0.10, execute:true },
 
   // ============================================================
   // BLEACH
@@ -316,7 +316,7 @@ const SKILL_DATA = {
   // -- 四楓院夜一 --
   yoruichi_basic:     { name:'瞬歩連撃',          icon:'🐱', noSP:true,  power:4,  type:'physical', target:'single', hits:3, animation:'slash' },
   yoruichi_shunko:    { name:'瞬閧',              icon:'⬆️', spCost:1,    power:0,   type:'support',  target:'self',   effect:'atk_up', effectChance:1, effectTurns:4, animation:'buff', alsoEffect2:'def_up' },
-  yoruichi_raishunko: { name:'瞬閧・雷神戦形',    icon:'💥', spCost:2,    power:48, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'paralyze', effectChance:1, effectTurns:2 },
+  yoruichi_raishunko: { name:'瞬閧・雷神戦形',    icon:'💥', spCost:2,    power:56, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'paralyze', effectChance:1, effectTurns:2 },
   // -- 更木剣八 --
   kenpachi_basic:     { name:'野晒',              icon:'🔔', noSP:true,  power:13, type:'physical', target:'single', hits:1, animation:'slash' },
   kenpachi_eyepatch:  { name:'呑め「野晒」',      icon:'💥', spCost:1,    power:30, type:'physical', target:'single', hits:1, animation:'slash_heavy', execute:true, shieldBreak:true },
@@ -328,11 +328,11 @@ const SKILL_DATA = {
   // -- キルア＝ゾルディック --
   hand_slice:             { name:'手刀',                  icon:'⚡', noSP:true,  power:13, type:'physical', target:'single', hits:1, animation:'slash' },
   godspeed:               { name:'電光石火',              icon:'⬆️', spCost:1,    power:0,   type:'support',  target:'self',   effect:'atk_up', effectChance:1, effectTurns:4, animation:'buff', alsoEffect2:'def_up' },
-  kanmuru:                { name:'神速（カンムル）',      icon:'💥', spCost:2,    power:50, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'paralyze', effectChance:1, effectTurns:3 },
+  kanmuru:                { name:'神速（カンムル）',      icon:'💥', spCost:2,    power:58, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'paralyze', effectChance:1, effectTurns:3 },
   // -- ゴン＝フリークス --
   gon_basic:          { name:'ジャジャン拳・パー',   icon:'🖐️', noSP:true,  power:12, type:'physical', target:'single', hits:1, animation:'beam' },
   gon_rock:           { name:'ジャジャン拳・グー',   icon:'✊', spCost:1,    power:35, type:'physical', target:'single', hits:1, animation:'punch_heavy', execute:true, shieldBreak:true },
-  gon_adult:          { name:'ゴンさん',             icon:'💥', spCost:2,    power:54, type:'physical', target:'single', hits:1, animation:'explosion', recoilPct:0.10, selfEffect:'atk_up', selfEffectTurns:4 },
+  gon_adult:          { name:'ゴンさん',             icon:'💥', spCost:2,    power:63, type:'physical', target:'single', hits:1, animation:'explosion', recoilPct:0.10, selfEffect:'atk_up', selfEffectTurns:4 },
   // -- ヒソカ＝モロウ --
   hisoka_basic:       { name:'トランプ投げ',                              icon:'🃏', noSP:true,   power:3, type:'physical', target:'single', hits:4, animation:'slash' },
   hisoka_bungee:      { name:'伸縮自在の愛（バンジーガム）',              icon:'🃏', spCost:1,     power:31, type:'physical', target:'single', hits:1, animation:'slash', effect:'stun', effectChance:1, effectTurns:1, shieldBreak:true },
@@ -340,7 +340,7 @@ const SKILL_DATA = {
   // -- クラピカ --
   kurapika_basic:         { name:'鎖打撃',                                icon:'🔗', noSP:true,  power:11,  type:'physical', target:'single', hits:1, animation:'punch' },
   kurapika_chain:         { name:'奪う人差し指の鎖（スチールチェーン）',    icon:'🔗', spCost:1,    power:31, type:'magic',    target:'single', hits:1, animation:'dark', effect:'def_down', effectChance:1, effectTurns:1 },
-  kurapika_emperor:       { name:'絶対時間（エンペラータイム）',            icon:'💥', spCost:2,    power:52, type:'magic',    target:'single', hits:1, animation:'explosion', recoilPct:0.20, selfEffect:'atk_up', selfEffectTurns:3 },
+  kurapika_emperor:       { name:'絶対時間（エンペラータイム）',            icon:'💥', spCost:2,    power:61, type:'magic',    target:'single', hits:1, animation:'explosion', recoilPct:0.20, selfEffect:'atk_up', selfEffectTurns:3 },
 
   // ============================================================
   // 僕のヒーローアカデミア
@@ -348,19 +348,19 @@ const SKILL_DATA = {
   // -- オールマイト --
   smash_basic:            { name:'スマッシュ',                               icon:'💪', noSP:true,  power:13, type:'physical', target:'single', hits:1, animation:'punch' },
   detroit_smash:          { name:'デトロイトスマッシュ',                     icon:'💪', spCost:1,   power:35, type:'physical', target:'single', hits:1, animation:'punch_heavy', effect:'stun', effectChance:1, effectTurns:1 },
-  plus_ultra:             { name:'ユナイテッド・ステイツ・オブ・スマッシュ', icon:'💥', spCost:2,   power:57, type:'physical', target:'single', hits:1, animation:'punch_heavy', bossKiller:true, shieldBreak:true },
+  plus_ultra:             { name:'ユナイテッド・ステイツ・オブ・スマッシュ', icon:'💥', spCost:2,   power:67, type:'physical', target:'single', hits:1, animation:'punch_heavy', bossKiller:true, shieldBreak:true },
   // -- 緑谷出久 --
   blackwhip_basic:        { name:'黒鞭',                                 icon:'🥦', noSP:true,  power:13, type:'physical', target:'single', hits:1, animation:'slash' },
   deku_airforce:          { name:'デラウェア・スマッシュ・エアフォース', icon:'🥦', spCost:1,   power:35, type:'physical', target:'all', hits:1, animation:'punch_heavy' },
-  deku_100percent:        { name:'ワイオミングスマッシュ',               icon:'💥', spCost:2,   power:55, type:'physical', target:'single', hits:1, animation:'punch_heavy', bossKiller:true, shieldBreak:true },
+  deku_100percent:        { name:'ワイオミングスマッシュ',               icon:'💥', spCost:2,   power:64, type:'physical', target:'single', hits:1, animation:'punch_heavy', bossKiller:true, shieldBreak:true },
   // -- 轟焦凍 --
   todoroki_basic:         { name:'半冷半燃',              icon:'🌡️', noSP:true,  power:11,  type:'physical', target:'single', hits:1, animation:'slash' },
   todoroki_fire:          { name:'赫灼熱拳',              icon:'🔥', spCost:1,    power:32, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:2 },
-  todoroki_heaven:        { name:'冷炎白刃',              icon:'🧊', spCost:2,    power:53, type:'magic',    target:'single', hits:1, animation:'ice', effect:'freeze', effectChance:1, effectTurns:3 },
+  todoroki_heaven:        { name:'冷炎白刃',              icon:'🧊', spCost:2,    power:62, type:'magic',    target:'single', hits:1, animation:'ice', effect:'freeze', effectChance:1, effectTurns:3 },
   // -- 爆豪勝己 --
   bakugo_basic:           { name:'爆破',                             icon:'💥', noSP:true,  power:12,  type:'physical', target:'single', hits:1, animation:'slash' },
   bakugo_blast:           { name:'徹甲弾（A・P・ショット）',         icon:'💥', spCost:1,    power:36, type:'physical', target:'single', hits:1, animation:'explosion', shieldBreak:true },
-  bakugo_howitzer:        { name:'榴弾砲着弾（ハウザーインパクト）', icon:'💥', spCost:2,    power:54, type:'magic',    target:'single', hits:1, animation:'explosion', execute:true, shieldBreak:true },
+  bakugo_howitzer:        { name:'榴弾砲着弾（ハウザーインパクト）', icon:'💥', spCost:2,    power:63, type:'magic',    target:'single', hits:1, animation:'explosion', execute:true, shieldBreak:true },
 
   // ============================================================
   // ジョジョの奇妙な冒険
@@ -368,11 +368,11 @@ const SKILL_DATA = {
   // -- DIO --
   knife_throw:            { name:'ナイフ投擲',                           icon:'🧛', noSP:true,  power:4,  type:'physical', target:'single', hits:3, animation:'slash' },
   the_world_stop:         { name:'時よ止まれ！',                         icon:'⏰', spCost:3,   power:0,   type:'support',  target:'all',    effect:'stun', effectChance:1, effectTurns:3, animation:'dark' },
-  time_erase:             { name:'無駄無駄無駄無駄無駄無駄ァ─────ッ',  icon:'💥', spCost:2,   power:5,  type:'physical', target:'single', hits:11, animation:'explosion', execute:true, shieldBreak:true },
+  time_erase:             { name:'無駄無駄無駄無駄無駄無駄ァ─────ッ',  icon:'💥', spCost:2,   power:6,  type:'physical', target:'single', hits:11, animation:'explosion', execute:true, shieldBreak:true },
   // -- 空条承太郎 --
   jotaro_basic:           { name:'オラァ！',                         icon:'⭐', noSP:true,   power:12, type:'physical', target:'single', hits:1, animation:'slash' },
   jotaro_time_stop:       { name:'スタープラチナ・ザ・ワールド',     icon:'⏰', spCost:3,    power:0, type:'support', target:'all',    effect:'stun', effectChance:1, effectTurns:2, animation:'dark' },
-  jotaro_ora_rush:        { name:'オラオラオラオラオラオラァーッ！', icon:'💥', spCost:2,    power:5,  type:'physical', target:'single', hits:11, animation:'explosion', bossKiller:true, shieldBreak:true },
+  jotaro_ora_rush:        { name:'オラオラオラオラオラオラァーッ！', icon:'💥', spCost:2,    power:6,  type:'physical', target:'single', hits:11, animation:'explosion', bossKiller:true, shieldBreak:true },
   // -- ジョセフ・ジョースター --
 
   // ============================================================
@@ -393,7 +393,7 @@ const SKILL_DATA = {
   // -- 暁美ほむら --
   pistol_shoot:           { name:'拳銃連射',              icon:'⏰', noSP:true,  power:4,  type:'physical', target:'single', hits:3, animation:'slash' },
   time_stop_hw:           { name:'時間停止',              icon:'⏰', spCost:4,    power:0,   type:'support',  target:'all',    effect:'stun', effectChance:1, effectTurns:1, animation:'dark' },
-  barrier_hw:             { name:'全武装展開',            icon:'💥', spCost:2,    power:10, type:'physical', target:'single', hits:5, animation:'explosion' },
+  barrier_hw:             { name:'全武装展開',            icon:'💥', spCost:2,    power:12, type:'physical', target:'single', hits:5, animation:'explosion' },
   // -- 鹿目まどか --
   madoka_basic:           { name:'ホーミングアロー',      icon:'🎀', noSP:true,   power:6,  type:'physical', target:'single', hits:2, animation:'slash' },
   madoka_heal:            { name:'スターライトアロー',    icon:'🎀', spCost:1,    power:7,   type:'physical', target:'all', hits:5, animation:'explosion', shieldBreak:true },
@@ -401,7 +401,7 @@ const SKILL_DATA = {
   // -- 巴マミ --
   mami_basic:         { name:'マスケット射撃',    icon:'🌼', noSP:true,  power:4,  type:'physical', target:'single', hits:3, animation:'slash' },
   mami_bind:          { name:'レガーレ・ヴァスタリア', icon:'🌼', spCost:4,    power:0,   type:'support',  target:'all',    effect:'stun', effectChance:1, effectTurns:1, animation:'dark' },
-  mami_finale:        { name:'ティロ・フィナーレ', icon:'💥', spCost:2,   power:53, type:'physical', target:'single', hits:1, animation:'explosion', bossKiller:true },
+  mami_finale:        { name:'ティロ・フィナーレ', icon:'💥', spCost:2,   power:62, type:'physical', target:'single', hits:1, animation:'explosion', bossKiller:true },
   // -- 佐倉杏子 --
   kyoko_basic:        { name:'打突',              icon:'🍎', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
   kyoko_spear:        { name:'鉄砕鞭',            icon:'🍎', spCost:1,    power:35, type:'physical', target:'all',    hits:1, animation:'slash' },
@@ -425,7 +425,7 @@ const SKILL_DATA = {
   // -- 遠坂凛 --
   rin_basic:          { name:'蹴り技',             icon:'💎', noSP:true,  power:7,  type:'magic',    target:'single', hits:1, animation:'punch' },
   rin_gandr:          { name:'ガンド撃ち',         icon:'💎', spCost:1,    power:28, type:'magic',    target:'single', hits:1, animation:'dark', effect:'paralyze', effectChance:1, effectTurns:2 },
-  rin_jewels:         { name:'フィンのガトリング', icon:'💥', spCost:2,    power:8, type:'magic',     target:'single',    hits:6, animation:'explosion', effect:'curse', effectChance:1, effectTurns:2 },
+  rin_jewels:         { name:'フィンのガトリング', icon:'💥', spCost:2,    power:9, type:'magic',     target:'single',    hits:6, animation:'explosion', effect:'curse', effectChance:1, effectTurns:2 },
   // -- ランサー（クー・フーリン） --
   lancer_basic:       { name:'槍の一閃',                         icon:'🏃', noSP:true,  power:12, type:'physical', target:'single', hits:1, animation:'slash' },
   lancer_gae:         { name:'刺し穿つ死棘の槍（ゲイ・ボルク）', icon:'🏃', spCost:1,    power:35, type:'physical', target:'single', hits:1, animation:'explosion', execute:true, shieldBreak:true },
@@ -453,11 +453,11 @@ const SKILL_DATA = {
   // -- アスタ --
   anti_magic_basic:       { name:'ブラックスラッシュ',    icon:'🍀', noSP:true,  power:11,  type:'physical', target:'single', hits:1, animation:'slash', },
   black_hole:             { name:'滅魔の剣・因果解放',    icon:'🍀', spCost:1,    power:0,   type:'support',  target:'all',    effect:'dispel', effectChance:1, animation:'dark', alsoEffect2:'curse', effectTurns:4 },
-  black_divider:          { name:'断魔の剣・ブラックディバイダー', icon:'💥', spCost:2,    power:54,  type:'physical', target:'single', hits:1, animation:'slash_heavy', effect:'burn', effectChance:1, effectTurns:2, execute:true, shieldBreak:true },
+  black_divider:          { name:'断魔の剣・ブラックディバイダー', icon:'💥', spCost:2,    power:63,  type:'physical', target:'single', hits:1, animation:'slash_heavy', effect:'burn', effectChance:1, effectTurns:2, execute:true, shieldBreak:true },
   // -- ヤミ・スケヒロ --
   yami_basic:         { name:'闇纏・無明斬り',            icon:'🌑', noSP:true,  power:13, type:'physical', target:'single', hits:1, animation:'slash' },
   yami_slash:         { name:'黒月',                      icon:'🌑', spCost:1,    power:0,   type:'support',  target:'all',    effect:'dispel', effectChance:1, animation:'dark' },
-  yami_dimension:     { name:'闇纏・次元斬り',            icon:'💥', spCost:2,    power:52, type:'physical', target:'single', hits:1, animation:'slash_heavy', shieldBreak:true },
+  yami_dimension:     { name:'闇纏・次元斬り',            icon:'💥', spCost:2,    power:61, type:'physical', target:'single', hits:1, animation:'slash_heavy', shieldBreak:true },
 
   // ============================================================
   // 進撃の巨人
@@ -465,7 +465,7 @@ const SKILL_DATA = {
   // -- リヴァイ --
   levi_basic:             { name:'立体機動連撃',          icon:'⚔️', noSP:true,  power:2, type:'physical', target:'single', hits:7, animation:'slash' },
   levi_aerial:            { name:'斬撃乱舞',              icon:'⚔️', spCost:1,    power:5, type:'physical', target:'all',    hits:7, animation:'slash' },
-  levi_perfect:           { name:'リヴァイ斬り',          icon:'💥', spCost:2,    power:5, type:'physical', target:'single', hits:11, animation:'slash_heavy', bossKiller:true },
+  levi_perfect:           { name:'リヴァイ斬り',          icon:'💥', spCost:2,    power:6, type:'physical', target:'single', hits:11, animation:'slash_heavy', bossKiller:true },
   // -- エレン・イェーガー --
   eren_basic:         { name:'立体機動連撃',      icon:'🦅', noSP:true,  power:4,  type:'physical', target:'single', hits:3, animation:'slash' },
   eren_thunderspear:  { name:'雷槍',              icon:'⚡', spCost:1,    power:35, type:'physical', target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:3 },
@@ -485,11 +485,11 @@ const SKILL_DATA = {
   // -- メリオダス --
   meliodas_basic:         { name:'魔剣ロストヴェイン',       icon:'⚔️', noSP:true,   power:12, type:'physical', target:'single', hits:1, animation:'slash' },
   meliodas_reflection:    { name:'リベンジカウンター',     icon:'⚔️', spCost:1,    power:50, type:'physical', target:'single', hits:1, animation:'slash', execute:true, selfEffect:'def_down', selfEffectTurns:2 },
-  meliodas_rising:        { name:'獄炎（ヘルブレイズ）',     icon:'🔥', spCost:2,    power:52, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:6 },
+  meliodas_rising:        { name:'獄炎（ヘルブレイズ）',     icon:'🔥', spCost:2,    power:61, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:6 },
   // -- エスカノール --
   escanor_basic:      { name:'神斧リッタ',                       icon:'🌞', noSP:true,  power:12, type:'physical', target:'single', hits:1, animation:'slash' },
   escanor_sunshine:   { name:'無慈悲な太陽（クルーエル・サン）', icon:'🌞', spCost:1,    power:37, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:2 },
-  escanor_the_one:    { name:'天上天下唯我独尊（ザ・ワン）',     icon:'🌞', spCost:2,    power:45, type:'physical', target:'single', hits:1, animation:'explosion', selfEffect:'atk_up', selfEffectTurns:3 },
+  escanor_the_one:    { name:'天上天下唯我独尊（ザ・ワン）',     icon:'🌞', spCost:2,    power:53, type:'physical', target:'single', hits:1, animation:'explosion', selfEffect:'atk_up', selfEffectTurns:3 },
 
   // ============================================================
   // FAIRY TAIL
@@ -497,11 +497,11 @@ const SKILL_DATA = {
   // -- ナツ・ドラグニル --
   natsu_basic:            { name:'火竜の鉄拳',            icon:'🐉', noSP:true,  power:11,  type:'physical', target:'single', hits:1, animation:'punch' },
   natsu_iron:             { name:'雷炎竜の撃鉄',          icon:'⚡', spCost:1,    power:35, type:'physical', target:'single', hits:1, animation:'thunder', effect:'paralyze', effectChance:1, effectTurns:2 },
-  natsu_explode:          { name:'滅竜奥義・漆黒爆炎刃',  icon:'💥', spCost:2,    power:55, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:4, bossKiller:true },
+  natsu_explode:          { name:'滅竜奥義・漆黒爆炎刃',  icon:'💥', spCost:2,    power:64, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:4, bossKiller:true },
   // -- エルザ・スカーレット --
   erza_basic:             { name:'天輪の鎧',          icon:'⚔️', noSP:true,  power:12,  type:'physical', target:'single', hits:1, animation:'slash' },
   erza_eight:             { name:'天輪・五芒星の剣',  icon:'⚔️', spCost:1,    power:7,   type:'physical', target:'single', hits:5, animation:'slash' },
-  erza_hero:              { name:'妖精の鎧',          icon:'💥', spCost:2,    power:26, type:'magic', target:'single', hits:2, animation:'explosion', execute:true },
+  erza_hero:              { name:'妖精の鎧',          icon:'💥', spCost:2,    power:30, type:'magic', target:'single', hits:2, animation:'explosion', execute:true },
   // -- グレイ・フルバスター --
   gray_basic:             { name:'アイスメイク・ランス',      icon:'🧊', noSP:true,  power:10,  type:'magic',    target:'single', hits:1, animation:'ice' },
   gray_rampart:           { name:'アイスメイク・ランパート',  icon:'🧊', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:10, effectChance:1, animation:'buff' },
@@ -521,7 +521,7 @@ const SKILL_DATA = {
   // -- アルベド --
   albedo_basic:       { name:'3F',                         icon:'👸', noSP:true,  power:9,  type:'physical', target:'single', hits:1, animation:'slash' },
   albedo_guardian:    { name:'ウォールズ・オブ・ジェリコ', icon:'🛡️', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:10, effectChance:1, animation:'buff' },
-  albedo_apocalypse:  { name:'真なる無（ギンヌンガガプ）', icon:'💥', spCost:2,    power:48, type:'physical', target:'single', hits:1, animation:'slash_heavy', effect:'def_down', effectChance:1, effectTurns:2, shieldBreak:true },
+  albedo_apocalypse:  { name:'真なる無（ギンヌンガガプ）', icon:'💥', spCost:2,    power:56, type:'physical', target:'single', hits:1, animation:'slash_heavy', effect:'def_down', effectChance:1, effectTurns:2, shieldBreak:true },
 
   // ============================================================
   // この素晴らしい世界
@@ -549,11 +549,11 @@ const SKILL_DATA = {
   // -- デンジ --
   denji_basic:        { name:'チェンソー斬り',    icon:'⛓️', noSP:true,  power:2, type:'physical', target:'single', hits:6, animation:'slash' },
   denji_saw:          { name:'チェンソー乱撃',    icon:'⛓️', spCost:1,    power:4, type:'physical',  target:'all',    hits:9, animation:'slash', execute:true },
-  denji_chainsaw:     { name:'永久機関',          icon:'💥', spCost:2,    power:53, type:'physical', target:'single', hits:1, animation:'slash_heavy', healSelf:0.2 },
+  denji_chainsaw:     { name:'永久機関',          icon:'💥', spCost:2,    power:62, type:'physical', target:'single', hits:1, animation:'slash_heavy', healSelf:0.2 },
   // -- パワー --
   power_basic:        { name:'血の鉈',            icon:'🩸', noSP:true,   power:12, type:'physical', target:'single', hits:1, animation:'slash' },
   power_blood:        { name:'止血',              icon:'💚', spCost:1,    power:0,   type:'heal',    target:'single', healPower:20, animation:'heal' },
-  power_hammer:       { name:'血のハンマー',      icon:'💥', spCost:2,    power:51, type:'physical', target:'single', hits:1, animation:'punch_heavy', shieldBreak:true },
+  power_hammer:       { name:'血のハンマー',      icon:'💥', spCost:2,    power:60, type:'physical', target:'single', hits:1, animation:'punch_heavy', shieldBreak:true },
   // -- マキマ --
   makima_basic:       { name:'「ぱん」',                   icon:'🐕', noSP:true,  power:11,  type:'magic',    target:'single', hits:1, animation:'beam' },
   makima_control:     { name:'「ばん」「ばん」「ばーん」', icon:'🐕', spCost:1,    power:11,  type:'magic',    target:'single', hits:3, animation:'beam' },
@@ -572,11 +572,11 @@ const SKILL_DATA = {
   // -- 森羅日下部 --
   shinra_basic:    { name:'森羅イダーキック',    icon:'🔥', noSP:true,  power:13, type:'physical', target:'single', hits:1, animation:'punch' },
   shinra_adolla:   { name:'高速粒子化',          icon:'⬆️', spCost:1,    power:0,  type:'support',  target:'self',   effect:'atk_up', effectChance:1, effectTurns:4, animation:'buff', alsoEffect2:'def_up' },
-  shinra_burst:    { name:'悪魔の型（コルナ）',    icon:'💥', spCost:2,    power:55, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:2, bossKiller:true, shieldBreak:true },
+  shinra_burst:    { name:'悪魔の型（コルナ）',    icon:'💥', spCost:2,    power:64, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:2, bossKiller:true, shieldBreak:true },
   // -- アーサー・ボイル --
   arthur_basic:    { name:'炎の剣（エクスカリバー）', icon:'⚔️', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'slash' },
   arthur_plasma:   { name:'紫電一閃',               icon:'⚡', spCost:1,    power:34, type:'physical', target:'single', hits:1, animation:'slash' },
-  arthur_excalibur:{ name:'居合カリバー',           icon:'⚡', spCost:2,    power:51, type:'physical', target:'single', hits:1, animation:'slash_heavy', execute:true, shieldBreak:true },
+  arthur_excalibur:{ name:'居合カリバー',           icon:'⚡', spCost:2,    power:60, type:'physical', target:'single', hits:1, animation:'slash_heavy', execute:true, shieldBreak:true },
 
   // ============================================================
   // FINAL FANTASY
@@ -584,7 +584,7 @@ const SKILL_DATA = {
   // -- クラウド・ストライフ --
   cloud_basic:     { name:'破晄撃',               icon:'⚔️', noSP:true,  power:12, type:'physical', target:'single', hits:1,  animation:'slash' },
   cloud_braver:    { name:'凶斬り',               icon:'⚔️', spCost:1,    power:7,  type:'physical', target:'single', hits:5,  animation:'slash', effect:'paralyze', effectChance:1, effectTurns:3, execute:true },
-  cloud_omnislash: { name:'画龍点睛',             icon:'💥', spCost:2,    power:56, type:'physical', target:'single', hits:1, animation:'slash_heavy', execute:true, shieldBreak:true },
+  cloud_omnislash: { name:'画龍点睛',             icon:'💥', spCost:2,    power:66, type:'physical', target:'single', hits:1, animation:'slash_heavy', execute:true, shieldBreak:true },
   // -- セフィロス --
   seph_basic:      { name:'一陣',                 icon:'🗡️', noSP:true,  power:13, type:'physical', target:'single', hits:1, animation:'slash' },
   seph_shadow:     { name:'八刀一閃',             icon:'😈', spCost:1,    power:4,  type:'magic',    target:'single', hits:8, animation:'slash', execute:true },
@@ -592,7 +592,7 @@ const SKILL_DATA = {
   // -- ティファ・ロックハート --
   tifa_basic:      { name:'サマーソルト',         icon:'🦶', noSP:true,  power:11,  type:'physical', target:'single', hits:1, animation:'slash' },
   tifa_straight: { name:'正拳突き',               icon:'👊', spCost:1,    power:28,  type:'physical', target:'single', hits:1, animation:'punch', effect:'def_down', effectChance:1, effectTurns:1 },
-  tifa_final_heaven:{ name:'ファイナルヘブン',    icon:'💥', spCost:2,    power:52,  type:'physical', target:'single', hits:1, animation:'explosion', shieldBreak:true },
+  tifa_final_heaven:{ name:'ファイナルヘブン',    icon:'💥', spCost:2,    power:61,  type:'physical', target:'single', hits:1, animation:'explosion', shieldBreak:true },
   // -- エアリス --
   aerith_basic:    { name:'ロッド',               icon:'🌸', noSP:true,  power:8,  type:'physical', target:'single', hits:1, animation:'slash' },
   aerith_heal:     { name:'癒しの風',             icon:'💚', spCost:2,    power:0,   type:'heal',     target:'all_ally', healPower:20, animation:'heal' },
@@ -604,7 +604,7 @@ const SKILL_DATA = {
   // -- 御坂美琴 --
   misaka_basic:    { name:'落雷',                   icon:'⚡', noSP:true,   power:2, type:'magic',     target:'single', hits:6, animation:'beam' },
   misaka_storm:    { name:'サンダーストーム',       icon:'⛈️', spCost:1,    power:32, type:'magic',    target:'all',    hits:1, animation:'thunder', effect:'paralyze', effectChance:1, effectTurns:3 },
-  misaka_dragon:   { name:'超電磁砲（レールガン）', icon:'💥', spCost:2,    power:55, type:'magic',    target:'single', hits:1, animation:'thunder', bossKiller:true, shieldBreak:true },
+  misaka_dragon:   { name:'超電磁砲（レールガン）', icon:'💥', spCost:2,    power:64, type:'magic',    target:'single', hits:1, animation:'thunder', bossKiller:true, shieldBreak:true },
   // -- 一方通行 --
   accel_basic:     { name:'小石の砲弾',             icon:'🔄', noSP:true,  power:14, type:'physical', target:'single', hits:1, animation:'slash' },
   accel_vector:    { name:'大気圧縮・プラズマ生成', icon:'💥', spCost:1,    power:35, type:'magic',    target:'all',    hits:1, animation:'explosion', noSpread:true },
@@ -612,7 +612,7 @@ const SKILL_DATA = {
   // -- 上条当麻 --
   touma_basic:     { name:'拳',                             icon:'✊', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'punch' },
   touma_cancel:    { name:'幻想殺し（イマジンブレイカー）', icon:'✊', spCost:1,    power:0,   type:'support',  target:'single', effect:'dispel', effectChance:1, animation:'dark', alsoEffect2:'atk_down', effectTurns:3 },
-  touma_possibility:{ name:'竜王の顎（ドラゴンストライク）',  icon:'💥', spCost:2,    power:50, type:'physical', target:'single', hits:1, animation:'punch_heavy', bossKiller:true, shieldBreak:true },
+  touma_possibility:{ name:'竜王の顎（ドラゴンストライク）',  icon:'💥', spCost:2,    power:58, type:'physical', target:'single', hits:1, animation:'punch_heavy', bossKiller:true, shieldBreak:true },
   // -- インデックス --
   index_basic:     { name:'シェオールフィア（魔滅の声）', icon:'📚', noSP:true,  power:8,  type:'magic',    target:'single', hits:1, animation:'beam' },
   index_spell:     { name:'自動書記（ヨハネのペン）',     icon:'📚', spCost:1,    power:0,   type:'support',  target:'all_ally', effect:'atk_up', effectChance:1, effectTurns:3,  animation:'buff' },
@@ -652,7 +652,7 @@ const SKILL_DATA = {
   // -- エリス・ボレアス・グレイラット --
   eris_basic:      { name:'斬撃',                 icon:'🦁', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
   eris_rengeki:    { name:'苛烈な連撃',           icon:'⚔️', spCost:1,    power:7, type:'physical',  target:'all', hits:5, animation:'slash' },
-  eris_rush:       { name:'光の太刀',             icon:'💥', spCost:2,    power:55, type:'physical', target:'single', hits:1, animation:'slash', execute:true, shieldBreak:true },
+  eris_rush:       { name:'光の太刀',             icon:'💥', spCost:2,    power:64, type:'physical', target:'single', hits:1, animation:'slash', execute:true, shieldBreak:true },
   // -- ロキシー・ミグルディア --
   roxy_basic:      { name:'水弾（ウォーターボール）',   icon:'💧', noSP:true,  power:10,  type:'magic',    target:'single', hits:1, animation:'ice' },
   roxy_icicle:     { name:'氷霜撃（アイシクルブレイク）', icon:'💧', spCost:1,    power:34, type:'magic',    target:'single', hits:1, animation:'ice', effect:'freeze', effectChance:1, effectTurns:2 },
@@ -667,11 +667,11 @@ const SKILL_DATA = {
   // -- 岩谷尚文 --
   naofumi_basic:   { name:'盾の打撃',             icon:'🛡️', noSP:true,  power:6,  type:'physical', target:'single', hits:1, animation:'punch' },
   naofumi_airst:   { name:'エアストシールド',     icon:'🛡️', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:20, effectChance:1, animation:'buff' },
-  naofumi_maiden:  { name:'アイアンメイデン',     icon:'💥', spCost:2,    power:54, type:'physical', target:'single', hits:1, animation:'explosion' },
+  naofumi_maiden:  { name:'アイアンメイデン',     icon:'💥', spCost:2,    power:63, type:'physical', target:'single', hits:1, animation:'explosion' },
   // -- ラフタリア --
   raphtalia_basic: { name:'一閃',                     icon:'🦝', noSP:true,  power:11,  type:'physical', target:'single', hits:1, animation:'slash' },
   raphtalia_stardust:{ name:'スターダスト・ブレイド', icon:'✨', spCost:1,    power:11,  type:'magic',    target:'single', hits:3, animation:'slash' },
-  raphtalia_tenmei:{ name:'八極陣天命剣',             icon:'💥', spCost:2,    power:52, type:'physical', target:'single', hits:1, animation:'slash', execute:true },
+  raphtalia_tenmei:{ name:'八極陣天命剣',             icon:'💥', spCost:2,    power:61, type:'physical', target:'single', hits:1, animation:'slash', execute:true },
   // -- フィーロ --
   filo_basic:      { name:'フィロリアルの蹴り',     icon:'🐤', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'punch' },
   filo_quick:      { name:'ハイクイック',           icon:'🐤', spCost:1,    power:10,  type:'physical', target:'single', hits:3, animation:'punch', effect:'def_down', effectChance:1, effectTurns:1 },

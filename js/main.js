@@ -2306,6 +2306,12 @@ const Game = (() => {
         <span class="settings-label">🔊 効果音<div class="settings-desc">攻撃・回復などの効果音を鳴らします</div></span>
         <button class="origin-toggle${Audio.isSEOn() ? ' tog-on' : ' tog-off'}" data-setting="se">${Audio.isSEOn() ? 'ON' : 'OFF'}</button>
       </div>
+      <!-- 省電力は「画面を狭く使う」話ではなく電池の話なので一括設定には入れない。
+           スマホでは initDeviceDefaults が既定でONにする -->
+      <div class="settings-row">
+        <span class="settings-label">🔋 省電力モード<div class="settings-desc">カードやSPが光り続ける演出を止めます。発熱や電池の減りが気になるときに。ダメージ表示など進行に必要な演出は残ります。スマホでは最初からONです</div></span>
+        <button class="origin-toggle${lowPower ? ' tog-on' : ' tog-off'}" data-setting="lowPower">${lowPower ? 'ON' : 'OFF'}</button>
+      </div>
 
       <div class="settings-group">
         <div class="settings-row settings-row-master">
@@ -2327,15 +2333,6 @@ const Game = (() => {
         <div class="settings-row settings-row-child">
           <span class="settings-label">🎖️ ロールを名前と合体させて省略<div class="settings-desc">ONにすると、ロールのアイコンを名前の前に置いて背景をロールカラーにし、独立したバッジ行を消します</div></span>
           <button class="origin-toggle${mergeRoleName ? ' tog-on' : ' tog-off'}" data-setting="mergeRole">${mergeRoleName ? 'ON' : 'OFF'}</button>
-        </div>
-      </div>
-
-      <!-- 省電力は「画面を狭く使う」話ではなく電池の話なので、一括設定とは独立させている。
-           スマホでは initDeviceDefaults が既定でONにする -->
-      <div class="settings-group">
-        <div class="settings-row">
-          <span class="settings-label">🔋 省電力モード<div class="settings-desc">カードやSPが光り続ける演出を止めます。発熱や電池の減りが気になるときに。ダメージ表示など進行に必要な演出は残ります。スマホでは最初からONです</div></span>
-          <button class="origin-toggle${lowPower ? ' tog-on' : ' tog-off'}" data-setting="lowPower">${lowPower ? 'ON' : 'OFF'}</button>
         </div>
       </div>
     </div>`;
