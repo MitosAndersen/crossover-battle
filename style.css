@@ -42,8 +42,15 @@
 @media (min-width: 1600px) and (min-height:  900px) { :root { --ui-scale: 1.22; } }
 @media (min-width: 1900px) and (min-height: 1000px) { :root { --ui-scale: 1.35; } }
 
+/* 100vh は iOS Safari では「アドレスバーが隠れたときの高さ」を指すため、
+   バーが出ている間は実際の表示領域より大きくなる。内容が収まっていても常に
+   スクロール可能な状態になり、タップのたびにバーが出入りして画面が上下に飛ぶ。
+   100dvh は「今まさに見えている高さ」なのでこれが起きない。
+   dvh を知らない古いブラウザは2行目を無視して 100vh のまま動く */
 html, body {
-  width: 100%; min-height: 100vh;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   background: radial-gradient(ellipse at top, #1a0a3a 0%, #0a0a1a 60%);
   color: var(--text-main);
   font-family: var(--font);
@@ -54,7 +61,7 @@ html, body {
 /* ============================================================
    SCREENS
    ============================================================ */
-.screen { display: none; min-height: 100vh; }
+.screen { display: none; min-height: 100vh; min-height: 100dvh; }
 .screen.active { display: flex; flex-direction: column; }
 
 /* ============================================================
@@ -113,6 +120,7 @@ html, body {
   flex-direction: row !important;
   background: radial-gradient(ellipse at top, #120a2a 0%, #0a0a18 70%);
   height: 100vh;
+  height: 100dvh;   /* html,body と同じ理由。PCでは 100vh と同値 */
   align-items: stretch;
   overflow: hidden;
   /* 1920px級のモニタでは横が余りすぎる。パーティは3人固定・敵も最大3〜4体なので
@@ -1134,6 +1142,7 @@ body.hide-passive-name .passive-name { display: none; }
      パネルのpaddingぶんを引いた値。行数固定より、ウィンドウの高さに自動で
      追従するほうが無駄がない（件数の上限は log() 側の80件で担保済み） */
   max-height: calc(100vh - 90px);
+  max-height: calc(100dvh - 90px);
   overflow-y: auto;
   padding: calc(4px * var(--ui-scale)) calc(8px * var(--ui-scale));
   font-size: calc(0.73rem * var(--ui-scale));
@@ -2070,7 +2079,9 @@ body.hide-passive-name .passive-name { display: none; }
    ============================================================ */
 #collection-screen {
   background: radial-gradient(ellipse at top, #0a0a2a 0%, #0a0a14 70%);
-  min-height: 100vh; flex-direction: column !important;
+  min-height: 100vh;
+  min-height: 100dvh;
+  flex-direction: column !important;
   padding: 0;
 }
 
@@ -2678,7 +2689,11 @@ details[open] > .sidebar-dropdown-title::after { content: ' ▾'; }
   #battle-screen {
     flex-direction: column !important;
     height: auto !important;
+    /* ここが症状の中心。100vh のままだと内容が収まっていても常に
+       約140px(SE2の場合)スクロールできてしまい、タップのたびに
+       Safariのアドレスバーが出入りして画面が上下に飛ぶ */
     min-height: 100vh;
+    min-height: 100dvh;
     overflow-y: auto;
     overflow-x: hidden;
   }
