@@ -23,7 +23,22 @@ const Tutorial = (() => {
     {
       sel: '#ally-area',
       title: '👥 仲間',
-      body: '<strong>行動する順番は自由に選べます</strong>。カードをタップすれば、動かす仲間を切り替えられます。4つのロールで役割が違うので、詳しくは📖ガイドを見てください。'
+      body: '<strong>行動する順番は自由に選べます</strong>。カードをタップすれば、動かす仲間を切り替えられます。'
+    },
+    {
+      // ロールは戦い方を左右するので独立したステップにする。
+      // 対象は前と同じ味方エリアだが、切り抜きが動かないぶん文章に集中してもらえる
+      sel: '#ally-area',
+      title: '🎖️ 4つのロール',
+      // 表示位置には触れないこと。ロールのアイコンは既定ではカード上部の
+      // 独立したバッジだが、小画面向け設定(mergeRoleName)がONだと名前の前へ移る
+      body: '仲間はそれぞれ4つのロールのどれかを持ち、戦い方が変わります。'
+        + '<div class="tut-roles">'
+        + '<div><b>⚔️ アタッカー</b>敵を倒すと、そのターンもう一度動ける</div>'
+        + '<div><b>💚 サポーター</b>通常攻撃でSPが<strong>2</strong>回復する（他は1）</div>'
+        + '<div><b>🛡️ タンク</b>敵の単体攻撃とデバフを自分に集める</div>'
+        + '<div><b>⚡ ストライカー</b>初回だけ先制行動。そのときSP消費-2</div>'
+        + '</div>'
     },
     {
       sel: '.skill-grid',
@@ -125,19 +140,22 @@ const Tutorial = (() => {
       step = STEPS[_idx];
       el = step ? findTarget(step) : null;
     }
-    if (!step) { finish(); return; }
+    if (!step) { finish(false); return; }   // 全ステップの対象が無い異常時
 
+    // 最後のステップでは「スキップ」が意味を持たないので、
+    // 代わりに📋システムガイドへの導線を置く。細かい仕様はそちらに任せる
     const isLast = _idx >= STEPS.length - 1;
     _bubble.innerHTML = `
       <div class="tut-step">${_idx + 1} / ${STEPS.length}</div>
       <div class="tut-title">${step.title}</div>
       <div class="tut-body">${step.body}</div>
       <div class="tut-actions">
-        <button class="tut-skip">スキップ</button>
+        <button class="tut-skip">${isLast ? '📋 ガイドを見る' : 'スキップ'}</button>
         <button class="tut-next">${isLast ? '始める' : '次へ'}</button>
       </div>`;
-    _bubble.querySelector('.tut-next').addEventListener('click', next);
-    _bubble.querySelector('.tut-skip').addEventListener('click', finish);
+    _bubble.querySelector('.tut-next').addEventListener('click', () => next());
+    _bubble.querySelector('.tut-skip')
+      .addEventListener('click', () => finish(isLast));   // 最後ならガイドを開く
 
     // モバイルでは対象が画面外にあり得るので、測る前に見える位置へ送る。
     // scrollIntoView の反映を待ってから測らないと古い座標を掴む
@@ -159,11 +177,13 @@ const Tutorial = (() => {
   function next() {
     clearResize();
     _idx++;
-    if (_idx >= STEPS.length) { finish(); return; }
+    if (_idx >= STEPS.length) { finish(false); return; }
     render();
   }
 
-  function finish() {
+  // openGuide=true なら「📋 ガイドを見る」で終えたということ。
+  // #system-modal を直接触らずコールバックで意図だけ返し、開くのは呼び出し側に任せる
+  function finish(openGuide) {
     clearResize();
     markDone();
     if (_root) { _root.remove(); _root = null; }
@@ -171,7 +191,7 @@ const Tutorial = (() => {
     _bubble = null;
     const cb = _onDone;
     _onDone = null;
-    if (cb) cb();
+    if (cb) cb(!!openGuide);
   }
 
   // 案内を再生する。onDone は完了・スキップのどちらでも呼ばれる

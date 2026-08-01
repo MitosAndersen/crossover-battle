@@ -10,8 +10,26 @@ const Audio = (() => {
   let bgmType = null; // 'title' | 'normal' | 'boss'
   let bgmVariant = 0; // 0,1,2 — random variant picked per battle
   let bgmGeneration = 0; // incremented on every start/stop to invalidate stale loops
-  let seEnabled = true;
-  let bgmEnabled = true;
+  // 音のON/OFFはリロードで消えないよう localStorage に持つ。
+  // キー名は他の設定（icb_showCardInfo など）と同じ接頭辞に揃えている。
+  // localStorage が使えない環境（プライベートモードの一部）でも Audio モジュール
+  // 自体が定義されないと全機能が落ちるので、読み書きは必ず try で囲む
+  const SE_KEY  = 'icb_seOn';
+  const BGM_KEY = 'icb_bgmOn';
+  function loadPref(key) {
+    try {
+      const v = localStorage.getItem(key);
+      return v === null ? true : v === 'true';   // 未設定なら既定ON
+    } catch (e) { return true; }
+  }
+  function savePrefs() {
+    try {
+      localStorage.setItem(SE_KEY,  String(seEnabled));
+      localStorage.setItem(BGM_KEY, String(bgmEnabled));
+    } catch (e) {}
+  }
+  let seEnabled  = loadPref(SE_KEY);
+  let bgmEnabled = loadPref(BGM_KEY);
 
   function getCtx() {
     try {
@@ -740,10 +758,11 @@ const Audio = (() => {
   function toggleBGM() {
     bgmEnabled = !bgmEnabled;
     if (!bgmEnabled) stopBGM();
+    savePrefs();
     return bgmEnabled;
   }
 
-  function toggleSE() { seEnabled = !seEnabled; return seEnabled; }
+  function toggleSE() { seEnabled = !seEnabled; savePrefs(); return seEnabled; }
 
   function playByAnimation(anim) {
     switch (anim) {

@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // MAIN GAME CONTROLLER v6
 // - 6 battles per loop (1-2 normal, 3 = mid-boss, 4-5 normal, 6 = boss)
 // - After normal battle: HP 25% × supporter count heal, no swap, no PP restore
@@ -22,6 +22,8 @@ const Game = (() => {
   // チュートリアルを1ラン中に二重で出さないための印。
   // 「もう見たか」自体は Tutorial 側が localStorage で持つ
   let _tutorialShown = false;
+  // タイトルの📘ボタンから始めたラン。1戦だけ遊んでタイトルへ戻す
+  let _tutorialRun = false;
 
   // ---- バトル用状態 ----
   let currentTurnNum = 0;
@@ -146,15 +148,13 @@ const Game = (() => {
     document.getElementById('tutorial-btn')?.addEventListener('click', () => {
       try { Audio.SE.battleStart(); } catch(e) {}
       if (typeof Tutorial !== 'undefined') Tutorial.reset();
-      startGame();
+      startGame(true);   // 1戦だけのお試しラン
     });
     // BGM/SE の切り替えは設定モーダル（トップバーの⚙️）へ集約した
     // 図鑑・実績ボタン
     const colBtn = document.getElementById('collection-btn');
     if (colBtn) colBtn.addEventListener('click', () => { Audio.SE.cursor(); showCollectionScreen('chars'); });
     // 登場作品ボタン
-    document.getElementById('origins-btn')?.addEventListener('click', () => { Audio.SE.cursor(); showOriginsScreen(); });
-    document.getElementById('origins-back-btn')?.addEventListener('click', () => { Audio.SE.cursor(); goTitleScreen(); });
     // 設定ボタン
     document.getElementById('settings-btn')?.addEventListener('click', () => { Audio.SE.cursor(); showSettingsScreen(); });
     document.getElementById('settings-back-btn')?.addEventListener('click', () => { Audio.SE.cursor(); goTitleScreen(); });
@@ -183,6 +183,11 @@ const Game = (() => {
       document.getElementById('relic-modal').style.display = 'none';
     });
     wireModalDismiss('relic-modal');
+    // 図鑑のキャラ詳細モーダル
+    document.getElementById('char-modal-close')?.addEventListener('click', () => {
+      document.getElementById('char-modal').style.display = 'none';
+    });
+    wireModalDismiss('char-modal');
     // 戦闘中のシステムガイド（トップバーの📖）。タイトル画面と同じモーダルを開く
     document.getElementById('guide-modal-btn')?.addEventListener('click', () => {
       Audio.SE.cursor();
@@ -414,7 +419,9 @@ const Game = (() => {
   }
 
   // ---- Game Start ----
-  function startGame() {
+  // tutorialRun=true でタイトルの📘ボタンから始めた場合。1戦で終わる
+  function startGame(tutorialRun = false) {
+    _tutorialRun = tutorialRun;
     gameState.relics = [];
     gameState._reviveUsed = {};
     gameState._surviveUsed = false;
@@ -902,8 +909,12 @@ const Game = (() => {
             UI.queueFloat(tick.target.id, `⚡${tick.text}`, 'float-buff');
             UI.log(`⚡ <strong>${tick.target.name}</strong> の「${tick.name}」が発動！${tick.text}`, 'log-status');
           } else if (tick.type === 'survive_fatal') {
+            const dotSurvRelic = tick.target._lastSurviveRelic;
+            if (dotSurvRelic) { delete tick.target._lastSurviveRelic; }
             UI.queueFloat(tick.target.id, '✋くいしばり!', 'float-heal');
-            UI.log(`✋ <strong>${tick.target.name}</strong> は令呪の力でHP1で耐えた！`, 'log-status');
+            UI.log(dotSurvRelic
+              ? `✋ <strong>${tick.target.name}</strong> は「${dotSurvRelic.name}」の力でHP1で耐えた！`
+              : `✋ <strong>${tick.target.name}</strong> はHP1で耐えた！`, 'log-status');
           } else if (tick.type === 'revive_relic') {
             const dotRevRelic = tick.target._lastReviveRelic;
             if (dotRevRelic) { delete tick.target._lastReviveRelic; }
@@ -1275,7 +1286,14 @@ const Game = (() => {
         && typeof Tutorial !== 'undefined' && Tutorial.shouldAutoRun()) {
       _tutorialShown = true;
       isBusy = true;                         // 案内中は他の処理を割り込ませない
-      Tutorial.run(() => { isBusy = false; });
+      Tutorial.run((openGuide) => {
+        isBusy = false;
+        // 最後のステップで「📋 ガイドを見る」を選んだ場合だけ開く
+        if (openGuide) {
+          const sm = document.getElementById('system-modal');
+          if (sm) sm.style.display = 'flex';
+        }
+      });
       return;                                // 通常攻撃の自動選択は案内の邪魔になるので走らせない
     }
 
@@ -1755,11 +1773,16 @@ const Game = (() => {
           }
           break;
 
-        case 'survive_fatal':
+        case 'survive_fatal': {
+          const survRelic = r.target._lastSurviveRelic;
+          if (survRelic) { delete r.target._lastSurviveRelic; }
           UI.updateCharBars(r.target);
           UI.floatNumber(r.target.id, '✋くいしばり!', 'float-heal');
-          UI.log(`✋ <strong>${r.target.name}</strong> は令呪の力でHP1で耐えた！`, 'log-status');
+          UI.log(survRelic
+            ? `✋ <strong>${r.target.name}</strong> は「${survRelic.name}」の力でHP1で耐えた！`
+            : `✋ <strong>${r.target.name}</strong> はHP1で耐えた！`, 'log-status');
           break;
+        }
 
         case 'passive_proc':
           UI.updateCharBars(r.target);
@@ -1974,7 +1997,12 @@ const Game = (() => {
           const doShowResult = (droppedRelic) => {
             showAchievementNotifs(() => {
               UI.showBattleResult('win', healPctLabel,
-                () => { isBusy = false; nextBattle(); },
+                () => {
+                  isBusy = false;
+                  // 📘チュートリアルから始めたランは1戦で切り上げてタイトルへ戻す
+                  if (_tutorialRun) { endTutorialRun(); return; }
+                  nextBattle();
+                },
                 droppedRelic
               );
             });
@@ -2001,8 +2029,17 @@ const Game = (() => {
     }
   }
 
+  // 📘チュートリアルのランを終える。endGame と分けているのは、
+  // あちらが「ゲームクリア／敗北」という別の意味を持つ処理だから
+  function endTutorialRun() {
+    _tutorialRun = false;
+    currentBattle = 0; loopCount = 0; activeAllies = [];
+    goTitleScreen();
+  }
+
   function endGame(won) {
     isBusy = false;
+    _tutorialRun = false;   // 敗北でランが終わった場合もここを通る
     if (won) {
       if (typeof ACH !== 'undefined') {
         _runParticipants.forEach(id => ACH.onCharUsed(id));
@@ -2208,9 +2245,11 @@ const Game = (() => {
   };
 
   // ---- 登場作品スクリーン ----
-  function showOriginsScreen() {
-    UI.showScreen('origins-screen');
-    const content = document.getElementById('origins-content');
+  // 登場作品の中身を描画する。単独スクリーンは廃止し、いまは
+  // 📖図鑑・実績の🎬タブからのみ呼ばれる。
+  // ONにする作品を選ぶUIなので1つ触るたびに全体を描き直す。その呼び直し方は
+  // 呼び出し元によって変わり得るので rerender として引数で受け取る
+  function renderOriginsInto(content, rerender) {
     if (!content) return;
 
     const originMap = {};
@@ -2243,18 +2282,18 @@ const Game = (() => {
     content.querySelector('#all-on-btn').addEventListener('click', () => {
       disabledOrigins.clear();
       saveDisabledOrigins();
-      showOriginsScreen();
+      rerender();
     });
     content.querySelector('#all-off-btn').addEventListener('click', () => {
       const allOrigins = [...new Set(ALLY_DATA.map(d => d.origin || 'その他'))];
       allOrigins.slice(1).forEach(o => disabledOrigins.add(o));
       saveDisabledOrigins();
-      showOriginsScreen();
+      rerender();
     });
     content.querySelector('#series-bonus-btn').addEventListener('click', () => {
       seriesBonusEnabled = !seriesBonusEnabled;
       saveSeriesBonusEnabled();
-      showOriginsScreen();
+      rerender();
     });
 
     content.querySelectorAll('.origin-toggle').forEach(btn => {
@@ -2267,7 +2306,7 @@ const Game = (() => {
         if (currentlyOn) disabledOrigins.add(o);
         else disabledOrigins.delete(o);
         saveDisabledOrigins();
-        showOriginsScreen();
+        rerender();
       });
     });
   }
@@ -2449,12 +2488,81 @@ const Game = (() => {
     wireSettingsRows(body, renderSettingsModal);
   }
 
+  // ---- 図鑑のキャラ詳細モーダル ----
+  // 技の対象表記。ui.js の renderSkillButtons と同じ言い回しに揃えてある
+  const CHAR_MODAL_TARGET_LABEL = {
+    single: '単体', all: '敵全体', self: '自分',
+    all_ally: '味方全体', dead_ally: '倒れた仲間'
+  };
+
+  function showCharModal(charId) {
+    const d = ALLY_DATA.find(x => x.id === charId);
+    const body = document.getElementById('char-modal-body');
+    if (!d || !body) return;
+
+    const rarity = (typeof CHAR_RARITY !== 'undefined' && CHAR_RARITY[d.id]) || 2;
+    const role   = (typeof ROLES !== 'undefined' && ROLES[d.role]) || { label: d.role, icon: '', color: '#888' };
+    // 実際の戦闘HPはロール補正込み。makeCombatant と同じ式で出さないと
+    // 図鑑の数字と戦闘中の数字が食い違う
+    const roleHpBonus = d.role === 'tank' ? 1.2 : d.role === 'striker' ? 0.9 : d.role === 'support' ? 0.9 : 1.0;
+    const shownHp = Math.floor(d.maxHp * roleHpBonus);
+
+    const passive = (typeof PASSIVE_DATA !== 'undefined') ? PASSIVE_DATA[d.id] : null;
+    const quote   = (typeof JOIN_QUOTES !== 'undefined') ? JOIN_QUOTES[d.id] : null;
+
+    const skillsHtml = (d.skillIds || []).map(sid => {
+      const sk = (typeof SKILL_DATA !== 'undefined') ? SKILL_DATA[sid] : null;
+      if (!sk) return '';
+      const isNoSP = !!(sk.noSP || sk.noPP);
+      const cost   = isNoSP ? '<span class="cm-sp-free">SP回復</span>' : `SP${sk.spCost ?? 5}`;
+      const hits   = sk.hits || 1;
+      const power  = (sk.power || 0) > 0
+        ? `威力${sk.power}${hits > 1 ? `×${hits}` : ''}`
+        : (sk.healPower ? `回復${sk.healPower}` : '—');
+      const tgt    = CHAR_MODAL_TARGET_LABEL[sk.target] || '';
+      return `<div class="cm-skill">
+        <div class="cm-skill-head"><span class="cm-skill-icon">${sk.icon || '✨'}</span><span class="cm-skill-name">${sk.name}</span></div>
+        <div class="cm-skill-meta"><span>${cost}</span><span>${power}</span><span>${tgt}</span></div>
+      </div>`;
+    }).join('');
+
+    body.innerHTML = `
+      <div class="cm-head">
+        <div class="cm-emoji">${d.emoji}</div>
+        <div class="cm-headtext">
+          <div class="cm-name">${d.name}</div>
+          <div class="cm-stars rarity${rarity}">${'★'.repeat(rarity)}</div>
+          <div class="cm-origin">${d.origin || ''}</div>
+        </div>
+      </div>
+      ${quote ? `<div class="cm-quote">「${quote}」</div>` : ''}
+      <div class="cm-stats">
+        <div class="cm-stat"><span class="cm-stat-k">ロール</span><span class="cm-stat-v" style="color:${role.color}">${role.icon} ${role.label}</span></div>
+        <div class="cm-stat"><span class="cm-stat-k">最大HP</span><span class="cm-stat-v">❤️ ${shownHp}</span></div>
+        <div class="cm-stat"><span class="cm-stat-k">性別</span><span class="cm-stat-v">${d.gender || '—'}</span></div>
+        <div class="cm-stat"><span class="cm-stat-k">職業</span><span class="cm-stat-v">${d.job || '—'}</span></div>
+      </div>
+      ${passive ? `<div class="cm-section-title">◆ パッシブ</div>
+        <div class="cm-passive"><div class="cm-passive-name">${passive.name}</div><div class="cm-passive-desc">${passive.desc}</div></div>` : ''}
+      <div class="cm-section-title">⚔️ スキル</div>
+      <div class="cm-skills">${skillsHtml}</div>`;
+
+    document.getElementById('char-modal').style.display = 'flex';
+  }
+
   // ---- 図鑑・実績スクリーン ----
   function showCollectionScreen(tab) {
     UI.showScreen('collection-screen');
     const content = document.getElementById('collection-content');
     if (!content) return;
     const t = tab || 'chars';
+
+    // 🎬登場作品は単独スクリーンと中身を共用する。
+    // 作品をON/OFFすると描き直しが要るので、自分自身をタブ指定で呼び直す
+    if (t === 'origins') {
+      renderOriginsInto(content, () => showCollectionScreen('origins'));
+      return;
+    }
 
     if (t === 'chars') {
       const seenChars = (typeof ACH !== 'undefined') ? ACH.getSeenChars() : new Set();
@@ -2474,7 +2582,8 @@ const Game = (() => {
           const rarity = (typeof CHAR_RARITY !== 'undefined' && CHAR_RARITY[d.id]) || 2;
           const stars = '★'.repeat(rarity);
           if (seen) {
-            html += `<div class="coll-char-card seen" title="${d.name}">
+            // data-char-id を持つカードだけ詳細モーダルを開ける（未発見は押せない）
+            html += `<div class="coll-char-card seen" title="${d.name}" data-char-id="${d.id}">
               <div class="coll-char-emoji">${d.emoji}</div>
               <div class="coll-char-name">${d.name}</div>
               <div class="coll-char-stars rarity${rarity}">${stars}</div>
@@ -2488,6 +2597,13 @@ const Game = (() => {
       html += `<div class="coll-total">図鑑進捗: ${seenChars.size} / ${ALLY_DATA.length} 体</div>`;
       html += '</div>';
       content.innerHTML = html;
+
+      content.querySelectorAll('.coll-char-card[data-char-id]').forEach(card => {
+        card.addEventListener('click', () => {
+          Audio.SE.cursor();
+          showCharModal(card.dataset.charId);
+        });
+      });
 
     } else if (t === 'relics') {
       const seenRelics = (typeof ACH !== 'undefined') ? ACH.getSeenRelics() : new Set();

@@ -600,6 +600,16 @@ body.hide-hp-bar .char-card .bar-wrap { display: none; }
   color: var(--text-main); line-height: 1.7;
 }
 .tut-body strong { color: #ffe600; }
+/* ロール一覧。1行1ロールで詰めて、吹き出しが縦に伸びすぎないようにする */
+.tut-roles { margin-top: calc(6px * var(--ui-scale)); }
+.tut-roles > div {
+  font-size: calc(0.72rem * var(--ui-scale));
+  line-height: 1.5;
+  padding: calc(3px * var(--ui-scale)) 0;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.tut-roles > div:first-child { border-top: none; }
+.tut-roles b { color: #9fd8ff; margin-right: 6px; }
 .tut-actions {
   display: flex; justify-content: flex-end; gap: 8px;
   margin-top: calc(10px * var(--ui-scale));
@@ -2395,13 +2405,16 @@ body.hide-passive-name .passive-name { display: none; }
 .coll-relic-desc { font-size: 0.6rem; color: #aaccff; line-height: 1.4; }
 
 /* 実績 */
+/* 実績の文字は --ui-scale を掛けていなかったため、大画面でも小さいままだった。
+   戦闘UIと同じく画面サイズに追従させ、素の値も読めるサイズまで引き上げている */
 .coll-ach-progress {
-  font-size: 0.9rem; font-weight: 700; color: var(--neon-gold);
+  font-size: calc(1rem * var(--ui-scale)); font-weight: 700; color: var(--neon-gold);
   text-align: center; padding: 8px; margin-bottom: 12px;
 }
 .coll-ach-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  /* 文字が大きくなったぶん、1枠の最小幅も一緒に広げないと説明文が折り返しすぎる */
+  grid-template-columns: repeat(auto-fit, minmax(calc(290px * var(--ui-scale)), 1fr));
   gap: 6px 10px;
   align-items: start;
 }
@@ -2417,11 +2430,11 @@ body.hide-passive-name .passive-name { display: none; }
   border-color: rgba(255,204,0,0.4);
   background: rgba(40,35,10,0.7);
 }
-.coll-ach-icon { font-size: 1.2rem; flex-shrink: 0; }
+.coll-ach-icon { font-size: calc(1.35rem * var(--ui-scale)); flex-shrink: 0; }
 .coll-ach-text { flex: 1; min-width: 0; }
-.coll-ach-name { font-size: 0.76rem; font-weight: 700; color: var(--text-main); }
-.coll-ach-desc { font-size: 0.64rem; color: var(--text-dim); margin-top: 1px; }
-.coll-ach-status { font-size: 0.9rem; flex-shrink: 0; }
+.coll-ach-name { font-size: calc(0.88rem * var(--ui-scale)); font-weight: 700; color: var(--text-main); }
+.coll-ach-desc { font-size: calc(0.76rem * var(--ui-scale)); color: var(--text-dim); line-height: 1.5; margin-top: 2px; }
+.coll-ach-status { font-size: calc(1rem * var(--ui-scale)); flex-shrink: 0; }
 
 /* ============================================================
    RELIC DROP OVERLAY
@@ -2965,6 +2978,56 @@ details[open] > .sidebar-dropdown-title::after { content: ' ▾'; }
   font-size: 1.1rem; cursor: pointer; line-height: 1;
 }
 .system-modal-close:hover { color: #fff; }
+
+/* ---- 図鑑のキャラ詳細モーダル ---- */
+.coll-char-card.seen[data-char-id] { cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
+.coll-char-card.seen[data-char-id]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(80,180,255,0.35);
+}
+.cm-head { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+.cm-emoji { font-size: 2.6rem; flex-shrink: 0; }
+.cm-name { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+.cm-stars { font-size: 0.82rem; letter-spacing: 0.1em; }
+.cm-origin { font-size: 0.76rem; color: var(--text-dim); margin-top: 2px; }
+.cm-quote {
+  font-size: 0.8rem; color: #9fd8ff; line-height: 1.6;
+  border-left: 2px solid rgba(120,200,255,0.5); padding: 4px 0 4px 10px; margin-bottom: 12px;
+}
+.cm-stats {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px; margin-bottom: 14px;
+}
+.cm-stat {
+  display: flex; justify-content: space-between; align-items: baseline;
+  background: rgba(255,255,255,0.04); border-radius: 5px; padding: 5px 9px;
+}
+.cm-stat-k { font-size: 0.7rem; color: var(--text-dim); }
+.cm-stat-v { font-size: 0.82rem; font-weight: 700; color: var(--text-main); }
+.cm-section-title {
+  font-size: 0.82rem; font-weight: 700; color: var(--neon-blue);
+  border-bottom: 1px solid rgba(80,180,255,0.25);
+  padding-bottom: 3px; margin: 12px 0 8px;
+}
+.cm-passive {
+  background: rgba(255,204,0,0.07); border-left: 2px solid rgba(255,204,0,0.5);
+  border-radius: 0 5px 5px 0; padding: 7px 10px;
+}
+.cm-passive-name { font-size: 0.84rem; font-weight: 700; color: #ffcc44; }
+.cm-passive-desc { font-size: 0.76rem; color: var(--text-main); line-height: 1.6; margin-top: 2px; }
+.cm-skills { display: flex; flex-direction: column; gap: 7px; }
+.cm-skill {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px; padding: 7px 10px;
+}
+.cm-skill-head { display: flex; align-items: center; gap: 7px; }
+.cm-skill-icon { font-size: 1rem; }
+.cm-skill-name { font-size: 0.86rem; font-weight: 700; color: var(--text-main); }
+.cm-skill-meta {
+  display: flex; gap: 12px; margin-top: 3px;
+  font-size: 0.72rem; color: var(--text-dim);
+}
+.cm-sp-free { color: var(--neon-green); font-weight: 700; }
 
 .system-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
 .sys-tab {

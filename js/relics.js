@@ -511,17 +511,19 @@ const Relics = (() => {
   }
 
   // くいしばりレリック: 致死ダメージをHP1で耐える（1戦闘1回）
+  // 発動したレリック本体を返す（tryRevive と同じ約束）。
+  // true を返すだけだと呼び出し側がレリック名を知りようがなく、
+  // ログに名前を直書きすることになって改名時に取り残される
   function trySurviveFatal(target) {
     const gs = window.gameState;
-    if (!gs || gs._surviveUsed) return false;
-    const has = getHeld().some(relicId => {
-      const relic = RELIC_DATA.find(r => r.id === relicId);
-      return relic && relic.effect.type === 'survive_fatal';
-    });
-    if (!has) return false;
+    if (!gs || gs._surviveUsed) return null;
+    const relic = getHeld()
+      .map(relicId => RELIC_DATA.find(r => r.id === relicId))
+      .find(r => r && r.effect.type === 'survive_fatal');
+    if (!relic) return null;
     gs._surviveUsed = true;
     target.hp = 1;
-    return true;
+    return relic;
   }
 
   // 毎ターンSP回復

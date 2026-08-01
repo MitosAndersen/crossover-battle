@@ -649,7 +649,11 @@ const Battle = (() => {
       target.hp = 1;
       return 'guts';
     }
-    if (!target.isEnemy && typeof Relics !== 'undefined' && Relics.trySurviveFatal(target)) return 'survive_relic';
+    const survivedByRelic = !target.isEnemy && typeof Relics !== 'undefined' && Relics.trySurviveFatal(target);
+    if (survivedByRelic) {
+      target._lastSurviveRelic = survivedByRelic;   // ログで名前を出すため（_lastReviveRelic と同じ流儀）
+      return 'survive_relic';
+    }
     const revivedByRelic = !target.isEnemy && typeof Relics !== 'undefined' && Relics.tryRevive(target);
     if (revivedByRelic) {
       target._lastReviveRelic = revivedByRelic;
