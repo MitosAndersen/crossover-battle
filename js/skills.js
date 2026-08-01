@@ -380,7 +380,7 @@ const SKILL_DATA = {
   // -- 花京院典明 --
   kakyoin_basic:          { name:'ハイエロファントグリーン',          icon:'🍒', noSP:true,  power:12, type:'magic',    target:'single', hits:1, animation:'beam' },
   kakyoin_emerald:        { name:'エメラルドスプラッシュ',            icon:'💥', spCost:1,    power:8,  type:'magic',    target:'all',    hits:4, animation:'beam', execute:true },
-  kakyoin_barrier:        { name:'法皇の結界',                       icon:'🕸️', spCost:2,    power:52, type:'magic',    target:'all',    hits:1, animation:'dark', effect:'atk_down', effectChance:1, effectTurns:2 },
+  kakyoin_barrier:        { name:'法皇の結界',                       icon:'🕸️', spCost:2,    power:5,  type:'magic',    target:'all',    hits:9, animation:'dark', effect:'atk_down', effectChance:1, effectTurns:2 },
   // -- ジャン＝ピエール・ポルナレフ --
   polnareff_basic:        { name:'レイピア突き',                     icon:'🤺', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
   polnareff_rush:         { name:'乱れ突き',                         icon:'⚔️', spCost:1,    power:7,  type:'physical', target:'single', hits:5, animation:'slash' },
