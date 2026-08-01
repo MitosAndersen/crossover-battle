@@ -3023,11 +3023,23 @@ details[open] > .sidebar-dropdown-title::after { content: ' ▾'; }
 .cm-skill-head { display: flex; align-items: center; gap: 7px; }
 .cm-skill-icon { font-size: 1rem; }
 .cm-skill-name { font-size: 0.86rem; font-weight: 700; color: var(--text-main); }
+/* SPと対象。戦闘中のスキルボタン（.skill-mp / .skill-tgt）と同じ見せ方に揃える */
 .cm-skill-meta {
-  display: flex; gap: 12px; margin-top: 3px;
-  font-size: 0.72rem; color: var(--text-dim);
+  display: flex; gap: 10px; align-items: center; margin-top: 5px;
 }
-.cm-sp-free { color: var(--neon-green); font-weight: 700; }
+.cm-sp {
+  font-size: 0.85rem; font-weight: 700;
+  color: var(--neon-blue); letter-spacing: 1px;
+}
+.cm-sp-free { color: var(--neon-green); letter-spacing: 0; }
+.cm-tgt {
+  font-size: 0.74rem; font-weight: 700; color: var(--text-main);
+  background: rgba(255,255,255,0.09); border-radius: 4px; padding: 2px 9px;
+}
+/* 効果チップ。中身は戦闘中のスキルボタンと同じ .skill-effect-line を使う */
+.cm-skill-effects {
+  display: flex; flex-wrap: wrap; gap: 3px; margin-top: 5px;
+}
 
 .system-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
 .sys-tab {

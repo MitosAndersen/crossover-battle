@@ -2492,11 +2492,9 @@ const Game = (() => {
   }
 
   // ---- 図鑑のキャラ詳細モーダル ----
-  // 技の対象表記。ui.js の renderSkillButtons と同じ言い回しに揃えてある
-  const CHAR_MODAL_TARGET_LABEL = {
-    single: '単体', all: '敵全体', self: '自分',
-    all_ally: '味方全体', dead_ally: '倒れた仲間'
-  };
+  // 対象表記は独自に持たず UI.buildTargetLabel を使う。
+  // 同じ 'single' でも通常攻撃／攻撃技／回復技で言い方が変わるため、
+  // 単純な対応表を別に持つと戦闘中の表示と食い違う
 
   function showCharModal(charId) {
     const d = ALLY_DATA.find(x => x.id === charId);
@@ -2517,15 +2515,23 @@ const Game = (() => {
       const sk = (typeof SKILL_DATA !== 'undefined') ? SKILL_DATA[sid] : null;
       if (!sk) return '';
       const isNoSP = !!(sk.noSP || sk.noPP);
-      const cost   = isNoSP ? '<span class="cm-sp-free">SP回復</span>' : `SP${sk.spCost ?? 5}`;
-      const hits   = sk.hits || 1;
-      const power  = (sk.power || 0) > 0
-        ? `威力${sk.power}${hits > 1 ? `×${hits}` : ''}`
-        : (sk.healPower ? `回復${sk.healPower}` : '—');
-      const tgt    = CHAR_MODAL_TARGET_LABEL[sk.target] || '';
+      // SPの見せ方は戦闘中のスキルボタンに合わせる（◆の数で消費量が一目で分かる）
+      const n      = sk.spCost ?? 5;
+      const cost   = isNoSP
+        ? '<span class="cm-sp cm-sp-free">🔋SP回復</span>'
+        : `<span class="cm-sp">SP${n} ${'◆'.repeat(n)}</span>`;
+      // 対象の言い回しも戦闘中と同じ関数から取る（同じ single でも技によって変わる）
+      const tgtText = (typeof UI !== 'undefined' && UI.buildTargetLabel) ? UI.buildTargetLabel(sk) : '';
+      const tgt    = tgtText ? `<span class="cm-tgt">${tgtText}</span>` : '';
+      // 威力・付加効果の文言は戦闘中のスキルボタンと同じ組み立てを使う。
+      // ここで別に書くと、効果を足したときに図鑑だけ古い表示のまま取り残される
+      const lines  = (typeof UI !== 'undefined' && UI.buildSkillEffectLines)
+        ? UI.buildSkillEffectLines(sk) : [];
+      const effectsHtml = lines.map(l => `<span class="skill-effect-line">${l}</span>`).join('');
       return `<div class="cm-skill">
         <div class="cm-skill-head"><span class="cm-skill-icon">${sk.icon || '✨'}</span><span class="cm-skill-name">${sk.name}</span></div>
-        <div class="cm-skill-meta"><span>${cost}</span><span>${power}</span><span>${tgt}</span></div>
+        <div class="cm-skill-meta">${cost}${tgt}</div>
+        ${effectsHtml ? `<div class="cm-skill-effects">${effectsHtml}</div>` : ''}
       </div>`;
     }).join('');
 

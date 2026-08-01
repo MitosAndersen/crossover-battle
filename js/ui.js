@@ -530,6 +530,19 @@ const UI = (() => {
   }
 
   // ---- Build skill effect summary lines ----
+  // 対象の表記。同じ 'single' でも、通常攻撃／攻撃技／回復技で言い方を変える。
+  // 戦闘中のスキルボタンと図鑑の詳細モーダルの両方から使うので関数にしてある
+  function buildTargetLabel(skill) {
+    if (!skill) return '';
+    const isNoSP = !!(skill.noSP || skill.noPP);
+    const hasDmg = (skill.power || 0) > 0;
+    const singleLabel = isNoSP && hasDmg ? '通常攻撃' : hasDmg ? '単体攻撃'
+      : (skill.type === 'heal' || skill.type === 'revive') ? '味方単体' : '敵単体';
+    return skill.target === 'all'
+      ? (hasDmg ? '全体攻撃' : '敵全体')
+      : ({ single: singleLabel, self:'自分', all_ally:'味方全体', dead_ally:'倒れた仲間' }[skill.target] || '');
+  }
+
   function buildSkillEffectLines(skill) {
     const lines = [];
 
@@ -826,12 +839,7 @@ const UI = (() => {
       btn.dataset.skillId = skillId;
       btn.disabled = !canUse;
 
-      const hasDmg = (skill.power || 0) > 0;
-      const singleLabel = isNoSP && hasDmg ? '通常攻撃' : hasDmg ? '単体攻撃'
-        : (skill.type === 'heal' || skill.type === 'revive') ? '味方単体' : '敵単体';
-      const targetLabel = skill.target === 'all'
-        ? (hasDmg ? '全体攻撃' : '敵全体')
-        : ({ single: singleLabel, self:'自分', all_ally:'味方全体', dead_ally:'倒れた仲間' }[skill.target] || '');
+      const targetLabel = buildTargetLabel(skill);
 
       const spGain = ally.role === 'support' ? 2 : 1;
       // 先制割引の見せ方は3通り。
@@ -1757,6 +1765,9 @@ const UI = (() => {
     makeAllyCardsSelectable, clearAllyCardSelection, showInitiativeBanner, showTurnChangeBanner,
     renderCharacterSelect, showPlayerTurnMsg, showEnemyTurnStartMsg,
     renderSkillButtons, hideSkillPanel, showEnemyTurnMsg,
+    // 図鑑の詳細モーダルが同じ効果表示を出すために使う。
+    // 同じ組み立てを main.js 側に書き直すと、効果を足したときに片方だけ古くなる
+    buildSkillEffectLines, buildTargetLabel,
     renderInfoSidebar, heldRelicsHtml, updateNextTurn,
     log, clearLog,
     floatNumber, queueFloat, flashCard, flashPassive, flashRole, screenShake,
