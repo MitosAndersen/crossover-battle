@@ -97,7 +97,7 @@ const PASSIVE_DATA = {
 
   // ==== HUNTER×HUNTER ====
   killua:       { name:'神速の稲妻',              type:'exploit_status',          desc:'麻痺中の敵へ与ダメ+30%', effect:'paralyze', value:0.30 },
-  gon:          { name:'練（レン）',              type:'battle_start_buffs',      desc:'開幕 攻防↑(2T)', buffs:['atk_up','def_up'], turns:2 },
+  gon:          { name:'強制的成長',              type:'low_hp_atk',              desc:'HP50%↓ 攻防↑＋リジェネ（3T）', threshold:0.5, buffs:['atk_up','def_up','regen'], turns:3 },
   hisoka:       { name:'伸縮自在の愛',            type:'counter',                 desc:'被ダメの50%を反射', value:0.50 },
   kurapika:     { name:'緋の眼',                  type:'low_hp_atk',              desc:'HP50%↓ 防↑（3T）', threshold:0.5, buff:'def_up', turns:3 },
 
