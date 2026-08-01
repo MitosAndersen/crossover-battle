@@ -110,6 +110,11 @@ const PASSIVE_DATA = {
   // ==== ジョジョの奇妙な冒険 ====
   dio:          { name:'ザ・ワールド',            type:'exploit_status',          desc:'気絶中の敵へ与ダメ+50%', effect:'stun', value:0.50 },
   jotaro:       { name:'スタープラチナ・ザ・ワールド', type:'exploit_status',     desc:'気絶中の敵へ与ダメ+50%', effect:'stun', value:0.50 },
+  joseph:       { name:'次にお前は',                type:'enemy_debuff_start',      desc:'開幕 敵全攻↓(1T)', turns:1 },
+  kakyoin:      { name:'法皇の緑',                  type:'multi_hit_boost',         desc:'連続ヒット技+20%', value:0.20 },
+  polnareff:    { name:'銀の戦車',                  type:'basic_atk_boost',         desc:'通常攻撃+100%', value:1.00 },
+  avdol:        { name:'魔術師の赤',                type:'exploit_status',          desc:'燃焼中の敵へ与ダメ+30%', effect:'burn', value:0.30 },
+  iggy:         { name:'愚者',                      type:'shield_start',            desc:'開幕 シールド(HP15%)', value:0.15 },
 
   // ==== 転生したらスライムだった件 ====
   rimuru:       { name:'智慧之王(ラファエル)',    type:'sp_regen',                desc:'毎T SP+1' },

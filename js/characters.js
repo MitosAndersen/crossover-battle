@@ -107,6 +107,11 @@ const JOIN_QUOTES = {
   // -- ジョジョの奇妙な冒険 --
   dio: 'このDIOが来たのだ、感謝するがいい。',
   jotaro: 'やれやれだぜ。',
+  joseph: '次にお前はこう言う。「助けてくれ」とな！',
+  kakyoin: 'やはりエジプトか……いつ出発する？わたしも同行する',
+  polnareff: '自分の周りで死なれるのはスゲー迷惑だぜッ！ このオレはッ！',
+  avdol: 'YES I AM！　チッ♪　チッ♪',
+  iggy: 'やれやれ…犬好きの子供は見殺しには……できねーぜ！',
 
   // -- 転生したらスライムだった件 --
   rimuru: 'ま、大抵のことは何とかなるさ。俺に任とけ。',
@@ -235,7 +240,7 @@ const CHAR_RARITY = {
   // -- 僕のヒーローアカデミア --
   allmight:3, deku:3, todoroki:2, bakugo:2,
   // -- ジョジョの奇妙な冒険 --
-  dio:3, jotaro:3,
+  dio:3, jotaro:3, joseph:2, kakyoin:2, polnareff:2, avdol:2, iggy:2,
   // -- 転生したらスライムだった件 --
   rimuru:3, milim:3,
   // -- 魔法少女まどか☆マギカ --
@@ -378,6 +383,11 @@ const ALLY_DATA = [
   // -- ジョジョの奇妙な冒険 (3) --
   { id:'dio',        name:'DIO',                   origin:'ジョジョの奇妙な冒険',   emoji:'🧛', maxHp:85,  role:'attacker', gender:'男', job:'吸血鬼',       skillIds:['knife_throw','the_world_stop','time_erase'],                color:'#ffdd00' },
   { id:'jotaro',     name:'空条承太郎',             origin:'ジョジョの奇妙な冒険',   emoji:'⭐', maxHp:87,  role:'attacker', gender:'男', job:'高校生',       skillIds:['jotaro_basic','jotaro_time_stop','jotaro_ora_rush'], color:'#114433' },
+  { id:'joseph',     name:'ジョセフ・ジョースター',   origin:'ジョジョの奇妙な冒険',   emoji:'🔮', maxHp:78,  role:'support',  gender:'男', job:'波紋使い',     skillIds:['joseph_basic','joseph_nensha','joseph_overdrive'],   color:'#7755aa' },
+  { id:'kakyoin',    name:'花京院典明',             origin:'ジョジョの奇妙な冒険',   emoji:'🍒', maxHp:76,  role:'striker',  gender:'男', job:'高校生',       skillIds:['kakyoin_basic','kakyoin_emerald','kakyoin_barrier'], color:'#22aa66' },
+  { id:'polnareff',  name:'ジャン＝ピエール・ポルナレフ', origin:'ジョジョの奇妙な冒険', emoji:'🤺', maxHp:80,  role:'tank',     gender:'男', job:'剣士',         skillIds:['polnareff_basic','polnareff_rush','polnareff_armor'], color:'#aabbcc' },
+  { id:'avdol',      name:'モハメド・アヴドゥル',     origin:'ジョジョの奇妙な冒険',   emoji:'🕯️', maxHp:84,  role:'attacker', gender:'男', job:'占い師',       skillIds:['avdol_basic','avdol_crossfire','avdol_crossfire_sp'], color:'#cc4422' },
+  { id:'iggy',       name:'イギー',                origin:'ジョジョの奇妙な冒険',   emoji:'🐩', maxHp:80,  role:'tank',     gender:'不明', job:'犬',          skillIds:['iggy_basic','iggy_spear','iggy_clone'],              color:'#ccaa77' },
   // -- 転生したらスライムだった件 (2) --
   { id:'rimuru',     name:'リムル・テンペスト',     origin:'転生したらスライムだった件',emoji:'💧',maxHp:80, role:'attacker', gender:'不明', job:'魔王',      skillIds:['water_blade','storm_magic','megiddo'],                       color:'#55aaff' },
   { id:'milim',      name:'ミリム・ナーヴァ',          origin:'転生したらスライムだった件',emoji:'🍑',maxHp:90, role:'attacker', gender:'女', job:'魔王',        skillIds:['milim_basic','milim_drago','milim_millennium'],             color:'#ff4488' },

@@ -374,6 +374,25 @@ const SKILL_DATA = {
   jotaro_time_stop:       { name:'スタープラチナ・ザ・ワールド',     icon:'⏰', spCost:3,    power:0, type:'support', target:'all',    effect:'stun', effectChance:1, effectTurns:2, animation:'dark' },
   jotaro_ora_rush:        { name:'オラオラオラオラオラオラァーッ！', icon:'💥', spCost:2,    power:6,  type:'physical', target:'single', hits:11, animation:'explosion', bossKiller:true, shieldBreak:true },
   // -- ジョセフ・ジョースター --
+  joseph_basic:           { name:'ハーミットパープル',                icon:'🔮', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
+  joseph_nensha:          { name:'念写',                             icon:'🔮', spCost:1,    power:0,  type:'support',  target:'all',    effect:'def_down', effectChance:1, effectTurns:3, animation:'dark' },
+  joseph_overdrive:       { name:'波紋疾走（オーバードライブ）',      icon:'💥', spCost:2,    power:60, type:'physical', target:'single', hits:1, animation:'punch_heavy', bossKiller:true },
+  // -- 花京院典明 --
+  kakyoin_basic:          { name:'ハイエロファントグリーン',          icon:'🍒', noSP:true,  power:12, type:'magic',    target:'single', hits:1, animation:'beam' },
+  kakyoin_emerald:        { name:'エメラルドスプラッシュ',            icon:'💥', spCost:1,    power:8,  type:'magic',    target:'all',    hits:4, animation:'beam', execute:true },
+  kakyoin_barrier:        { name:'法皇の結界',                       icon:'🕸️', spCost:2,    power:52, type:'magic',    target:'all',    hits:1, animation:'dark', effect:'atk_down', effectChance:1, effectTurns:2 },
+  // -- ジャン＝ピエール・ポルナレフ --
+  polnareff_basic:        { name:'レイピア突き',                     icon:'🤺', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
+  polnareff_rush:         { name:'乱れ突き',                         icon:'⚔️', spCost:1,    power:7,  type:'physical', target:'single', hits:5, animation:'slash' },
+  polnareff_armor:        { name:'甲冑脱ぎ（アーマーテイクオフ）',    icon:'💥', spCost:2,    power:11, type:'physical', target:'single', hits:6, animation:'slash_heavy', execute:true, selfEffect:'def_down', selfEffectTurns:1 },
+  // -- モハメド・アヴドゥル --
+  avdol_basic:            { name:'マジシャンズレッド',                icon:'🕯️', noSP:true,  power:12, type:'magic',    target:'single', hits:1, animation:'explosion' },
+  avdol_crossfire:        { name:'クロスファイヤーハリケーン',        icon:'🔥', spCost:1,    power:34, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:2 },
+  avdol_crossfire_sp:     { name:'クロスファイヤーハリケーンスペシャル', icon:'💥', spCost:2, power:52, type:'magic',    target:'all',    hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:3 },
+  // -- イギー --
+  iggy_basic:             { name:'砂の爪',                           icon:'🐩', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'slash' },
+  iggy_spear:             { name:'砂の槍',                           icon:'🏜️', spCost:1,    power:32, type:'physical', target:'single', hits:1, animation:'slash' },
+  iggy_clone:             { name:'砂像',                             icon:'🛡️', spCost:2,    power:0,  type:'support',  target:'all_ally', effect:'shield', shieldPower:15, effectChance:1, animation:'buff' },
 
   // ============================================================
   // 転生したらスライムだった件
