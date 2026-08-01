@@ -3,7 +3,7 @@
 ブラウザだけで遊べる、ターン制のパーティバトルゲームです。
 インストール不要で、下のURLを開けばすぐ始められます。
 
-**▶ [遊ぶ](https://mitosandersen.github.io/CrossoverBattle/)**
+**▶ [遊ぶ](https://mitosandersen.github.io/crossover-battle/)**
 
 ## 特徴
 
