@@ -12,7 +12,7 @@ const PASSIVE_DATA = {
   piccolo:      { name:'ナメック星人',            type:'regen',                   desc:'毎T HP3%回復', value:0.03 },
   trunks:       { name:'ゼットソード',            type:'boss_damage',             desc:'ボスへ与ダメ+15%', value:0.15 },
   krillin:      { name:'最強の地球人',            type:'basic_atk_boost',         desc:'通常攻撃+100%', value:1.00 },
-  frieza:       { name:'帝王の威圧',              type:'enemy_debuff_start',      desc:'開幕 敵全攻↓(2T)', turns:2 },
+  frieza:       { name:'帝王の威圧',              type:'enemy_debuff_start',      desc:'開幕 敵全攻↓(1T)', turns:1 },
 
   // ==== NARUTO ====
   naruto:       { name:'仙人モード',              type:'low_hp_atk',              desc:'HP50%↓ 攻防↑＋リジェネ（3T）', threshold:0.5, buffs:['atk_up','def_up','regen'], turns:3 },
@@ -37,7 +37,7 @@ const PASSIVE_DATA = {
   genos:        { name:'鬼サイボーグ',            type:'basic_atk_boost',         desc:'通常攻撃+100%', value:1.00 },
   garou:        { name:'怪人覚醒',                type:'low_hp_atk',              desc:'HP50%↓ 攻↑（3T）', threshold:0.5, turns:3 },
   tatsumaki:    { name:'念動力バリア',            type:'shield_start',            desc:'開幕 シールド(HP15%)', value:0.15 },
-  king:         { name:'キングエンジン',          type:'enemy_debuff_start',      desc:'開幕 敵全攻↓(2T)', turns:2 },
+  king:         { name:'キングエンジン',          type:'enemy_debuff_start',      desc:'開幕 敵全攻↓(1T)', turns:1 },
   sonic:        { name:'音速',                    type:'multi_hit_boost',         desc:'連続ヒット技+20%', value:0.20 },
 
   // ==== 鬼滅の刃 ====
@@ -66,7 +66,7 @@ const PASSIVE_DATA = {
 
   // ==== ポケモン ====
   pikachu:      { name:'せいでんき',              type:'counter_status',          desc:'被弾時、攻撃した敵を麻痺(3T)', effect:'paralyze', chance:1.0, turns:3 },
-  mewtwo:       { name:'プレッシャー',            type:'enemy_debuff_start',      desc:'開幕 敵全攻↓(3T)', turns:3 },
+  mewtwo:       { name:'プレッシャー',            type:'enemy_debuff_start',      desc:'開幕 敵全攻↓(2T)', turns:2 },
   lucario:      { name:'せいしんりょく',          type:'compound',                desc:'気絶・攻↓・防↓無効', effects:[{type:'status_immune',targets:['stun','atk_down','def_down']}] },
   charizard:    { name:'もうか',                  type:'low_hp_atk',              desc:'HP50%↓ 攻↑（3T）', threshold:0.5, turns:3 },
   gengar:       { name:'のろわれボディ',          type:'counter_status',          desc:'被弾時、攻撃した敵を呪う(2T)', effect:'curse', chance:1.0, turns:2 },
@@ -159,7 +159,7 @@ const PASSIVE_DATA = {
   lucy_ft:      { name:'星霊との契約',            type:'sp_max_up',               desc:'最大SP+1', value:1 },
 
   // ==== オーバーロード ====
-  ainz:         { name:'絶望のオーラ',            type:'enemy_debuff_start',      desc:'開幕 敵全攻↓(3T)', turns:3 },
+  ainz:         { name:'絶望のオーラ',            type:'enemy_debuff_start',      desc:'開幕 敵全攻↓(2T)', turns:2 },
   albedo:       { name:'守護者の忠誠',            type:'shield_start',            desc:'開幕 シールド(HP15%)', value:0.15 },
 
   // ==== この素晴らしい世界 ====
@@ -210,7 +210,7 @@ const PASSIVE_DATA = {
   filo:         { name:'竜の天敵',                type:'boss_damage',             desc:'ボスへ与ダメ+15%', value:0.15 },
 
   // ==== BOSS / MIDBOSS ====
-  frieza_final:     { name:'宇宙帝王の威圧', type:'enemy_debuff_start', desc:'開幕 全員に攻↓(3T)', turns:3 },
+  frieza_final:     { name:'宇宙帝王の威圧', type:'enemy_debuff_start', desc:'開幕 全員に攻↓(2T)', turns:2 },
   madara:           { name:'神樹の完全再生', type:'regen', desc:'毎T HP3%回復', value:0.03 },
   kaido:            { name:'不死身の悪龍', type:'regen', desc:'毎T HP3%回復', value:0.03 },
   zoma:             { name:'闇に守られし魔王', type:'compound', desc:'開幕シールド(HP15%)＋攻撃力+10%', effects:[{type:'shield_start',value:0.15},{type:'atk_boost',value:0.10}] },
@@ -221,14 +221,14 @@ const PASSIVE_DATA = {
   cell_perfect:     { name:'完全体の細胞再生', type:'regen', desc:'毎T HP3%回復', value:0.03 },
   demon_king_seven: { name:'絶望を糧とする力', type:'low_hp_atk', desc:'HP50%↓ 防↑（3T）', threshold:0.5, buff:'def_up', turns:3 },
   gilgamesh_boss:   { name:'王の財宝',                type:'atk_boost',           desc:'攻撃力常時+15%', value:0.15 },
-  muzan_boss:       { name:'鬼の始祖の威圧', type:'enemy_debuff_start', desc:'開幕 全員に攻↓(3T)', turns:3 },
+  muzan_boss:       { name:'鬼の始祖の威圧', type:'enemy_debuff_start', desc:'開幕 全員に攻↓(2T)', turns:2 },
   kaguya_boss:      { name:'神樹の力', type:'battle_start_atk', desc:'開幕 攻↑(3T)', value:0.30, turns:3 },
   meruem_boss:      { name:'完全なる王の進化', type:'low_hp_atk', desc:'HP50%↓ リジェネ（3T）', threshold:0.5, buff:'regen', turns:3 },
   aizen_boss:       { name:'完全催眠',                type:'def_boost',           desc:'被ダメ-15%', value:0.15 },
-  acnologia_boss:   { name:'魔竜の咆哮', type:'enemy_debuff_start', desc:'開幕 全員に攻↓(3T)', turns:3 },
-  yhwach_boss:      { name:'全知全能の未来視', type:'enemy_debuff_start', desc:'開幕 全員に攻↓(3T)', turns:3 },
+  acnologia_boss:   { name:'魔竜の咆哮', type:'enemy_debuff_start', desc:'開幕 全員に攻↓(2T)', turns:2 },
+  yhwach_boss:      { name:'全知全能の未来視', type:'enemy_debuff_start', desc:'開幕 全員に攻↓(2T)', turns:2 },
   veldanava_boss:   { name:'星王竜の権能', type:'regen', desc:'毎T HP3%回復', value:0.03 },
-  all_for_one:      { name:'個性を強奪せし力', type:'enemy_debuff_start', desc:'開幕 全員に攻↓(3T)', turns:3 },
+  all_for_one:      { name:'個性を強奪せし力', type:'enemy_debuff_start', desc:'開幕 全員に攻↓(2T)', turns:2 },
   kenjaku:          { name:'呪術の蓄積',              type:'def_boost',           desc:'被ダメ-15%', value:0.15 },
   zenon_boss:       { name:'空間魔法の守り', type:'def_boost', desc:'被ダメ-15%', value:0.15 },
   satella_boss:     { name:'嫉妬に狂う魔女の力', type:'low_hp_atk', desc:'HP50%↓ 攻↑（3T）', threshold:0.5, buff:'atk_up', turns:3 },
