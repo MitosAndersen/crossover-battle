@@ -426,8 +426,8 @@ const ALLY_DATA = [
   { id:'makima',     name:'マキマ',                   origin:'チェンソーマン',        emoji:'🐕', maxHp:85,  role:'support',  gender:'女', job:'公安対魔特異4課長', skillIds:['makima_basic','makima_control','makima_will'],           color:'#cc9944' },
   { id:'aki',        name:'早川アキ',                 origin:'チェンソーマン',        emoji:'🪖', maxHp:80,  role:'attacker', gender:'男', job:'デビルハンター', skillIds:['aki_basic','aki_fox','aki_future'],                          color:'#334455' },
   // -- 炎炎ノ消防隊 (2) --
-  { id:'shinra',      name:'森羅日下部',          origin:'炎炎ノ消防隊',          emoji:'👣', maxHp:90,  role:'attacker', gender:'男', job:'消防士',         skillIds:['shinra_basic','shinra_adolla','shinra_burst'],              color:'#cc2200' },
-  { id:'arthur',      name:'アーサー・ボイル',     origin:'炎炎ノ消防隊',          emoji:'🐴', maxHp:82,  role:'striker',  gender:'男', job:'消防士',         skillIds:['arthur_basic','arthur_plasma','arthur_excalibur'],                         color:'#4488cc' },
+  { id:'shinra',      name:'森羅日下部',          origin:'炎炎ノ消防隊',          emoji:'👣', maxHp:90,  role:'striker',  gender:'男', job:'消防士',         skillIds:['shinra_basic','shinra_adolla','shinra_burst'],              color:'#cc2200' },
+  { id:'arthur',      name:'アーサー・ボイル',     origin:'炎炎ノ消防隊',          emoji:'🐴', maxHp:82,  role:'attacker', gender:'男', job:'消防士',         skillIds:['arthur_basic','arthur_plasma','arthur_excalibur'],                         color:'#4488cc' },
   { id:'benimaru',    name:'新門紅丸',            origin:'炎炎ノ消防隊',          emoji:'⛩️', maxHp:92,  role:'attacker', gender:'男', job:'大隊長',        skillIds:['benimaru_basic','benimaru_kagetsu','benimaru_nichirin'],                    color:'#dd2244' },
   // -- FINAL FANTASY (4) --
   { id:'cloud',       name:'クラウド・ストライフ', origin:'FINAL FANTASY',        emoji:'🏍️', maxHp:90,  role:'attacker', gender:'男', job:'傭兵',           skillIds:['cloud_basic','cloud_braver','cloud_omnislash'],             color:'#4466cc' },
