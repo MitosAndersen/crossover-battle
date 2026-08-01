@@ -175,7 +175,7 @@ const SKILL_DATA = {
   mother_rosario:         { name:'フラッシング・ペネトレイター', icon:'💥', spCost:2,    power:64, type:'physical', target:'single', hits:1, animation:'slash_heavy', shieldBreak:true },
   // -- シノン --
   sinon_basic:        { name:'グロック18C',          icon:'🎯', noSP:true,  power:1,  type:'physical', target:'single', hits:13, animation:'slash' },
-  sinon_rifle:        { name:'ファントム・バレット', icon:'🎯', spCost:1,    power:0,   type:'support',  target:'all',    effect:'atk_down', effectChance:1, effectTurns:3, animation:'dark' },
+  sinon_rifle:        { name:'ファントム・バレット', icon:'🎯', spCost:1,    power:0,   type:'support',  target:'all',    effect:'def_down', effectChance:1, effectTurns:3, animation:'dark' },
   sinon_bullet:       { name:'ヘカートII',           icon:'💥', spCost:2,    power:66, type:'physical',  target:'single', hits:1, animation:'explosion', execute:true, shieldBreak:true },
   // -- ユウキ --
   yuuki_basic:        { name:'スラント',             icon:'🗡️', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'slash' },

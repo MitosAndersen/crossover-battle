@@ -52,7 +52,7 @@ const PASSIVE_DATA = {
   // ==== SAO ====
   kirito:       { name:'二刀流',                  type:'multi_hit_boost',         desc:'連続ヒット技+30%', value:0.30 },
   asuna:        { name:'閃光',                    type:'battle_start_sp',         desc:'開幕 SP+1' },
-  sinon:        { name:'氷の狙撃手',              type:'boss_damage',             desc:'ボスへ与ダメ+15%', value:0.15 },
+  sinon:        { name:'氷の狙撃手',              type:'exploit_status',          desc:'防御↓中の敵へ与ダメ+20%', effect:'def_down', value:0.20 },
   yuuki:        { name:'絶剣',                    type:'multi_hit_boost',         desc:'連続ヒット技+20%', value:0.20 },
   leafa:        { name:'スピードホリック',        type:'basic_atk_boost',         desc:'通常攻撃+100%', value:1.00 },
 
