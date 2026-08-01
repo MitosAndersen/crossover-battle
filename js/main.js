@@ -2240,33 +2240,52 @@ const Game = (() => {
 
   // ---- 設定 ----
   // タイトル画面の設定スクリーンと、戦闘中トップバーの設定モーダルで同じ内容を共用する
-  // スマホ向け一括設定。表示短縮3項目＋ロール合体＋省電力をまとめて切り替える。
-  // 状態は個別設定から導出するので、あとから個別に触っても表示がズレない
+  // スマホ向け一括設定。「画面を狭く使うための表示省略」だけをまとめて切り替える。
+  // 状態は個別設定から導出するので、あとから個別に触っても表示がズレない。
+  //
+  // 省電力(lowPower)はここに含めない。画面の広さと電池の持ちは別の軸で、
+  // 縦に余裕のある最近のスマホでもアニメーションは止めておきたいため、
+  // 一括設定とは独立に initDeviceDefaults でスマホなら常にONにしている
   function isMobilePresetOn() {
     return !showCardInfo && !showTurnHeader && !showPassiveName
-        && mergeRoleName && lowPower;
+        && mergeRoleName;
   }
   function setMobilePreset(on) {
     showCardInfo    = !on;   // 作品名・レア度
     showTurnHeader  = !on;   // 「〇〇のターン！」
     showPassiveName = !on;   // パッシブ名
     mergeRoleName   = on;    // ロールを名前と合体（ONで省スペース）
-    lowPower        = on;    // 省電力
     saveShowCardInfo(); saveShowTurnHeader(); saveShowPassiveName();
-    saveMergeRoleName(); saveLowPower();
+    saveMergeRoleName();
     applyShowCardInfo(); applyShowTurnHeader(); applyShowPassiveName();
-    applyMergeRoleName(); applyLowPower();
+    applyMergeRoleName();
   }
 
-  // 初回起動時だけ、画面幅からスマホ判定して既定を決める。
-  // 判定はCSSのブレークポイント(640px)と揃えてある。
-  // 5つのキーのどれかが保存済み＝一度でも設定を触っているので、その場合は保存値を優先する。
-  // PCでは何もせず各項目の既定値のままにする（勝手にフル表示へ倒さない）
+  // 初回起動時だけ、実際の画面サイズを見て既定を決める。
+  // 保存済みのキーがあれば「一度でも自分で設定を触った」ということなので保存値を優先する。
+  // 省電力と表示省略は別々に判定するので、判定も別々に書く。
+  // PCでは何もしない（勝手にフル表示や省電力へ倒さない）
   function initDeviceDefaults() {
-    const KEYS = ['icb_showCardInfo', 'icb_showTurnHeader', 'icb_showPassiveName',
-                  'icb_mergeRoleName', 'icb_lowPower'];
-    if (KEYS.some(k => localStorage.getItem(k) !== null)) return;
-    if (window.matchMedia('(max-width: 640px)').matches) setMobilePreset(true);
+    const isPhone = window.matchMedia('(max-width: 640px)').matches;
+    if (!isPhone) return;
+
+    // 省電力: スマホなら画面の広さに関係なく既定ON。
+    // 光り続ける演出は発熱と電池に直結するので、縦に余裕がある端末でも止めておく
+    if (localStorage.getItem('icb_lowPower') === null) {
+      lowPower = true;
+      saveLowPower();
+      applyLowPower();
+    }
+
+    // 表示省略: 縦が短い端末だけ既定ON。
+    // 省略は1画面に収めるための妥協なので、縦に余裕があるなら最初からフル表示でよい。
+    // 730px の根拠: iPhone SE2/SE3 が 667px、iPhone 12〜15 が 844px。その間で切る
+    const DISPLAY_KEYS = ['icb_showCardInfo', 'icb_showTurnHeader',
+                          'icb_showPassiveName', 'icb_mergeRoleName'];
+    if (DISPLAY_KEYS.every(k => localStorage.getItem(k) === null)
+        && window.matchMedia('(max-height: 730px)').matches) {
+      setMobilePreset(true);
+    }
   }
 
   // 設定画面では「ONで省スペース／省エネ」に統一している。
@@ -2290,7 +2309,7 @@ const Game = (() => {
 
       <div class="settings-group">
         <div class="settings-row settings-row-master">
-          <span class="settings-label">📱 スマホ設定（一括）<div class="settings-desc">この枠の中の5つをまとめて切り替えます。ONで省スペース＋省電力、OFFでフル表示に戻ります</div></span>
+          <span class="settings-label">📱 スマホ設定（一括）<div class="settings-desc">この枠の中の4つをまとめて切り替えます。ONで省スペース表示、OFFでフル表示に戻ります</div></span>
           <button class="origin-toggle${mp ? ' tog-on' : ' tog-off'}" data-setting="mobilePreset">${mp ? 'ON' : 'OFF'}</button>
         </div>
         <div class="settings-row settings-row-child">
@@ -2309,8 +2328,13 @@ const Game = (() => {
           <span class="settings-label">🎖️ ロールを名前と合体させて省略<div class="settings-desc">ONにすると、ロールのアイコンを名前の前に置いて背景をロールカラーにし、独立したバッジ行を消します</div></span>
           <button class="origin-toggle${mergeRoleName ? ' tog-on' : ' tog-off'}" data-setting="mergeRole">${mergeRoleName ? 'ON' : 'OFF'}</button>
         </div>
-        <div class="settings-row settings-row-child">
-          <span class="settings-label">🔋 省電力モード<div class="settings-desc">カードやSPが光り続ける演出を止めます。発熱や電池の減りが気になるときに。ダメージ表示など進行に必要な演出は残ります</div></span>
+      </div>
+
+      <!-- 省電力は「画面を狭く使う」話ではなく電池の話なので、一括設定とは独立させている。
+           スマホでは initDeviceDefaults が既定でONにする -->
+      <div class="settings-group">
+        <div class="settings-row">
+          <span class="settings-label">🔋 省電力モード<div class="settings-desc">カードやSPが光り続ける演出を止めます。発熱や電池の減りが気になるときに。ダメージ表示など進行に必要な演出は残ります。スマホでは最初からONです</div></span>
           <button class="origin-toggle${lowPower ? ' tog-on' : ' tog-off'}" data-setting="lowPower">${lowPower ? 'ON' : 'OFF'}</button>
         </div>
       </div>
