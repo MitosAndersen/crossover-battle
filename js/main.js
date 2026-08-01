@@ -559,7 +559,10 @@ const Game = (() => {
           }
           if (p.type === 'enemy_debuff_start') {
             const isDefDown = p.debuff === 'def_down';
-            UI.log(`👁️ <strong>${ally.name}</strong>（写輪眼）：敵全体に${isDefDown ? '防御力' : '攻撃力'}DOWN！`, 'log-status');
+            // パッシブ名は p.name から取る。以前は「写輪眼」を直書きしていたため、
+            // フリーザの「帝王の威圧」やキングの「キングエンジン」でも
+            // 「（写輪眼）」と表示されていた
+            UI.log(`👁️ <strong>${ally.name}</strong>（${p.name}）：敵全体に${isDefDown ? '防御力' : '攻撃力'}DOWN！`, 'log-status');
             const floatLabel = isDefDown ? '⬇️防' : '⬇️攻';
             enemies.forEach(e => floatQueue.push([e.id, floatLabel, 'float-debuff float-down']));
           }

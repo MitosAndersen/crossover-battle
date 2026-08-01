@@ -172,6 +172,7 @@ const PASSIVE_DATA = {
   // ==== 炎炎ノ消防隊 ====
   shinra:       { name:'アドラバースト',          type:'exploit_status',          desc:'燃焼中の敵へ与ダメ+50%', effect:'burn', value:0.50 },
   arthur:       { name:'騎士王の妄想',            type:'boss_damage',             desc:'ボスへ与ダメ+15%', value:0.15 },
+  benimaru:     { name:'煉合消防官',              type:'exploit_status',          desc:'燃焼中の敵へ与ダメ+50%', effect:'burn', value:0.50 },
 
   // ==== FINAL FANTASY ====
   cloud:        { name:'元SOLDIER',               type:'battle_start_buffs',      desc:'開幕 攻防↑(2T)', buffs:['atk_up','def_up'], turns:2 },

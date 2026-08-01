@@ -169,6 +169,7 @@ const JOIN_QUOTES = {
   // -- 炎炎ノ消防隊 --
   shinra: '悪魔の足音、聞こえますか？',
   arthur: '我が剣の名はエクスカリバー！',
+  benimaru: 'その喧嘩、俺も混ぜてくれ、面白そうだ',
 
   // -- FINAL FANTASY --
   cloud: '……興味ないね。',
@@ -258,7 +259,7 @@ const CHAR_RARITY = {
   // -- チェンソーマン --
   denji:3, power_csm:1, aki:1, makima:2,
   // -- 炎炎ノ消防隊 --
-  shinra:3, arthur:2,
+  shinra:3, arthur:2, benimaru:3,
   // -- FINAL FANTASY --
   cloud:3, sephiroth_ff:3, tifa:2, aerith:2,
   // -- とある魔術の禁書目録 --
@@ -427,6 +428,7 @@ const ALLY_DATA = [
   // -- 炎炎ノ消防隊 (2) --
   { id:'shinra',      name:'森羅日下部',          origin:'炎炎ノ消防隊',          emoji:'👣', maxHp:90,  role:'attacker', gender:'男', job:'消防士',         skillIds:['shinra_basic','shinra_adolla','shinra_burst'],              color:'#cc2200' },
   { id:'arthur',      name:'アーサー・ボイル',     origin:'炎炎ノ消防隊',          emoji:'🐴', maxHp:82,  role:'striker',  gender:'男', job:'消防士',         skillIds:['arthur_basic','arthur_plasma','arthur_excalibur'],                         color:'#4488cc' },
+  { id:'benimaru',    name:'新門紅丸',            origin:'炎炎ノ消防隊',          emoji:'⛩️', maxHp:92,  role:'attacker', gender:'男', job:'大隊長',        skillIds:['benimaru_basic','benimaru_kagetsu','benimaru_nichirin'],                    color:'#dd2244' },
   // -- FINAL FANTASY (4) --
   { id:'cloud',       name:'クラウド・ストライフ', origin:'FINAL FANTASY',        emoji:'🏍️', maxHp:90,  role:'attacker', gender:'男', job:'傭兵',           skillIds:['cloud_basic','cloud_braver','cloud_omnislash'],             color:'#4466cc' },
   { id:'sephiroth_ff',name:'セフィロス',          origin:'FINAL FANTASY',        emoji:'🪽', maxHp:94,  role:'attacker', gender:'男', job:'元SOLDIER',      skillIds:['seph_basic','seph_shadow','seph_supernova'],                 color:'#aaaaaa' },

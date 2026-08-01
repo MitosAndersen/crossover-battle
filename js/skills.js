@@ -577,6 +577,10 @@ const SKILL_DATA = {
   arthur_basic:    { name:'炎の剣（エクスカリバー）', icon:'⚔️', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'slash' },
   arthur_plasma:   { name:'紫電一閃',               icon:'⚡', spCost:1,    power:34, type:'physical', target:'single', hits:1, animation:'slash' },
   arthur_excalibur:{ name:'居合カリバー',           icon:'⚡', spCost:2,    power:60, type:'physical', target:'single', hits:1, animation:'slash_heavy', execute:true, shieldBreak:true },
+  // -- 新門紅丸 --
+  benimaru_basic:  { name:'居合手刀',               icon:'✋', noSP:true,  power:13, type:'physical', target:'single', hits:1, animation:'slash' },
+  benimaru_kagetsu:{ name:'壱ノ型『火月』',          icon:'🌙', spCost:1,    power:35, type:'magic',    target:'all',    hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:3 },
+  benimaru_nichirin:{ name:'漆ノ型『日輪紅月』',     icon:'☀️', spCost:2,    power:65, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:3, execute:true, shieldBreak:true },
 
   // ============================================================
   // FINAL FANTASY
