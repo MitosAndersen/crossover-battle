@@ -1,0 +1,2929 @@
+/* ============================================================
+   GLOBAL RESET & VARIABLES
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-dark: #0a0a1a;
+  --bg-panel: #12122a;
+  --bg-card: #1a1a35;
+  --border-glow: rgba(100, 120, 255, 0.4);
+  --neon-blue: #4488ff;
+  --neon-purple: #aa44ff;
+  --neon-gold: #ffcc00;
+  --neon-green: #44ffaa;
+  --text-main: #ddeeff;
+  --text-dim: #778899;
+  --red: #ff3344;
+  --orange: #ff8833;
+  --font: 'Segoe UI', 'Meiryo', sans-serif;
+
+  /* PC版のUI倍率。バトル画面専用CSS（#battle-screen 〜 FLOATING NUMBERS）の
+     寸法だけがこの値に連動する。他画面はモーダルやガチャカードが px 固定枠なので
+     巻き込むと中身が溢れる。あえて範囲を切り離している */
+  --ui-scale: 1;
+
+  /* 戦闘フィールドの横幅（敵/味方エリアの外寸＝左右12pxのpadding込み）。
+     敵エリア・味方エリア・スキルグリッド・キャラ選択グリッドがこの値を共有するので、
+     どの画面幅でも縦のラインが揃う。
+
+     下限の根拠: 敵は全分岐で最大3体（main.js の summonCap = 3）。最も広いのは
+     最終決戦の [中ボス, 大ボス, 中ボス]。.boss-card が付くのは isBoss だけなので
+     130 + gap16 + 155 + gap16 + 130 = 447px、エリアのpadding 24pxを足して471px。
+     味方は 130×3 + gap14×2 + 24 = 442px。520pxなら約50pxの余裕がある */
+  --field-max: calc(520px * var(--ui-scale));
+}
+
+/* #battle-screen は height:100vh + overflow:hidden なので、拡大しすぎると下端が切れる。
+   バトル画面の自然高さは約720px。倍率Sで約720×Sになるため、幅だけでなく
+   「高さ」も条件に入れて安全側に倒す。max-width:640px のモバイル指定とは条件が
+   重ならないので、スマホ側は常に倍率1のまま */
+@media (min-width: 1280px) and (min-height:  800px) { :root { --ui-scale: 1.10; } }
+@media (min-width: 1600px) and (min-height:  900px) { :root { --ui-scale: 1.22; } }
+@media (min-width: 1900px) and (min-height: 1000px) { :root { --ui-scale: 1.35; } }
+
+html, body {
+  width: 100%; min-height: 100vh;
+  background: radial-gradient(ellipse at top, #1a0a3a 0%, #0a0a1a 60%);
+  color: var(--text-main);
+  font-family: var(--font);
+  font-size: 14px;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   SCREENS
+   ============================================================ */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ============================================================
+   TITLE SCREEN
+   ============================================================ */
+#title-screen {
+  align-items: center; justify-content: center; text-align: center;
+  padding: 40px 20px;
+  background: radial-gradient(ellipse at center, #1a0040 0%, #0a0a1a 70%);
+  position: relative; overflow: hidden;
+}
+
+/* タイトル画面に浮かぶセリフ */
+.title-quote {
+  position: absolute; max-width: 320px; pointer-events: none; z-index: 1;
+  font-size: 0.8rem; color: #8899bb; text-align: left; line-height: 1.5;
+  opacity: 0; animation: titleQuoteFloat 6s ease-out forwards;
+}
+@keyframes titleQuoteFloat {
+  0%   { opacity: 0; transform: translate(-50%, 20px); }
+  15%  { opacity: 0.85; }
+  70%  { opacity: 0.6; }
+  100% { opacity: 0; transform: translate(-50%, -40px); }
+}
+
+.title-logo {
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 900; letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #ff6600, #ffcc00, #ff44aa, #4488ff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 10px;
+  animation: titlePulse 3s ease-in-out infinite;
+}
+@keyframes titlePulse { 0%, 100% { filter:brightness(1); } 50% { filter:brightness(1.4); } }
+
+.title-sub { font-size:1rem; color:var(--text-dim); margin-bottom:40px; letter-spacing:0.1em; }
+.title-chars { font-size:2.5rem; margin-bottom:30px; animation: floatChars 4s ease-in-out infinite; }
+@keyframes floatChars { 0%, 100% { transform:translateY(0); } 50% { transform:translateY(-8px); } }
+
+.btn-primary {
+  padding: 14px 40px; font-size: 1.2rem; font-weight: 700;
+  border: 2px solid var(--neon-blue);
+  background: linear-gradient(135deg, #1a2a6c, #2a1a6c);
+  color: #fff; border-radius: 8px; cursor: pointer; letter-spacing: 0.1em;
+  transition: all 0.2s; box-shadow: 0 0 20px rgba(68,136,255,0.4);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #2a3a8c, #3a2a8c);
+  box-shadow: 0 0 30px rgba(68,136,255,0.7); transform: scale(1.05);
+}
+
+/* ============================================================
+   BATTLE SCREEN — flex-row with sidebar
+   ============================================================ */
+#battle-screen {
+  flex-direction: row !important;
+  background: radial-gradient(ellipse at top, #120a2a 0%, #0a0a18 70%);
+  height: 100vh;
+  align-items: stretch;
+  overflow: hidden;
+  /* 1920px級のモニタでは横が余りすぎる。パーティは3人固定・敵も最大3〜4体なので
+     カード幅の合計は約564pxにしかならず、1441pxの中で6割が空いてしまう。
+     画面全体に上限を掛け、余った左右は body の背景として残す（レターボックス）。
+     倍率と違って固定値でよい: 2560px級でも左右の帯が増えるだけで中身は変わらない。
+     1440px以下では上限に当たらないので何も起きない。
+     内訳(倍率1.35): 左パネル344 + .battle-main 749 + 右パネル344 + border2 = 1440。
+     フィールド702pxが .battle-main の94%を占める */
+  max-width: 1440px;
+  margin-inline: auto;
+}
+
+/* Left: main battle content */
+.battle-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Top bar inside .battle-main */
+.battle-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: calc(8px * var(--ui-scale)) calc(14px * var(--ui-scale));
+  background: rgba(0,0,0,0.5);
+  border-bottom: 1px solid var(--border-glow);
+  flex-shrink: 0;
+}
+
+.topbar-left { display:flex; flex-direction:row; align-items:baseline; gap:10px; }
+#battle-num { font-size:calc(0.95rem * var(--ui-scale)); font-weight:700; color:var(--neon-gold); letter-spacing:0.08em; }
+.audio-controls { display:flex; gap:6px; }
+.audio-btn {
+  padding:4px 8px; font-size:calc(0.72rem * var(--ui-scale));
+  background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2);
+  color:var(--text-main); border-radius:4px; cursor:pointer; transition:all 0.15s;
+}
+.audio-btn:hover { background:rgba(255,255,255,0.15); }
+
+/* VS divider */
+/* 敵味方の区切り帯。パーティSPを同居させて専用行を廃止している（縦スペース節約）。
+   ui.js の showTurnChangeBanner がこの要素の位置を基準にバナーを出す */
+.vs-divider {
+  display:flex; align-items:center; justify-content:center;
+  gap:10px;
+  padding:3px 8px;
+  border-top:1px solid rgba(255,255,255,0.04);
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  flex-shrink: 0;
+}
+
+/* ---- Enemy Area ---- */
+#enemy-area {
+  display:flex; justify-content:center; align-items:flex-end;
+  /* 敵は最大3体なので通常は1段だが、狭い画面で折り返した場合に上段の吹き出しが
+     下段のカードへ食い込まないよう、行方向の間隔で吹き出しの高さ分を確保する */
+  /* 下余白は行動予告の吹き出し用。吹き出しは
+     技名14.1px + 詳細14.1px + padding8px + border2px = 約38px、
+     カード下端から10px離すので必要なのは約48px。52pxで4px余裕を持たせる。
+     この数字は倍率1.0のときの実測。吹き出しの中身も --ui-scale で一緒に伸びるので、
+     下余白にも同じ倍率を掛けて比率を保つ */
+  gap:calc(56px * var(--ui-scale)) calc(16px * var(--ui-scale));
+  padding:calc(8px * var(--ui-scale)) calc(12px * var(--ui-scale)) calc(52px * var(--ui-scale));
+  min-height:calc(140px * var(--ui-scale)); flex-wrap:wrap;
+  /* スキルパネルと同じ幅に揃える。align-self:center を併用しないと
+     縦フレックスの stretch で親幅いっぱいに伸びて max-width が中央寄せに効かない */
+  width:100%; max-width:var(--field-max); align-self:center;
+  /* flex-grow は付けないこと。付けるとスキルパネルの高さが変わるたびに
+     空きスペースの取り分が動き、敵カードも味方カードも上下に揺れる。
+     スキルの効果チップは最大5個あり、複雑な技ほどボタンが高くなるため
+     パネルの高さは技によって100px以上変わる。
+     余りは #skill-panel の margin-top:auto で「カードより下」の1箇所に集約する。
+     flex-shrink:0 は必ず残すこと。縮小を許すと画面が低いときに
+     #battle-screen の overflow:hidden でカード下端が切れる */
+  flex-shrink:0;
+}
+
+/* ---- Ally Area ---- */
+#ally-area {
+  display:flex; justify-content:center; align-items:flex-start;
+  gap:calc(14px * var(--ui-scale));
+  padding:calc(8px * var(--ui-scale)) calc(12px * var(--ui-scale)) calc(6px * var(--ui-scale));
+  flex-wrap:wrap;
+  flex-shrink:0;  /* #enemy-area と同じ理由（flex-grow は付けない） */
+  width:100%; max-width:var(--field-max); align-self:center;  /* #enemy-area と同じ理由 */
+}
+
+/* ---- Turn Order Badge ---- */
+.turn-order-badge {
+  position: absolute;
+  top: 4px; left: 4px;
+  width: calc(20px * var(--ui-scale)); height: calc(20px * var(--ui-scale));
+  border-radius: 50%;
+  background: rgba(40,80,200,0.9);
+  color: #fff;
+  font-size: calc(0.65rem * var(--ui-scale)); font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 5;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.6);
+  pointer-events: none;
+}
+.turn-order-badge.badge-now {
+  background: var(--neon-gold);
+  color: #111;
+  font-size: calc(0.75rem * var(--ui-scale));
+}
+
+/* ---- Character Cards ---- */
+.char-card {
+  background: var(--bg-card);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  padding: calc(10px * var(--ui-scale)) calc(8px * var(--ui-scale)) calc(7px * var(--ui-scale));
+  text-align: center;
+  width: calc(130px * var(--ui-scale));
+  position: relative;
+  transition: all 0.2s;
+  overflow: hidden;
+}
+.char-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, var(--char-color, #888) 0%, transparent 40%);
+  opacity: 0.06; pointer-events: none;
+}
+.ally-card  { border-color: rgba(68,136,255,0.3); }
+.enemy-card { border-color: rgba(255,50,50,0.3); }
+.boss-card  {
+  border-color: rgba(200,0,200,0.6);
+  box-shadow: 0 0 18px rgba(200,0,200,0.3);
+  width: calc(155px * var(--ui-scale));
+}
+.boss-card .char-emoji { font-size:calc(2.8rem * var(--ui-scale)); }
+
+/* 敵の死体カード畳み（撃破演出後にフェードアウトして幅を詰める） */
+.char-card.corpse-collapsed {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.char-card.selectable-ally {
+  border-color: rgba(80,200,255,0.3);
+  cursor: pointer;
+  animation: selectPulse 0.8s ease-in-out infinite alternate;
+}
+.char-card.selectable-ally:hover {
+  border-color: rgba(80,200,255,0.7);
+  box-shadow: 0 0 10px rgba(80,180,255,0.4);
+  transform: translateY(-2px);
+}
+@keyframes selectPulse {
+  from { box-shadow: 0 0 2px rgba(80,200,255,0.1); }
+  to   { box-shadow: 0 0 8px rgba(80,200,255,0.3); }
+}
+.char-card.active-actor {
+  border-color: #ffaa00 !important;
+  box-shadow: 0 0 18px rgba(255,160,0,0.85), 0 0 6px rgba(255,200,80,0.6);
+  animation: activeActorPulse 1s ease-in-out infinite alternate;
+}
+@keyframes activeActorPulse {
+  from { box-shadow: 0 0 12px rgba(255,140,0,0.6), 0 0 4px rgba(255,200,80,0.4); }
+  to   { box-shadow: 0 0 28px rgba(255,160,0,1),   0 0 10px rgba(255,220,80,0.8); }
+}
+
+/* 行動中のキャラを目立たせるため、それ以外の味方カードを少し縮める。
+   transform はレイアウト上の占有サイズを変えないので隣のカードは1pxも動かない。
+   GPU合成なので再描画も起きず、スマホでも負荷にならない（メディアクエリの外に
+   置いているのでPC・スマホ両方に効く）。
+
+   :has() で「行動中のカードが居るときだけ」に限定している。これが無いと
+   敵ターン中など active-actor が誰も居ない場面で全員が縮んでしまう。
+   transform-origin を top にするのは #ally-area が align-items:flex-start で
+   上揃えだから。center だと縮んだカードの上端だけ下がって不揃いに見える */
+#ally-area:has(.active-actor) .char-card:not(.active-actor) {
+  transform: scale(0.92);
+  transform-origin: top center;
+}
+/* 上のルールは #ally-area のぶん詳細度が (1,3,0) で、
+   .char-card.selectable-ally:hover の (0,3,0) より強い。transform は単一プロパティなので
+   勝ったほうが丸ごと置き換わり、放っておくとホバー時の浮き上がりが消えてしまう。
+   縮小を保ったまま translateY を復活させるため、ここで両方を書き直す */
+#ally-area:has(.active-actor) .char-card.selectable-ally:not(.active-actor):hover {
+  transform: scale(0.92) translateY(-2px);
+  transform-origin: top center;
+}
+/* 全体攻撃の対象表示: カードの上に半透明で重ねるオーバーレイ */
+#enemy-area, #ally-area { position: relative; }
+.aoe-overlay {
+  position: absolute; inset: 0; z-index: 5;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255, 50, 50, 0.10);
+  border-radius: 10px;
+  font-size: calc(1.8rem * var(--ui-scale)); font-weight: 900; letter-spacing: 0.25em;
+  color: rgba(255, 90, 90, 0.6);
+  text-shadow: 0 0 12px rgba(255, 50, 50, 0.4);
+  pointer-events: none; /* カードのクリック（発動確定）を邪魔しない */
+  animation: targetPulse 0.5s ease-in-out infinite alternate;
+}
+.aoe-overlay-ally {
+  background: rgba(68, 255, 170, 0.10);
+  color: rgba(80, 230, 160, 0.6);
+  animation: allyTargetPulse 0.5s ease-in-out infinite alternate;
+}
+
+.char-card.targetable {
+  border-color: var(--red) !important;
+  cursor: crosshair;
+  animation: targetPulse 0.5s ease-in-out infinite alternate;
+}
+@keyframes targetPulse {
+  from { box-shadow: 0 0 6px rgba(255,50,50,0.4); }
+  to   { box-shadow: 0 0 18px rgba(255,50,50,0.9); }
+}
+.char-card.hit-flash { animation: hitFlash 0.22s ease-out; }
+@keyframes hitFlash {
+  0%   { background-color: rgba(255, 60, 60, 0.35); }
+  30%  { background-color: rgba(255, 60, 60, 0.35); }
+  100% { background-color: rgba(255, 60, 60, 0); }
+}
+.char-card.shield-flash { animation: shieldFlash 0.9s ease; }
+@keyframes shieldFlash {
+  0%   { box-shadow: 0 0 0 0px rgba(68,102,136,0); }
+  35%  { box-shadow: 0 0 0 12px rgba(68,102,136,0.95), 0 0 24px rgba(68,102,136,0.6); }
+  100% { box-shadow: 0 0 0 0px rgba(68,102,136,0); }
+}
+.char-card.support-on-action {
+  animation: supportOnActionPulse 1.0s ease-in-out infinite alternate !important;
+}
+@keyframes supportOnActionPulse {
+  from { box-shadow: 0 0 6px rgba(40,180,80,0.3); }
+  to   { box-shadow: 0 0 24px rgba(40,180,80,0.9), 0 0 8px rgba(40,180,80,0.5) inset; }
+}
+.char-card[draggable="true"] { cursor: grab; }
+.char-card[draggable="true"]:active { cursor: grabbing; }
+.char-card.dragging  { opacity: 0.35; }
+.char-card.drag-over { outline: 2px dashed rgba(255,255,255,0.75); outline-offset: 3px; }
+
+.guard-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 6;
+  background: rgba(30, 60, 120, 0.30);
+  border-radius: 9px;
+  font-size: calc(5rem * var(--ui-scale));
+  line-height: 1;
+}
+.guard-overlay::after {
+  content: '防御中';
+  font-size: calc(0.55rem * var(--ui-scale));
+  color: rgba(180,210,255,0.9);
+  margin-top: 4px;
+  letter-spacing: 0.05em;
+}
+.guard-overlay.active {
+  display: flex;
+  animation: guardOverlayPulse 1.6s ease-in-out infinite;
+}
+@keyframes guardOverlayPulse {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 0.85; }
+}
+
+
+/* 行動済み: 中身だけ暗くする（色味は残す）。✔バッジは明るいまま重ねる */
+.char-card.ally-acted > * { opacity:0.55; filter:brightness(0.7); transition:opacity 0.3s, filter 0.3s; }
+.char-card.ally-waiting > * { opacity:0.55; filter:brightness(0.7); transition:opacity 0.3s, filter 0.3s; }
+.char-card.ally-acted::after {
+  content:'✔'; position:absolute; top:3px; right:6px; z-index:2;
+  font-size:calc(0.9rem * var(--ui-scale)); font-weight:900; color:#66dd88;
+  text-shadow:0 0 6px rgba(0,0,0,0.8);
+}
+/* 死亡: 中身は完全グレースケール。💀バッジは明るいまま重ねる */
+.char-card.defeated > * { opacity:0.35; filter:grayscale(1) brightness(0.7); }
+.char-card.defeated::after {
+  content:'💀'; position:absolute; top:3px; right:6px; z-index:2; font-size:calc(1.0rem * var(--ui-scale));
+}
+.char-card.defeated-flash { animation: defeatedFlash 0.5s ease; }
+@keyframes defeatedFlash {
+  0%   { background-color:var(--bg-card); transform:scale(1); }
+  50%  { background-color:rgba(255,50,50,0.6); transform:scale(1.05); }
+  100% { background-color:var(--bg-card); transform:scale(1); }
+}
+.char-passive.passive-flash { animation: passiveFlash 0.7s ease-in-out 1; }
+@keyframes passiveFlash {
+  0%, 100% { box-shadow: 0 0 0px rgba(100,255,180,0); background: rgba(40,60,120,0.35); }
+  50%       { box-shadow: 0 0 10px rgba(100,255,180,0.9), 0 0 4px rgba(100,255,180,0.5) inset; background: rgba(100,255,180,0.18); }
+}
+.char-card.relic-flash { animation: relicFlash 0.5s ease-out; }
+@keyframes relicFlash {
+  0%   { box-shadow: 0 0 0px rgba(255,200,50,0); }
+  40%  { box-shadow: 0 0 18px rgba(255,200,50,0.9), 0 0 6px rgba(255,200,50,0.4) inset; }
+  100% { box-shadow: 0 0 0px rgba(255,200,50,0); }
+}
+.char-card.extra-turn-flash    { animation: flashAttacker 0.6s ease-out 2; }
+.char-card.support-sp-flash    { animation: flashSupport  0.6s ease-out 2; }
+.char-card.tank-block-flash    { animation: flashTank     0.6s ease-out 2; }
+.char-card.striker-start-flash { animation: flashStriker  0.6s ease-out 2; }
+@keyframes flashAttacker {
+  0%   { box-shadow: 0 0 0px  rgba(255,100,50,0); }
+  25%  { box-shadow: 0 0 40px rgba(255,100,50,1), 0 0 0 3px rgba(255,100,50,0.9), 0 0 14px rgba(255,100,50,0.6) inset; }
+  100% { box-shadow: 0 0 0px  rgba(255,100,50,0); }
+}
+@keyframes flashSupport {
+  0%   { box-shadow: 0 0 0px  rgba(60,200,100,0); }
+  25%  { box-shadow: 0 0 40px rgba(60,200,100,1), 0 0 0 3px rgba(60,200,100,0.9), 0 0 14px rgba(60,200,100,0.6) inset; }
+  100% { box-shadow: 0 0 0px  rgba(60,200,100,0); }
+}
+@keyframes flashTank {
+  0%   { box-shadow: 0 0 0px  rgba(80,130,255,0); }
+  25%  { box-shadow: 0 0 40px rgba(80,130,255,1), 0 0 0 3px rgba(80,130,255,0.9), 0 0 14px rgba(80,130,255,0.6) inset; }
+  100% { box-shadow: 0 0 0px  rgba(80,130,255,0); }
+}
+@keyframes flashStriker {
+  0%   { box-shadow: 0 0 0px  rgba(255,204,0,0); }
+  25%  { box-shadow: 0 0 40px rgba(255,204,0,1), 0 0 0 3px rgba(255,204,0,0.9), 0 0 14px rgba(255,204,0,0.6) inset; }
+  100% { box-shadow: 0 0 0px  rgba(255,204,0,0); }
+}
+.char-card.revive-flash { animation: reviveFlash 1.4s ease-out forwards; }
+@keyframes reviveFlash {
+  0%   { box-shadow: 0 0 0px rgba(255,255,150,0); filter: brightness(1); }
+  15%  { box-shadow: 0 0 60px rgba(255,255,150,1); filter: brightness(3); }
+  45%  { box-shadow: 0 0 30px rgba(255,220,100,0.7); filter: brightness(1.8); }
+  100% { box-shadow: 0 0 0px rgba(255,255,150,0); filter: brightness(1); }
+}
+.char-card.striker-extra-flash { animation: strikerExtraPulse 0.7s ease-in-out infinite; }
+@keyframes strikerExtraPulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(255,204,0,0.3); border-color: #ffcc00; }
+  50%       { box-shadow: 0 0 28px rgba(255,204,0,1), 0 0 10px rgba(255,204,0,0.6) inset; border-color: #ffe066; }
+}
+.orig-sp-cost { opacity: 0.5; font-size: 0.8em; text-decoration: line-through; margin-left: 2px; }
+.char-card.sp-discount-glow { animation: spDiscountPulse 0.7s ease-in-out infinite; }
+@keyframes spDiscountPulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(255,204,0,0.3); border-color: #ffcc00; }
+  50%       { box-shadow: 0 0 28px rgba(255,204,0,1), 0 0 10px rgba(255,204,0,0.6) inset; border-color: #ffe066; }
+}
+
+/* 攻撃UP/DOWN パーティクル矢印 */
+
+/* Top badges row */
+.card-top-badges {
+  display:flex; flex-wrap:wrap; justify-content:center; gap:2px; margin-bottom:4px; min-height:calc(18px * var(--ui-scale));
+}
+
+/* Role badges */
+.boss-badge { background: #7b2fbe; }
+.role-badge {
+  font-size:calc(0.58rem * var(--ui-scale)); padding:1px 5px; border-radius:3px;
+  color:#fff; font-weight:700; letter-spacing:0.02em;
+  white-space:nowrap; display:inline-block;
+}
+.role-badge.extra-turn-flash,
+.role-badge.support-sp-flash,
+.role-badge.tank-block-flash,
+.role-badge.striker-start-flash { animation: roleBadgePop 0.55s ease-out forwards; }
+@keyframes roleBadgePop {
+  0%   { transform: scale(1);   opacity: 1; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+/* Element badges */
+.elem-badge {
+  font-size:calc(0.58rem * var(--ui-scale)); padding:1px 5px; border-radius:3px;
+  color:#fff; font-weight:700; letter-spacing:0.02em;
+  white-space:nowrap; display:inline-block;
+}
+
+.char-emoji { font-size:calc(2rem * var(--ui-scale)); line-height:1; margin-bottom:2px; }
+/* シリーズボーナス発動中は絵文字を光らせる。作品名の発光だけだと
+   「作品名・レア度を省略」ONのときに見えなくなるため。
+   絵文字はカラー文字なので text-shadow では光らず、drop-shadow を使う。
+   filter のアニメーションは再描画を伴うが、対象は最大3枚かつボーナス発動中のみ。
+   省電力モードでは animation を止め、下の静的な filter だけが残る */
+.series-bonus-active .char-emoji {
+  filter: drop-shadow(0 0 4px rgba(255,220,80,0.95))
+          drop-shadow(0 0 10px rgba(255,190,40,0.7));
+  animation: seriesBonusEmojiPulse 2.2s ease-in-out infinite alternate;
+}
+@keyframes seriesBonusEmojiPulse {
+  from { filter: drop-shadow(0 0 2px rgba(255,220,80,0.5)); }
+  to   { filter: drop-shadow(0 0 6px rgba(255,220,80,1))
+                 drop-shadow(0 0 14px rgba(255,190,40,0.85)); }
+}
+.char-name  { font-size:calc(0.68rem * var(--ui-scale)); font-weight:700; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* ---- ロールを名前と合体表示（設定でON/OFF、main.js が body に付与） ----
+   名前行にロールアイコンを入れ、背景をロールカラーにする。
+   キャラの絵文字（.char-emoji）はそのまま残る */
+.char-name-role-icon { display: none; margin-right: 2px; }
+
+body.merge-role-name .char-name-role-icon { display: inline; }
+body.merge-role-name .char-name {
+  background: var(--role-color, transparent);
+  color: #fff;
+  /* ストライカーの #ddaa00（黄）に白文字だとコントラストが足りないため縁取りする */
+  text-shadow: 0 1px 2px rgba(0,0,0,0.75);
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+/* ロールも👑ボスも名前チップへ移したので、バッジ行は全カードまとめて畳む（18px+4px） */
+body.merge-role-name .card-top-badges { display: none; }
+
+/* 名前チップはキャラ絵文字の上に置く（見出しとして読みやすい）。
+   DOM順は変えず flex の order で入れ替えるので、OFF時は従来の並びに戻る。
+   ボスの👑バッジはさらに上に残す */
+body.merge-role-name .char-card { display: flex; flex-direction: column; }
+body.merge-role-name .card-top-badges { order: -2; }
+body.merge-role-name .char-name      { order: -1; }
+
+/* Character info rows (origin, rarity, gender/job) */
+.char-info-row {
+  display: flex; align-items: center; gap: 4px;
+  margin-bottom: 1px; justify-content: center;
+}
+.char-rarity { font-size: calc(0.58rem * var(--ui-scale)); font-weight: 700; letter-spacing: 0.02em; }
+.char-gender-job { font-size: calc(0.52rem * var(--ui-scale)); color: var(--text-dim); white-space: nowrap; }
+.char-origin-row {
+  font-size: calc(0.52rem * var(--ui-scale)); color: #99aadd; text-align: center;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-bottom: 3px;
+}
+/* 設定「カードに作品名・レア度を表示」OFF時（main.js が body に付与）。
+   バトルカードのみ対象で、図鑑や交代画面の表示は残す */
+body.hide-card-info .char-card .char-info-row,
+body.hide-card-info .char-card .char-origin-row { display: none; }
+
+/* 設定「〇〇のターン！を表示」OFF時。
+   同じ .skill-header を使う「誰を動かす？」は消さないため専用クラスで絞る */
+body.hide-turn-header .actor-turn-header { display: none; }
+
+/* ============================================================
+   省電力モード（設定でON、またはOSの「視差を減らす」設定）
+   box-shadow / filter を動かす装飾アニメは毎フレーム再描画が走り、
+   スマホでは発熱と電池消費の主因になる。装飾目的のものだけ止め、
+   ダメージ表示や被弾フラッシュなど一回限りの演出は残す
+   ============================================================ */
+body.low-power .sp-seg.on::after,
+body.low-power .char-card.selectable-ally,
+body.low-power .char-card.active-actor,
+body.low-power .char-card.targetable,
+body.low-power .char-card.support-on-action,
+body.low-power .char-card.striker-extra-flash,
+body.low-power .char-card.sp-discount-flash,
+body.low-power .char-card.sp-discount-glow,
+body.low-power .char-card.enemy-charging,
+body.low-power .char-origin-row.series-bonus-glow,
+body.low-power .series-bonus-active .char-emoji,
+body.low-power .enemy-next-action,
+body.low-power .hp-fill.hp-danger,
+body.low-power #lethal-warning.active,
+body.low-power .skill-btn.skill-selected,
+body.low-power .guard-overlay.active,
+body.low-power .aoe-overlay,
+body.low-power .title-glow,
+body.low-power .title-chars { animation: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-seg.on::after,
+  .char-card.selectable-ally,
+  .char-card.active-actor,
+  .char-card.targetable,
+  .char-card.support-on-action,
+  .char-origin-row.series-bonus-glow,
+  .series-bonus-active .char-emoji,
+  .enemy-next-action,
+  .hp-fill.hp-danger,
+  #lethal-warning.active,
+  .skill-btn.skill-selected,
+  .aoe-overlay,
+  .title-chars { animation: none !important; }
+}
+
+/* 設定「パッシブ名を表示」OFF時。味方・敵の両方が対象で、効果の説明は残す。
+   全カードから一律に1行減るのでカード高さは揃ったまま */
+body.hide-passive-name .passive-name { display: none; }
+
+/* 設定「敵のバッジを表示」OFF時。ボスの👑バッジも含めて全部隠す。
+   .card-top-badges は min-height:18px + margin-bottom:4px を持つので、
+   バッジだけ消すと空白が残る。コンテナごと畳んで22px分を詰める */
+
+/* ---- Bars ---- */
+.bar-wrap { margin-bottom:1px; display:flex; align-items:center; gap:3px; }
+.bar {
+  flex:1; height:calc(5px * var(--ui-scale)); border-radius:3px;
+  background:rgba(255,255,255,0.1); overflow:hidden;
+  position: relative;
+}
+.bar-fill { height:100%; border-radius:3px; transition:width 0.4s ease; }
+.shield-fill {
+  position:absolute; top:0; left:0;
+  height:100%; border-radius:3px;
+  background:rgba(180,100,255,0.80);
+  transition:width 0.4s ease;
+  pointer-events:none;
+}
+.hp-fill { background:linear-gradient(90deg,#44ff88,#44cc66); }
+.hp-fill.hp-warning { background:linear-gradient(90deg,#ffaa22,#ff7700); }
+.hp-fill.hp-danger  { background:linear-gradient(90deg,#ff4444,#cc0000); animation:hpDanger 1s ease-in-out infinite alternate; }
+@keyframes hpDanger { from{opacity:1;} to{opacity:0.6;} }
+.mp-fill { background:linear-gradient(90deg,#4488ff,#2244cc); }
+.bar-value { font-size:calc(0.68rem * var(--ui-scale)); font-weight:700; color:#e8eef8; white-space:nowrap; text-align:center; margin:1px 0 3px; }
+.bar-value .shield-val { color:#cc99ff; margin-left:2px; }
+
+/* ---- Passive Display ---- */
+.char-passive {
+  font-size: calc(0.56rem * var(--ui-scale)); text-align: center; line-height: 1.4;
+  background: rgba(40,60,120,0.35); border-radius: 3px;
+  padding: 2px 4px; margin: 2px 0;
+  color: #aaccff;
+}
+.passive-name {
+  font-weight: 700; display: block; margin-bottom: 1px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.passive-desc {
+  opacity: 0.85;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+  /* 常に2行分を確保してカード高を揃える。.char-passive の font-size と同じ式なので
+     倍率も同じように掛ける（掛け忘れると拡大時に3行目が見切れる） */
+  height: calc(0.56rem * var(--ui-scale) * 1.4 * 2);
+}
+
+/* ---- Enemy Next Action ---- カードの下にふわふわ浮く吹き出し ---- */
+/* 敵カードのみクリップを解除して吹き出しがカード外に出られるようにする。
+   guard-overlay / ally-acted::after は味方専用、HPバーは .bar 側で自前に
+   クリップしているので、敵側だけ解除しても副作用はない */
+#enemy-area .char-card { overflow: visible; }
+
+.enemy-next-action {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  /* 絶対配置の100%は包含ブロック(.char-card)の幅に解決されるのでカード実幅に追従する。
+     隣接吹き出しの中心間距離は (W1+W2)/2 + gap、半幅の和は (W1+W2)/2 + 8 なので
+     gap が 8px 以上（実際はモバイル10px・PC16px）なら計算上絶対に重ならない */
+  width: calc(100% + 8px);
+  padding: calc(4px * var(--ui-scale)) calc(7px * var(--ui-scale));
+  text-align: center;
+  background: rgba(20, 8, 14, 0.94);
+  border: 1px solid rgba(255, 110, 110, 0.75);
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55), 0 0 12px rgba(255, 80, 80, 0.18);
+  z-index: 40;                 /* .aoe-overlay(5) より上、.enemy-skill-popup(50) より下 */
+  pointer-events: none;        /* カードのタップ判定を絶対に奪わない */
+  /* 中央寄せは静的に持たせる。キーフレーム側だけに書くと、
+     省電力モードで animation:none にしたとき寄せが外れて右へずれる */
+  transform: translateX(-50%);
+  animation: nextActionFloat 2.6s ease-in-out infinite alternate;
+}
+/* 行動が無いとき updateEnemyNextAction は innerHTML='' にするだけなので、
+   空の吹き出しが残らないよう消す */
+.enemy-next-action:empty { display: none; }
+
+/* 吹き出しのしっぽ（上向き三角） */
+.enemy-next-action::after {
+  content: '';
+  position: absolute;
+  bottom: 100%; left: 50%;
+  margin-left: -5px;
+  border: 5px solid transparent;
+  border-bottom-color: rgba(255, 110, 110, 0.75);
+}
+
+/* 中央寄せの translateX(-50%) をキーフレーム側にも含めないと横位置がずれる */
+@keyframes nextActionFloat {
+  from { transform: translateX(-50%) translateY(0); }
+  to   { transform: translateX(-50%) translateY(5px); }
+}
+
+.next-action-skill {
+  font-size: calc(0.68rem * var(--ui-scale));
+  font-weight: 700;
+  color: #ffcccc;
+  line-height: 1.3;
+}
+.next-action-detail {
+  font-size: calc(0.63rem * var(--ui-scale));
+  color: #ffaaaa;
+  margin-top: 1px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* ---- 電光掲示板風マーキー ----
+   固定幅に収まらない行だけを横スクロールさせる。
+   あふれ検知はCSS単独では不可能なので、updateEnemyNextAction が実測して
+   is-marquee クラスと --mq-shift / --mq-dur を付ける */
+.next-action-skill,
+.next-action-detail {
+  overflow: hidden;
+  white-space: nowrap;
+}
+.next-action-skill > span,
+.next-action-detail > span { display: inline-block; }
+
+.next-action-skill.is-marquee > span,
+.next-action-detail.is-marquee > span {
+  animation: marqueeScroll var(--mq-dur, 6s) linear infinite;
+}
+/* 両端で15%ずつ静止させ、読み取れる間を作る */
+@keyframes marqueeScroll {
+  0%, 15%   { transform: translateX(0); }
+  85%, 100% { transform: translateX(var(--mq-shift, 0px)); }
+}
+
+/* ---- Status Icons ---- */
+.status-icons { display:flex; flex-wrap:wrap; justify-content:center; gap:2px; margin-top:3px; min-height:calc(14px * var(--ui-scale)); }
+.status-icon {
+  font-size:calc(0.6rem * var(--ui-scale)); background:rgba(255,255,255,0.08);
+  border-radius:3px; padding:1px 3px; cursor:default;
+}
+
+/* ============================================================
+   SKILL PANEL — 2×2 grid + DEFEND button
+   ============================================================ */
+#skill-panel {
+  --theme-color: var(--border-glow);
+  background: rgba(0,0,0,0.6);
+  border-top: 2px solid var(--theme-color);
+  border-bottom: 2px solid var(--theme-color);
+  padding: calc(8px * var(--ui-scale)) calc(12px * var(--ui-scale));
+  transition: border-color 0.25s;
+
+  /* 高さを余ったスペースだけで決め、中身から完全に切り離す。
+     ・味方カードとの間にできていた隙間が消える
+     ・スキルの効果チップが1個でも5個でもパネルの箱は 1px も変わらない
+     ・上の要素（topbar / 敵 / VS帯 / 味方）はどれも flex-grow を持たないので
+       余りを取り合う相手が居ない ＝ カードも動かない
+
+     flex-grow:1 だけでは不十分。flex-basis の既定は auto ＝ 中身の高さで、
+     「中身の高さ ＋ 余り」になり結局スキルの内容で高さが変わる。
+     flex-basis を 0 にして初めて「高さ＝余りスペースだけ」になる */
+  flex: 1 1 0;
+  display: flex; flex-direction: column;
+  /* 万一あふれてもパネルの箱は変えず、中でスクロールさせる */
+  overflow-y: auto;
+  /* 画面が低くて余りが取れないときの下限。min-height を明示することで
+     flex アイテムの自動最小サイズ（中身依存）も同時に無効化される */
+  min-height: calc(220px * var(--ui-scale));
+}
+
+.skill-header {
+  font-size: calc(0.85rem * var(--ui-scale)); color: var(--neon-gold); margin-bottom: 7px;
+}
+
+.skill-grid {
+  display: grid;
+  /* 1fr は minmax(auto, 1fr) の略で、auto の最小値＝中身の最小幅。
+     折り返せない長いチップを持つスキルだと列がその幅まで押し広げられ、
+     下の max-width を突き抜けてキャラごとにパネルの幅が変わってしまう。
+     minmax(0, 1fr) にして「中身の都合で広がらない」列にする */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(7px * var(--ui-scale));
+  margin-bottom: calc(7px * var(--ui-scale));
+  /* パネル幅いっぱいに広げるとボタン1枚が700px超になり、
+     アイコン＋技名＋効果1行という中身に対して間延びする。
+     2×2の形は保ったまま横だけ抑える（高さが変わると #skill-panel の
+     min-height による揺れ止めと噛み合わなくなるため列数は変えない）。
+
+     以前は --field-max に合わせてカードの左右端と揃えていたが、
+     効果チップの折り返しを減らすため幅を優先してパネル一杯まで使う。
+     カードの端より左右 24px ずつ外へ出る（倍率1.35で片側24px）。
+
+     margin-inline:auto を書いてはいけない。#skill-panel が
+     display:flex; flex-direction:column なので、交差軸に auto マージンがあると
+     stretch が無効になり中身なりの幅（shrink-to-fit）になる。
+     結果としてスキルの効果チップが多いキャラほどパネルが広い、という
+     キャラ依存の幅になってしまう */
+  /* 広がったパネルの高さをボタンが使い切る。効果チップが増えても
+     ボタンの中で折り返すだけで、パネルの高さは変わらない */
+  flex: 1 1 auto;
+  grid-auto-rows: 1fr;
+}
+
+.skill-btn {
+  padding: calc(8px * var(--ui-scale)) calc(10px * var(--ui-scale)); border-radius: 8px;
+  min-height: calc(80px * var(--ui-scale));
+  min-width: 0;   /* グリッド項目の自動最小幅（中身依存）を切る。列幅を中身で変えさせない */
+  border: 2px solid rgba(255,255,255,0.12);
+  background: rgba(20,20,50,0.9);
+  color: var(--text-main); cursor: pointer;
+  text-align: left; transition: all 0.15s;
+  position: relative; overflow: hidden;
+}
+.skill-btn::before {
+  content:''; position:absolute; inset:0; opacity:0.1; transition:opacity 0.15s;
+}
+.skill-btn:hover:not(:disabled)::before { opacity:0.2; }
+.skill-btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 4px 16px rgba(0,0,0,0.5); }
+
+/* 対象確認待ちのスキル/防御ボタン（カードクリック or 2度押しで発動） */
+#skill-panel .skill-pending {
+  position: relative;
+  border-color: var(--neon-gold, #ffd700);
+  box-shadow: 0 0 10px rgba(255,215,0,0.45), inset 0 0 8px rgba(255,215,0,0.12);
+}
+/* 確認待ちの間は対象ラベルを隠し、同じ位置にヒントを表示（文字被り防止） */
+#skill-panel .skill-pending .skill-tgt { visibility: hidden; }
+#skill-panel .skill-pending::after {
+  content: attr(data-pending-hint);
+  position: absolute; right: 5px; bottom: 4px;
+  font-size: calc(0.56rem * var(--ui-scale)); font-weight: 700; color: var(--neon-gold, #ffd700);
+  background: rgba(0,0,0,0.72); padding: 1px 6px; border-radius: 6px;
+  pointer-events: none; z-index: 2;
+}
+.skill-btn:disabled { opacity:0.3; cursor:not-allowed; }
+.skill-disabled { opacity:0.3 !important; cursor:not-allowed !important; }
+.party-sp-label {
+  font-size: calc(0.72rem * var(--ui-scale)); font-weight: 700;
+  color: var(--neon-blue); letter-spacing: 0.1em;
+}
+#party-sp-gems {
+  display: flex; gap: 10px; align-items: center;
+}
+.sp-num {
+  font-size: 12px; font-weight: 700;
+  color: rgba(100, 170, 255, 0.8);
+  letter-spacing: 0.05em; margin-left: 4px;
+}
+.sp-seg {
+  position: relative;
+  width: calc(14px * var(--ui-scale)); height: calc(14px * var(--ui-scale)); border-radius: 2px;
+  transform: rotate(45deg);
+  background: rgba(68,136,255,0.08);
+  border: 1px solid rgba(68,136,255,0.25);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+/* 点灯時。SPの菱形は戦闘中ずっと5〜8個が光り続けるため、
+   box-shadow を直接アニメーションすると毎フレーム再描画が走って発熱の原因になる。
+   強い光は ::after に固定で描き、GPU合成される opacity だけを動かす */
+.sp-seg.on {
+  background: linear-gradient(135deg, #4488ff, #2255cc);
+  border-color: #66aaff;
+  box-shadow: 0 0 6px rgba(68,136,255,0.7), 0 0 2px #4488ff inset;
+}
+.sp-seg.on::after {
+  content: '';
+  position: absolute; inset: -1px;
+  border-radius: inherit;
+  box-shadow: 0 0 16px rgba(68,136,255,1), 0 0 6px #88bbff inset;
+  pointer-events: none;
+  animation: spSegGlow 1.8s ease-in-out infinite alternate;
+}
+@keyframes spSegGlow {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.skill-btn.skill-selected {
+  border-color: #ff8800 !important;
+  animation: skillSelectedPulse 0.7s ease-in-out infinite alternate;
+}
+@keyframes skillSelectedPulse {
+  from { box-shadow: 0 0 8px rgba(255,136,0,0.4); }
+  to   { box-shadow: 0 0 22px rgba(255,136,0,0.9); }
+}
+
+.skill-top   { display:flex; align-items:center; gap:5px; margin-bottom:3px; }
+.skill-icon  { font-size:calc(1.1rem * var(--ui-scale)); flex-shrink:0; }
+.skill-name  { font-size:calc(0.92rem * var(--ui-scale)); font-weight:700; line-height:1.2; }
+.skill-mid   { display:flex; gap:6px; margin-bottom:3px; align-items:center; }
+.skill-est   { font-size:calc(0.65rem * var(--ui-scale)); color:#88ddff; font-weight:700; }
+.skill-crit  { font-size:calc(0.6rem * var(--ui-scale)); color:#ffcc44; }
+.skill-meta  { display:flex; justify-content:space-between; font-size:calc(0.62rem * var(--ui-scale)); }
+.skill-mp    { color:var(--neon-blue); font-size:calc(0.85rem * var(--ui-scale)); letter-spacing:1px; }
+.skill-mp.mp-short { color:var(--red); }
+.skill-tgt   { color:var(--text-main); font-size:calc(0.85rem * var(--ui-scale)); font-weight:600; }
+
+/* DEFEND button */
+/* 防御ボタン: スキルグリッドのセルとして通常攻撃の隣に並ぶ */
+.defend-btn {
+  padding: calc(8px * var(--ui-scale)) calc(10px * var(--ui-scale)); border-radius: 8px;
+  min-height: calc(80px * var(--ui-scale));
+  min-width: 0;   /* .skill-btn と同じ理由 */
+  border: 2px solid rgba(255,255,255,0.12);
+  background: rgba(20,20,50,0.9);
+  color: var(--text-main); cursor: pointer;
+  text-align: left; transition: all 0.15s;
+  position: relative; overflow: hidden;
+}
+.defend-btn::before {
+  content:''; position:absolute; inset:0; opacity:0.1; transition:opacity 0.15s;
+}
+.defend-btn:hover:not(:disabled)::before { opacity:0.2; }
+.defend-btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 4px 16px rgba(0,0,0,0.5); }
+
+/* Character select (side-turn: choose who acts next) */
+.char-select-header {
+  font-size:calc(0.82rem * var(--ui-scale)); color:var(--neon-gold); margin-bottom:6px; font-weight:700;
+}
+.char-select-grid {
+  display: grid;
+  /* auto-fill は幅が余った分だけ空のトラックを作るので、パーティ3人だと
+     ボタンが左に寄って右側に空トラックが並ぶ。auto-fit なら空トラックが潰れ、
+     実際にあるボタンだけで幅を分け合うので中央に揃う */
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 6px;
+  margin-bottom: 7px;
+  /* .skill-grid と同じく margin-inline:auto は付けない（中身依存の幅になるため） */
+}
+.char-select-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 8px 6px; border-radius: 8px;
+  border: 2px solid rgba(100,220,255,0.35);
+  background: rgba(10,20,50,0.85);
+  color: var(--text-main); cursor: pointer;
+  transition: all 0.15s; text-align: center;
+}
+.char-select-btn:hover {
+  border-color: rgba(100,220,255,0.85);
+  background: rgba(30,50,100,0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(80,180,255,0.35);
+}
+.cs-emoji { font-size: calc(1.4rem * var(--ui-scale)); line-height: 1; }
+.cs-name  { font-size: calc(0.7rem * var(--ui-scale)); font-weight: 700; line-height: 1.2; }
+.cs-role  { font-size: calc(0.65rem * var(--ui-scale)); color: var(--text-dim); }
+.cs-hp-bar {
+  width: 100%; height: 5px; border-radius: 3px;
+  background: rgba(255,255,255,0.1); margin-top: 2px; overflow: hidden;
+}
+.cs-hp-fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg,#44ff88,#22cc66);
+  transition: width 0.2s;
+}
+.cs-hp-fill.low  { background: linear-gradient(90deg,#ffaa22,#ff8800); }
+.cs-hp-fill.crit { background: linear-gradient(90deg,#ff4444,#cc2222); }
+.cs-hp-val { font-size: calc(0.6rem * var(--ui-scale)); color: var(--text-dim); }
+
+.waiting-msg {
+  text-align:center; padding:16px; color:var(--text-dim); font-size:calc(0.9rem * var(--ui-scale));
+  animation: pulse 1s ease-in-out infinite alternate;
+  /* パネルが縦に広がったので、待機表示は上に張り付かず中央に置く */
+  margin-block: auto;
+}
+@keyframes pulse { from{opacity:0.6;} to{opacity:1;} }
+
+/* ============================================================
+   TURN CHANGE BANNER */
+.turn-change-banner {
+  position: fixed; left: 50%; top: 50%;
+  transform: translate(-50%, -50%) scale(0.7);
+  opacity: 0; z-index: 290; pointer-events: none;
+  padding: 12px 48px; border-radius: 10px;
+  font-size: calc(1.4rem * var(--ui-scale)); font-weight: 900; letter-spacing: 0.08em;
+  transition: opacity 0.18s, transform 0.18s;
+  white-space: nowrap;
+}
+.turn-change-banner.active {
+  opacity: 1; transform: translate(-50%, -50%) scale(1);
+}
+.turn-change-banner.turn-player {
+  background: linear-gradient(135deg, rgba(10,25,60,0.92), rgba(5,15,40,0.92));
+  border: 2px solid #4488ff;
+  color: #88bbff; box-shadow: 0 0 30px rgba(68,136,255,0.35);
+}
+.turn-change-banner.turn-enemy {
+  background: linear-gradient(135deg, rgba(50,10,10,0.92), rgba(30,5,5,0.92));
+  border: 2px solid #ff4444;
+  color: #ff8888; box-shadow: 0 0 30px rgba(255,50,50,0.35);
+}
+
+/* ============================================================
+   INITIATIVE BANNER — battle start overlay */
+.initiative-banner {
+  position: fixed; inset: 0; z-index: 300;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.3s;
+  background: rgba(0,0,0,0.4);
+}
+.initiative-banner.active { opacity: 1; }
+.initiative-banner .init-icon {
+  font-size: calc(3.5rem * var(--ui-scale)); line-height: 1; margin-bottom: 10px;
+  animation: initBounce 0.45s ease both;
+}
+.initiative-banner .init-text {
+  font-size: calc(2.2rem * var(--ui-scale)); font-weight: 800; text-align: center; line-height: 1.35;
+  text-shadow: 0 0 32px currentColor, 0 2px 8px rgba(0,0,0,0.8);
+  animation: initBounce 0.45s ease 0.1s both;
+}
+.initiative-banner .init-text span { font-size: calc(1.15rem * var(--ui-scale)); opacity: 0.85; }
+.initiative-banner.player-first .init-text { color: var(--neon-gold); }
+.initiative-banner.enemy-first  .init-text { color: #ff5555; }
+@keyframes initBounce {
+  0%   { transform: scale(0.4) translateY(-20px); opacity: 0; }
+  65%  { transform: scale(1.12) translateY(3px); }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* ============================================================
+   WAVE BANNER — shows before initiative banner */
+.wave-banner {
+  position: fixed; inset: 0; z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none; opacity: 0; transition: opacity 0.3s;
+  background: rgba(0,0,0,0.45);
+}
+.wave-banner.active { opacity: 1; }
+.wave-banner .wave-label {
+  font-size: calc(2.6rem * var(--ui-scale)); font-weight: 900; letter-spacing: 0.1em;
+  text-shadow: 0 0 32px currentColor, 0 2px 8px rgba(0,0,0,0.8);
+  animation: initBounce 0.45s ease both;
+}
+.wave-banner.wave-normal .wave-label  { color: #88ccff; }
+.wave-banner.wave-midboss .wave-label { color: #ffaa44; }
+.wave-banner.wave-boss .wave-label    { color: var(--neon-gold); }
+
+/* ============================================================
+   RESULT RELIC — 勝利画面のレリック入手表示 */
+#result-relic {
+  margin: calc(0.7rem * var(--ui-scale)) auto 0;
+  padding: calc(0.7rem * var(--ui-scale)) calc(1.4rem * var(--ui-scale));
+  background: rgba(20,10,50,0.9);
+  border: 2px solid var(--neon-purple);
+  border-radius: 10px;
+  max-width: 280px;
+  text-align: center;
+  box-shadow: 0 0 16px rgba(170,68,255,0.3);
+}
+#result-relic .rr-label {
+  font-size: calc(0.75rem * var(--ui-scale)); font-weight: 700; color: var(--neon-gold);
+  letter-spacing: 0.08em; margin-bottom: calc(0.35rem * var(--ui-scale));
+}
+#result-relic .rr-body { display: flex; align-items: center; justify-content: center; gap: calc(0.5rem * var(--ui-scale)); }
+#result-relic .rr-emoji { font-size: calc(2rem * var(--ui-scale)); line-height: 1; }
+#result-relic .rr-name  { font-size: calc(1.1rem * var(--ui-scale)); font-weight: 900; color: #fff; }
+#result-relic .rr-origin { font-size: calc(0.6rem * var(--ui-scale)); color: var(--text-dim); margin-top: calc(0.15rem * var(--ui-scale)); }
+#result-relic .rr-desc  { font-size: calc(0.75rem * var(--ui-scale)); color: #bbb; margin-top: calc(0.3rem * var(--ui-scale)); line-height: 1.4; }
+
+/* ============================================================
+   ENEMY SKILL NAME POPUP — above boss/midboss card on attack */
+.enemy-skill-popup {
+  position: absolute; top: calc(-2.4rem * var(--ui-scale)); left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: rgba(160,0,0,0.9); color: #fff;
+  font-size: calc(0.95rem * var(--ui-scale)); font-weight: 800; white-space: nowrap;
+  padding: 4px 12px; border-radius: 6px; border: 2px solid #ff4444;
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.25s, transform 0.25s;
+  z-index: 50; text-shadow: 0 1px 4px #000;
+}
+.enemy-skill-popup.active {
+  opacity: 1; transform: translateX(-50%) translateY(0);
+}
+
+/* ============================================================
+   STATUS SKIP POPUP — stun / paralyze card overlay */
+.status-skip-popup {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  background: rgba(15,15,35,0.92); color: #ffdd44;
+  font-size: calc(0.95rem * var(--ui-scale)); font-weight: 800; white-space: nowrap;
+  padding: 6px 14px; border-radius: 8px; border: 2px solid #ffdd44;
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.2s, transform 0.2s; z-index: 50;
+}
+.status-skip-popup.active {
+  opacity: 1; transform: translate(-50%, -50%) scale(1);
+}
+/* 付与ポップアップはHPバーに重ならないようカード上部（絵文字・名前あたり）に表示 */
+.status-skip-popup.status-applied { top: 26%; }
+
+.char-origin-row.series-bonus-glow {
+  color: #ffdd66;
+  text-shadow: 0 0 8px rgba(255,220,80,0.85);
+  animation: seriesBonusOriginPulse 2.4s ease-in-out infinite;
+}
+/* text-shadow のアニメーションは毎フレーム再描画になるため、opacity の明滅に置き換える。
+   光の強さは固定で持たせる */
+@keyframes seriesBonusOriginPulse {
+  0%, 100% { opacity: 0.65; }
+  50%       { opacity: 1; }
+}
+
+/* ---- enemy origin label on boss/midboss cards ---- */
+.char-origin-row.enemy-origin {
+  font-size: calc(0.65rem * var(--ui-scale)); opacity: 0.7; margin-top: 1px;
+}
+
+/* ============================================================
+   BATTLE SIDE — 左右のサイドパネル
+   左: 📘システム ＋ 💎レリック（参照情報。バフ・デバフ一覧は📖ガイドへ移した）
+   右: 📜バトルログ専用
+   ログ行は左揃えのテキストなので、右に置くと文字の開始位置がパネルの左端＝
+   フィールドに接する側に来る。左に置くと画面の最も外側から読み始めることになる
+   ============================================================ */
+.battle-side {
+  /* 2枚に分けると padding と border が1組増える。255×2＋border2 ＝ 約690px(倍率1.35)。
+     画面上限1440pxなら .battle-main に749px残り、--field-max の702pxが収まる */
+  width: calc(255px * var(--ui-scale));
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(6px * var(--ui-scale));
+  overflow-y: auto;
+  padding: calc(8px * var(--ui-scale));
+  background: rgba(0,0,0,0.55);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-glow) transparent;
+}
+#side-left  { border-right: 1px solid rgba(100,120,255,0.25); }
+#side-right { border-left:  1px solid rgba(100,120,255,0.25); }
+
+/* ============================================================
+   BATTLE LOG — #side-right 内の折りたたみBOX
+   ============================================================ */
+#battle-log {
+  /* ログ専用パネルなので画面の高さいっぱいを使う。100vh から summary(約40px) と
+     パネルのpaddingぶんを引いた値。行数固定より、ウィンドウの高さに自動で
+     追従するほうが無駄がない（件数の上限は log() 側の80件で担保済み） */
+  max-height: calc(100vh - 90px);
+  overflow-y: auto;
+  padding: calc(4px * var(--ui-scale)) calc(8px * var(--ui-scale));
+  font-size: calc(0.73rem * var(--ui-scale));
+  line-height: 1.6;
+  /* log() は prepend するので、新着が上に積まれる */
+  display: flex;
+  flex-direction: column;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-glow) transparent;
+}
+.log-line { padding:1px 0; border-bottom:1px solid rgba(255,255,255,0.03); }
+.log-system { color:var(--neon-gold); }
+.log-ally   { color:#88ccff; }
+.log-enemy  { color:#ffaaaa; }
+.log-status { color:#aabbaa; }
+.log-heal   { color:var(--neon-green); }
+.log-crit   { color:#ffdd44; font-weight:700; }
+
+/* ============================================================
+   INFO SIDEBAR
+   ============================================================ */
+/* 幅・枠・スクロールは親の .battle-side（#side-left）が持つ。ここは中身のブロックに徹する */
+#info-sidebar {
+  font-size: calc(0.7rem * var(--ui-scale));
+}
+
+.sidebar-section { margin-bottom: 12px; }
+.sidebar-title {
+  font-size: calc(0.72rem * var(--ui-scale)); font-weight: 700;
+  color: var(--neon-gold); margin-bottom: 6px;
+  padding-bottom: 3px; border-bottom: 1px solid rgba(255,204,0,0.2);
+}
+
+/* PP info block */
+.sidebar-pp-info { font-size:calc(0.63rem * var(--ui-scale)); color:var(--text-dim); line-height:1.6; }
+
+/* ============================================================
+   FLOATING NUMBERS
+   ============================================================ */
+.float-num {
+  position:fixed; font-size:calc(1.3rem * var(--ui-scale)); font-weight:900;
+  pointer-events:none; z-index:9999;
+  animation:floatUp 1.1s ease-out forwards;
+  white-space:nowrap; text-shadow:0 2px 6px rgba(0,0,0,0.8);
+}
+@keyframes floatUp {
+  0%   { transform:translateY(0) scale(1); opacity:1; }
+  60%  { transform:translateY(-45px) scale(1.1); opacity:1; }
+  100% { transform:translateY(-70px) scale(0.9); opacity:0; }
+}
+.float-dmg    { color:#ffffff; }
+.float-crit   { color:#ffee00; font-size:calc(1.6rem * var(--ui-scale)); }
+.float-weak   { color:#44ff88; font-size:calc(1.5rem * var(--ui-scale)); }
+.float-heal   { color:#44ffaa; }
+.float-revive { color:#ffffaa; font-size:calc(1.25rem * var(--ui-scale)); font-weight:900; text-shadow:0 0 14px rgba(255,255,100,0.9), 0 0 28px rgba(255,200,50,0.5); }
+.float-fire   { color:#ff7722; }
+.float-poison { color:#88ff44; }
+.float-shield { color:#55aaff; text-shadow:0 0 10px #55aaff; font-size:calc(1.5rem * var(--ui-scale)); }
+.float-buff   { color:#ffcc44; text-shadow:0 0 8px #ffcc44; }
+.float-debuff { color:#ff4466; text-shadow:0 0 8px #ff4466; }
+.float-num.float-down { animation: floatDown 1.1s ease-out forwards; }
+@keyframes floatDown {
+  0%   { transform: translateY(0) scale(1); opacity: 1; }
+  60%  { transform: translateY(42px) scale(1.1); opacity: 1; }
+  100% { transform: translateY(65px) scale(0.9); opacity: 0; }
+}
+
+/* ============================================================
+   SCREEN SHAKE
+   ============================================================ */
+.shake       { animation: shake 0.4s ease; }
+.shake-heavy { animation: shakeHeavy 0.5s ease; }
+@keyframes shake {
+  0%,100% { transform:translate(0); }
+  15% { transform:translate(-6px, 2px); }
+  30% { transform:translate(6px,-2px); }
+  45% { transform:translate(-5px, 4px); }
+  60% { transform:translate(5px,-3px); }
+  75% { transform:translate(-3px, 2px); }
+  90% { transform:translate(3px,-1px); }
+}
+@keyframes shakeHeavy {
+  0%,100% { transform:translate(0); }
+  10% { transform:translate(-12px, 4px); }
+  20% { transform:translate(12px,-4px); }
+  30% { transform:translate(-10px, 8px); }
+  40% { transform:translate(10px,-6px); }
+  50% { transform:translate(-8px, 4px); }
+  60% { transform:translate(8px,-4px); }
+  70% { transform:translate(-6px, 2px); }
+  80% { transform:translate(6px,-2px); }
+  90% { transform:translate(-3px,0); }
+}
+
+/* ============================================================
+   SKILL ANIMATION OVERLAY
+   ============================================================ */
+.anim-overlay {
+  position:fixed; inset:0; pointer-events:none; z-index:500;
+  opacity:0; transition:opacity 0.15s;
+}
+
+/* beam */
+.anim-beam::after {
+  content:''; position:absolute; top:var(--anim-target-y,50%); left:0; right:0; height:10px;
+  transform:translateY(-50%);
+  background:linear-gradient(90deg,transparent,#aa44ff,#fff,#aa44ff,transparent);
+  box-shadow:0 0 40px 20px rgba(170,68,255,0.6);
+  animation:beamFlash 0.6s ease-out;
+}
+@keyframes beamFlash {
+  0%   { opacity:0; transform:translateY(-50%) scaleX(0); }
+  30%  { opacity:1; transform:translateY(-50%) scaleX(1); }
+  100% { opacity:0; transform:translateY(-50%) scaleX(1); }
+}
+
+/* explosion */
+.anim-explosion::before {
+  content:''; position:absolute; top:var(--anim-target-y,35%); left:50%;
+  width:180px; height:180px; transform:translate(-50%,-50%);
+  background:radial-gradient(circle,#fff 0%,#ffcc00 20%,#ff4400 60%,transparent 100%);
+  border-radius:50%; animation:explode 0.6s ease-out forwards;
+}
+.anim-explosion.anim-wide::before { width:380px; height:280px; }
+@keyframes explode {
+  0%   { transform:translate(-50%,-50%) scale(0); opacity:1; }
+  60%  { transform:translate(-50%,-50%) scale(1); opacity:0.9; }
+  100% { transform:translate(-50%,-50%) scale(1.5); opacity:0; }
+}
+
+/* slash */
+.anim-slash::after {
+  content:''; position:absolute; top:var(--anim-target-y,35%); left:20%; right:20%; height:4px;
+  background:linear-gradient(90deg,transparent,#fff,transparent);
+  transform:rotate(-20deg);
+  box-shadow:0 0 15px 5px rgba(255,255,255,0.6);
+  animation:slashLine 0.4s ease-out;
+}
+@keyframes slashLine {
+  0%   { opacity:0; transform:rotate(-20deg) scaleX(0); }
+  20%  { opacity:1; transform:rotate(-20deg) scaleX(1); }
+  100% { opacity:0; transform:rotate(-20deg) scaleX(1) translateY(40px); }
+}
+
+/* slash_heavy */
+.anim-slash_heavy { animation:slashHeavyFlash 0.5s ease-out; }
+.anim-slash_heavy::before {
+  content:''; position:absolute;
+  top:calc(var(--anim-target-y,35%) - 6px); left:10%; right:10%; height:7px;
+  background:linear-gradient(90deg,transparent,#ffcc44,#fff,#ffcc44,transparent);
+  transform:rotate(-20deg);
+  box-shadow:0 0 28px 12px rgba(255,180,0,0.75);
+  animation:slashHeavyLine 0.5s ease-out;
+}
+.anim-slash_heavy::after {
+  content:''; position:absolute;
+  top:calc(var(--anim-target-y,35%) + 10px); left:15%; right:15%; height:3px;
+  background:linear-gradient(90deg,transparent,rgba(255,220,100,0.9),transparent);
+  transform:rotate(-20deg);
+  box-shadow:0 0 10px 4px rgba(255,180,0,0.4);
+  animation:slashHeavyLine 0.5s ease-out 0.07s;
+}
+.anim-wide.anim-slash_heavy::before { left:3%; right:3%; height:9px; }
+.anim-wide.anim-slash_heavy::after  { left:6%; right:6%; }
+@keyframes slashHeavyFlash {
+  0%   { background:rgba(255,180,0,0); }
+  25%  { background:rgba(255,180,0,0.13); }
+  100% { background:rgba(255,180,0,0); }
+}
+@keyframes slashHeavyLine {
+  0%   { opacity:0; transform:rotate(-20deg) scaleX(0); }
+  15%  { opacity:1; transform:rotate(-20deg) scaleX(1); }
+  100% { opacity:0; transform:rotate(-20deg) scaleX(1) translateY(52px); }
+}
+
+/* punch（通常打撃）: 拳が叩き込まれ、白い衝撃リングが弾ける */
+.anim-punch::before {
+  content:'👊'; position:absolute; font-size:3.2rem;
+  top:var(--anim-target-y,35%); left:50%;
+  animation:punchHit 0.35s ease-out forwards;
+}
+.anim-punch::after {
+  content:''; position:absolute; top:var(--anim-target-y,35%); left:50%;
+  width:90px; height:90px; border-radius:50%;
+  border:4px solid rgba(255,255,255,0.9);
+  box-shadow:0 0 20px 6px rgba(255,255,255,0.5);
+  animation:punchShock 0.4s ease-out forwards;
+}
+.anim-punch.anim-wide::before { font-size:4.2rem; }
+.anim-punch.anim-wide::after { width:200px; height:140px; border-radius:50%; }
+@keyframes punchHit {
+  0%   { opacity:0; transform:translate(-50%,-50%) scale(1.8) rotate(-25deg); }
+  40%  { opacity:1; transform:translate(-50%,-50%) scale(0.95) rotate(0deg); }
+  70%  { opacity:1; transform:translate(-50%,-50%) scale(1.05) rotate(0deg); }
+  100% { opacity:0; transform:translate(-50%,-50%) scale(1) rotate(0deg); }
+}
+@keyframes punchShock {
+  0%   { opacity:0; transform:translate(-50%,-50%) scale(0.2); }
+  30%  { opacity:1; transform:translate(-50%,-50%) scale(0.7); }
+  100% { opacity:0; transform:translate(-50%,-50%) scale(1.4); }
+}
+
+/* punch_heavy（強打）: 大きな拳＋二重衝撃波＋白フラッシュ */
+.anim-punch_heavy { background:rgba(255,255,255,0.0); animation:punchHeavyFlash 0.5s ease-out; }
+.anim-punch_heavy::before {
+  content:'👊'; position:absolute; font-size:5.2rem;
+  top:var(--anim-target-y,35%); left:50%;
+  filter:drop-shadow(0 0 14px rgba(255,180,60,0.9));
+  animation:punchHit 0.45s ease-out forwards;
+}
+.anim-punch_heavy::after {
+  content:''; position:absolute; top:var(--anim-target-y,35%); left:50%;
+  width:140px; height:140px; border-radius:50%;
+  border:5px solid rgba(255,220,120,0.95);
+  box-shadow:0 0 0 14px rgba(255,255,255,0.35), 0 0 40px 16px rgba(255,160,40,0.6);
+  animation:punchShock 0.55s ease-out forwards;
+}
+.anim-punch_heavy.anim-wide::before { font-size:6.5rem; }
+.anim-punch_heavy.anim-wide::after { width:300px; height:200px; }
+@keyframes punchHeavyFlash {
+  0%   { background:rgba(255,255,255,0); }
+  25%  { background:rgba(255,255,255,0.35); }
+  100% { background:rgba(255,255,255,0); }
+}
+
+/* heal */
+.anim-heal::before {
+  content:'💚💚💚'; position:absolute; font-size:1.8rem;
+  top:var(--anim-target-y,35%); left:50%; transform:translateX(-50%);
+  animation:healRise 0.7s ease-out forwards;
+}
+@keyframes healRise {
+  0%   { opacity:1; transform:translateX(-50%) translateY(0); }
+  100% { opacity:0; transform:translateX(-50%) translateY(-70px); }
+}
+
+/* thunder */
+.anim-thunder { background:rgba(255,220,0,0.07); }
+.anim-thunder::before {
+  content:'⚡'; position:absolute; font-size:4.5rem;
+  top:var(--anim-target-y,35%); left:50%; transform:translateX(-50%);
+  animation:thunderFlash 0.5s ease-out;
+}
+@keyframes thunderFlash {
+  0%,100% { opacity:0; transform:translateX(-50%) scale(0.5); }
+  20%,60% { opacity:1; transform:translateX(-50%) scale(1.2); }
+}
+
+/* ice */
+.anim-ice::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(circle at 50% var(--anim-target-y,35%),rgba(100,200,255,0.4) 0%,transparent 60%);
+  animation:iceBurst 0.6s ease-out;
+}
+@keyframes iceBurst { 0%{opacity:0;} 30%{opacity:1;} 100%{opacity:0;} }
+
+/* dark */
+.anim-dark::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(circle at 50% var(--anim-target-y,35%),rgba(100,0,150,0.6) 0%,transparent 70%);
+  animation:darkVortex 0.6s ease-out;
+}
+@keyframes darkVortex {
+  0%   { opacity:0; transform:scale(0); }
+  50%  { opacity:1; transform:scale(1) rotate(180deg); }
+  100% { opacity:0; transform:scale(1.5) rotate(360deg); }
+}
+
+/* buff */
+.anim-buff { background:rgba(255,204,0,0.05); }
+.anim-buff::before {
+  content:'✨✨✨'; position:absolute; font-size:1.8rem;
+  top:var(--anim-target-y,35%); left:50%; transform:translateX(-50%);
+  animation:buffSparkle 0.7s ease-out;
+}
+@keyframes buffSparkle {
+  0%   { opacity:0; transform:translateX(-50%) scale(0.5); }
+  40%  { opacity:1; transform:translateX(-50%) scale(1.3); }
+  100% { opacity:0; transform:translateX(-50%) scale(1); }
+}
+
+
+/* ============================================================
+   RESULT OVERLAY
+   ============================================================ */
+#result-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.78);
+  z-index:800; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:20px;
+  opacity:0; pointer-events:none; transition:opacity 0.4s;
+}
+#result-overlay.active { opacity:1; pointer-events:auto; }
+#result-msg { font-size:2rem; font-weight:900; text-align:center; line-height:1.4; }
+.result-win  { color:var(--neon-gold); text-shadow:0 0 20px rgba(255,204,0,0.7); }
+.result-lose { color:var(--red); text-shadow:0 0 20px rgba(255,50,50,0.7); }
+#result-btn {
+  padding:12px 40px; font-size:1rem; font-weight:700;
+  background:linear-gradient(135deg,#2255aa,#4477cc);
+  border:2px solid var(--neon-blue); color:#fff; border-radius:8px;
+  cursor:pointer; transition:all 0.2s; letter-spacing:0.08em;
+}
+#result-btn:hover { transform:scale(1.05); box-shadow:0 0 20px rgba(68,136,255,0.5); }
+/* ============================================================
+   BOSS INTRO OVERLAY
+   ============================================================ */
+#boss-intro-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.92);
+  z-index:900; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:16px;
+  opacity:0; pointer-events:none; transition:opacity 0.3s;
+}
+#boss-intro-overlay.active { opacity:1; pointer-events:auto; }
+#boss-intro-name {
+  font-size:clamp(1.8rem,5vw,3rem); font-weight:900; color:#cc44cc;
+  text-shadow:0 0 30px rgba(200,50,200,0.8);
+  animation:bossPulse 0.5s ease-in-out infinite alternate;
+}
+@keyframes bossPulse { from{filter:brightness(1);} to{filter:brightness(1.5);} }
+#boss-intro-quote {
+  font-size:0.95rem; color:var(--text-dim); font-style:italic;
+  max-width:480px; text-align:center; line-height:1.6;
+}
+
+/* ============================================================
+   SWAP OVERLAY
+   ============================================================ */
+#swap-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.82);
+  z-index:850; display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity 0.3s;
+}
+#swap-overlay.active { opacity:1; pointer-events:auto; }
+
+.swap-box {
+  background:var(--bg-panel); border:2px solid var(--neon-purple);
+  border-radius:16px; padding:24px 28px; max-width:440px; width:90%;
+  box-shadow:0 0 40px rgba(170,68,255,0.3);
+  text-align:center;
+}
+.swap-title { font-size:1.2rem; font-weight:900; color:var(--neon-gold); margin-bottom:14px; }
+.swap-cancel-btn {
+  padding:7px 20px; border-radius:7px;
+  border:1px solid rgba(150,150,150,0.3);
+  background:transparent; color:var(--text-dim);
+  cursor:pointer; font-size:0.8rem; transition:all 0.15s;
+}
+.swap-cancel-btn:hover { color:var(--text-main); border-color:rgba(255,255,255,0.4); }
+
+/* ============================================================
+   SWAP OVERLAY — 3 candidates layout
+   ============================================================ */
+.swap-box-3 { max-width: 680px; width: 95%; max-height: 90vh; overflow-y: auto; }
+
+.swap-subtitle {
+  font-size: 0.82rem; color: var(--text-dim); margin-bottom: 14px;
+}
+
+/* Current party display (always visible) */
+.swap-current-party {
+  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(68,136,255,0.25);
+  border-radius: 8px; padding: 8px 10px; margin-top: 14px; margin-bottom: 0;
+}
+.swap-current-label {
+  font-size: 0.68rem; color: var(--neon-blue);
+  margin-bottom: 7px; letter-spacing: 0.07em;
+}
+.swap-current-members {
+  display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+}
+.swap-cm-card {
+  display: block;
+  background: rgba(20,30,60,0.8);
+  border: 1px solid rgba(68,136,255,0.3);
+  border-radius: 7px; padding: 5px 9px;
+  min-width: 140px; text-align: left;
+}
+.swap-cm-top   { display: flex; align-items: center; gap: 7px; }
+.swap-cm-emoji { font-size: 1.4rem; flex-shrink: 0; }
+.swap-cm-name  { font-size: 0.74rem; font-weight: 700; color: var(--text-main); }
+.swap-cm-sub   { font-size: 0.58rem; color: var(--text-dim); margin-top: 1px; }
+.swap-cm-stats { font-size: 0.58rem; color: #88aacc; margin-top: 1px; }
+.swap-cm-passive {
+  font-size: 0.57rem; color: var(--neon-purple); font-weight: 700;
+  background: rgba(40,20,80,0.35); border-radius: 3px;
+  padding: 2px 5px; margin-top: 4px;
+}
+.swap-cm-passive-desc { color: #88ccaa; font-weight: 400; }
+.swap-cm-skills-toggle {
+  font-size: 0.6rem; color: var(--neon-purple); cursor: pointer;
+  padding: 2px 0; margin-top: 4px; user-select: none;
+}
+.swap-cm-skills-toggle:hover { color: #cc88ff; }
+.swap-cm-skills {
+  background: rgba(0,0,0,0.25); border-radius: 4px;
+  padding: 4px 5px; margin-top: 3px;
+}
+.swap-cm-card.selectable {
+  cursor: pointer;
+  border-color: rgba(255,180,0,0.7);
+  transition: all 0.15s;
+}
+.swap-cm-card.selectable:hover {
+  background: rgba(40,60,140,0.85);
+  border-color: var(--neon-blue);
+  transform: scale(1.04);
+}
+
+.swap-candidates {
+  display: flex; gap: 10px; justify-content: center;
+  flex-wrap: wrap; margin-bottom: 12px;
+}
+
+.swap-candidate-card {
+  background: rgba(20,20,50,0.9);
+  border: 2px solid rgba(100,120,255,0.3);
+  border-radius: 10px; padding: 10px;
+  width: 190px; flex-shrink: 0;
+  transition: all 0.15s;
+}
+.swap-candidate-card:hover {
+  border-color: rgba(100,150,255,0.7);
+  box-shadow: 0 0 12px rgba(100,150,255,0.25);
+}
+.swap-candidate-card.selected {
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 10px rgba(68,136,255,0.5);
+}
+
+/* カード幅より中身が狭いと flex 既定の左寄せで左端に張り付くため中央に揃える。
+   同カード内の HP・パッシブは .swap-box の text-align:center を継いで中央なので、
+   それらと横位置を合わせる意味もある */
+.swap-cand-top {
+  display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 6px;
+}
+.swap-cand-emoji { font-size: 1.8rem; flex-shrink: 0; }
+.swap-cand-info  { min-width: 0; }
+.swap-cand-name  { font-size: 0.78rem; font-weight: 700; color: var(--text-main); }
+.swap-cand-origin { font-size: 0.6rem; color: var(--text-dim); }
+.swap-cand-origin.same-series-glow { color: #ffcc55; animation: sameSeriesPulse 2.2s ease-in-out infinite; }
+@keyframes sameSeriesPulse {
+  0%, 100% { text-shadow: 0 0 4px rgba(255,204,68,0.2); }
+  50%       { text-shadow: 0 0 10px rgba(255,204,68,0.75); }
+}
+
+.swap-cand-badges {
+  display: flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 5px; flex-wrap: wrap;
+}
+.swap-cand-rarity { font-size: 0.65rem; font-weight: 700; }
+
+.swap-cand-stats {
+  font-size: 0.62rem; color: #88aacc; margin-bottom: 6px;
+}
+.swap-cand-passive {
+  font-size: 0.58rem; color: var(--neon-purple); font-weight: 700;
+  background: rgba(40,20,80,0.35); border-radius: 3px;
+  padding: 2px 5px; margin-bottom: 5px;
+}
+.swap-cand-passive-desc { color: #88ccaa; font-weight: 400; }
+
+.swap-cand-skills-toggle {
+  font-size: 0.62rem; color: var(--neon-purple); cursor: pointer;
+  padding: 2px 0; margin-bottom: 4px;
+}
+.swap-cand-skills-toggle:hover { color: #cc88ff; }
+
+.swap-cand-skills {
+  background: rgba(0,0,0,0.3); border-radius: 5px;
+  padding: 5px 6px; margin-bottom: 6px;
+}
+.cand-skill-item {
+  font-size: 0.6rem; color: var(--text-main); line-height: 1.6;
+}
+.cand-skill-pp {
+  color: var(--neon-blue); font-size: 0.56rem; margin-left: 3px;
+}
+
+.swap-select-btn {
+  width: 100%; padding: 6px; border-radius: 6px;
+  border: 2px solid rgba(68,255,170,0.4);
+  background: rgba(20,60,40,0.8); color: var(--neon-green);
+  cursor: pointer; font-size: 0.75rem; font-weight: 700;
+  transition: all 0.15s;
+}
+.swap-select-btn:hover {
+  background: rgba(40,100,70,0.9);
+  border-color: var(--neon-green);
+  box-shadow: 0 0 10px rgba(68,255,170,0.3);
+}
+
+
+/* ============================================================
+   BOSS VICTORY OVERLAY
+   ============================================================ */
+#boss-victory-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.88);
+  z-index:870; display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity 0.4s;
+}
+#boss-victory-overlay.active { opacity:1; pointer-events:auto; }
+
+.boss-victory-box {
+  background: linear-gradient(135deg, #1a1a40, #0a1a30);
+  border: 2px solid var(--neon-gold);
+  border-radius: 18px; padding: 32px 36px;
+  max-width: 460px; width: 90%; text-align: center;
+  box-shadow: 0 0 50px rgba(255,204,0,0.35);
+}
+.boss-victory-title {
+  font-size: 2.2rem; font-weight: 900; color: var(--neon-gold);
+  text-shadow: 0 0 25px rgba(255,204,0,0.8);
+  margin-bottom: 12px;
+  animation: bossPulse 0.6s ease-in-out infinite alternate;
+}
+.boss-victory-msg {
+  font-size: 1.1rem; color: var(--neon-green);
+  margin-bottom: 8px;
+}
+.boss-victory-sub {
+  font-size: 0.85rem; color: var(--text-dim); margin-bottom: 22px;
+}
+.boss-victory-btns {
+  display: flex; flex-direction: column; gap: 10px; align-items: center;
+}
+.boss-continue-btn {
+  padding: 12px 36px; font-size: 1rem; font-weight: 700;
+  background: linear-gradient(135deg, #225511, #448822);
+  border: 2px solid var(--neon-green);
+  color: #fff; border-radius: 8px; cursor: pointer; letter-spacing: 0.08em;
+  transition: all 0.2s; box-shadow: 0 0 16px rgba(68,255,170,0.3);
+}
+.boss-continue-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 28px rgba(68,255,170,0.6);
+}
+.boss-title-btn {
+  padding: 9px 28px; font-size: 0.85rem;
+  background: transparent;
+  border: 1px solid rgba(150,150,150,0.35);
+  color: var(--text-dim); border-radius: 7px; cursor: pointer;
+  transition: all 0.15s; letter-spacing: 0.05em;
+}
+.boss-title-btn:hover { color: var(--text-main); border-color: rgba(255,255,255,0.4); }
+
+/* ============================================================
+   SKILL BUTTON — effect display & noPP label
+   ============================================================ */
+.skill-effect-area {
+  display: flex; flex-wrap: wrap; gap: 3px;
+  align-items: center; margin-bottom: 3px; min-height: 14px;
+}
+.skill-effect-line {
+  font-size: 0.74rem; color: #aaddff;
+  background: rgba(100,160,255,0.12);
+  border-radius: 3px; padding: 1px 4px;
+}
+.skill-effect-line.effect-active {
+  color: #ffe600;
+  background: rgba(255,230,0,0.12);
+  text-shadow: 0 0 6px #ffe60099;
+  /* かつて white-space:nowrap を指定していたが、「🗡️追撃（HP70%以下の敵へ1.2倍）」
+     のような長いチップが分割不能な最小幅になり、発動条件を満たしたときだけ
+     スキルパネルの列幅が広がる原因になっていた。他のチップと同じく折り返させる */
+}
+.noPP-label {
+  color: var(--neon-green) !important;
+  font-weight: 700;
+}
+
+/* ============================================================
+   ALLY TARGET SELECT (for single-target heals)
+   ============================================================ */
+.char-card.targetable-ally {
+  border-color: var(--neon-green) !important;
+  cursor: crosshair;
+  animation: allyTargetPulse 0.5s ease-in-out infinite alternate;
+}
+@keyframes allyTargetPulse {
+  from { box-shadow: 0 0 6px rgba(68,255,170,0.4); }
+  to   { box-shadow: 0 0 18px rgba(68,255,170,0.9); }
+}
+
+/* ============================================================
+   SIDEBAR — recovery info
+   ============================================================ */
+.sidebar-recovery {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.recovery-row {
+  font-size: 0.63rem; color: var(--text-main); line-height: 1.4; padding: 2px 0;
+}
+.recovery-row.boss-row {
+  color: var(--neon-gold);
+}
+.recovery-row.recovery-note {
+  font-size: 0.58rem; color: var(--text-dim);
+  padding-left: 4px;
+}
+
+/* ============================================================
+   NEXT TURN PANEL (Pokemon-style — 1 actor)
+   ============================================================ */
+.ctb-panel {
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(68,136,255,0.25);
+  border-radius: 7px;
+  padding: 7px 6px;
+  margin-bottom: 8px;
+}
+
+.ctb-panel-title {
+  font-size: 0.68rem; font-weight: 700;
+  color: #44bbff; letter-spacing: 0.04em;
+  margin-bottom: 6px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid rgba(68,136,255,0.2);
+}
+
+.ctb-loading {
+  font-size: 0.63rem; color: var(--text-dim);
+  text-align: center; padding: 6px 0;
+}
+
+.ctb-entry {
+  display: flex; align-items: center; gap: 4px;
+  padding: 4px 5px; border-radius: 5px;
+  font-size: 0.7rem; font-weight: 700;
+  min-height: 26px; margin-bottom: 4px;
+}
+
+.ctb-entry.ctb-current {
+  background: rgba(68,187,255,0.16);
+  border-left: 2px solid #44bbff;
+}
+
+.ctb-ally-entry  { color: #99ddff; }
+.ctb-enemy-entry { color: #ffaaaa; }
+
+.ctb-char-emoji { font-size: 0.95rem; flex-shrink: 0; }
+.ctb-char-name  { flex: 1; font-size: 0.68rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.next-turn-spd  { font-size: 0.56rem; color: #aabbcc; flex-shrink: 0; }
+
+/* Enemy intent details */
+.next-turn-intent {
+  padding: 4px 6px; margin-top: 2px;
+  background: rgba(255,100,100,0.07);
+  border-radius: 4px; border-left: 2px solid rgba(255,100,100,0.3);
+}
+.intent-skill {
+  font-size: 0.68rem; color: #ffcc88; font-weight: 700; margin-bottom: 2px;
+}
+.intent-detail {
+  font-size: 0.6rem; color: var(--text-dim); line-height: 1.4;
+}
+.intent-dmg    { color: #ffaaaa; }
+.intent-effect { color: #ffdd88; }
+
+/* Compact sidebar sections */
+.sidebar-compact {
+  margin-bottom: 8px;
+}
+
+.sidebar-recovery-compact {
+  display: flex; flex-direction: column; gap: 3px;
+}
+
+.sidebar-recovery-compact .recovery-row {
+  font-size: 0.62rem; color: var(--text-main); line-height: 1.4;
+}
+
+.sidebar-recovery-compact .boss-row {
+  color: var(--neon-gold);
+}
+
+.reco-note {
+  font-size: 0.57rem; color: var(--text-dim); margin-left: 2px;
+}
+
+/* ============================================================
+   SKILL QUOTE BUBBLE — わざセリフ（フロート表示）
+   ============================================================ */
+.skill-quote-bubble {
+  position: absolute;
+  background: rgba(10,8,30,0.92);
+  color: #fff9cc;
+  border: 1px solid rgba(255,204,68,0.7);
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-style: italic;
+  font-weight: bold;
+  z-index: 600;
+  pointer-events: none;
+  max-width: 240px;
+  text-align: center;
+  white-space: pre-wrap;
+  animation: quoteRise 3.2s ease forwards;
+  text-shadow: 0 0 6px rgba(255,220,100,0.6);
+  box-shadow: 0 0 10px rgba(255,204,68,0.25);
+}
+@keyframes quoteRise {
+  0%   { opacity: 0; transform: translateY(0); }
+  10%  { opacity: 1; transform: translateY(-8px); }
+  70%  { opacity: 1; transform: translateY(-22px); }
+  100% { opacity: 0; transform: translateY(-38px); }
+}
+
+/* ============================================================
+   BATTLE LOG — セリフ行スタイル
+   ============================================================ */
+.log-speech {
+  color: #ffeeaa; font-style: italic;
+  border-left: 2px solid rgba(255,238,170,0.4);
+  padding-left: 4px; margin-left: 2px;
+}
+
+/* ============================================================
+   JOIN OVERLAY — キャラ参入セリフポップアップ
+   ============================================================ */
+.join-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+  z-index: 1000; display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.35s;
+}
+.join-overlay.active { opacity: 1; pointer-events: auto; }
+
+/* ============================================================
+   ガチャ風パーティ公開（ゲーム開始時・裏向きカードをタップでめくる）
+   ============================================================ */
+.gacha-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,10,0.92);
+  z-index: 900; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 22px;
+  opacity: 0; pointer-events: none; transition: opacity 0.35s;
+}
+.gacha-overlay.active { opacity: 1; pointer-events: auto; }
+.gacha-title {
+  font-size: 1.4rem; font-weight: 900; color: var(--neon-gold);
+  letter-spacing: 0.12em; text-shadow: 0 0 16px rgba(255,204,0,0.5);
+  animation: titlePulse 1.2s ease-in-out infinite alternate;
+}
+.gacha-hint { font-size: 0.85rem; color: var(--text-dim); letter-spacing: 0.1em; }
+.gacha-cards { display: flex; gap: 22px; }
+
+.gacha-card { width: 150px; height: 210px; perspective: 800px; cursor: pointer; }
+.gacha-card-inner {
+  position: relative; width: 100%; height: 100%;
+  transform-style: preserve-3d; transition: transform 0.6s ease;
+}
+.gacha-card.flipped .gacha-card-inner { transform: rotateY(180deg); }
+.gacha-card.flipped { cursor: default; }
+
+.gacha-card-back, .gacha-card-front {
+  position: absolute; inset: 0; backface-visibility: hidden;
+  border-radius: 12px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 6px;
+}
+.gacha-card-back {
+  background: linear-gradient(135deg, #14143a, #0a0a22);
+  border: 2px solid rgba(255,255,255,0.25);
+}
+.gacha-q { font-size: 3.2rem; font-weight: 900; color: rgba(255,255,255,0.45); }
+
+/* カード裏のレア度オーラ */
+.gacha-aura-3 {
+  border-color: rgba(255,204,0,0.9);
+  animation: gachaGoldPulse 0.9s ease-in-out infinite;
+}
+@keyframes gachaGoldPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(255,204,0,0.45); }
+  50%      { box-shadow: 0 0 26px rgba(255,204,0,0.95), inset 0 0 12px rgba(255,204,0,0.3); }
+}
+.gacha-aura-2 {
+  border-color: rgba(180,200,230,0.7);
+  box-shadow: 0 0 12px rgba(180,200,230,0.35);
+}
+
+.gacha-card-front {
+  transform: rotateY(180deg);
+  background: linear-gradient(180deg, var(--char-color, #888) -60%, #10102c 45%);
+  border: 2px solid var(--char-color, #888);
+  padding: 8px; text-align: center;
+}
+.gacha-stars { font-size: 0.95rem; font-weight: 900; letter-spacing: 0.15em; }
+.gacha-emoji { font-size: 3.4rem; line-height: 1.1; }
+.gacha-name { font-size: 0.95rem; font-weight: 800; line-height: 1.25; }
+.gacha-origin { font-size: 0.68rem; color: var(--text-dim); }
+.gacha-quote-float {
+  position: absolute;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.78);
+  color: #fff;
+  font-size: 0.78rem;
+  font-style: italic;
+  padding: 6px 12px;
+  border-radius: 20px;
+  pointer-events: none;
+  z-index: 9999;
+  max-width: 260px;
+  text-align: center;
+  line-height: 1.5;
+  animation: gacha-quote-rise 3.5s ease-out forwards;
+}
+@keyframes gacha-quote-rise {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(0); }
+  15%  { opacity: 1; }
+  70%  { opacity: 1; transform: translateX(-50%) translateY(-60px); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-80px); }
+}
+
+/* 交代抽選: 候補カードの順次公開 */
+.swap-candidate-card.cand-hidden { opacity: 0; transform: translateY(20px) scale(0.9); pointer-events: none; }
+.swap-candidate-card.cand-reveal { animation: candPop 0.4s ease; }
+@keyframes candPop {
+  0%   { opacity: 0; transform: translateY(20px) scale(0.85); }
+  60%  { opacity: 1; transform: translateY(-4px) scale(1.04); }
+  100% { opacity: 1; transform: none; }
+}
+.swap-candidate-card.cand-flash-gold { animation: candPop 0.4s ease, gachaGoldFlash 0.7s ease-out 0.15s; }
+
+/* ★3をめくった瞬間の金フラッシュ */
+.gacha-flash-gold .gacha-card-front { animation: gachaGoldFlash 0.7s ease-out 0.3s; }
+@keyframes gachaGoldFlash {
+  0%   { box-shadow: 0 0 0 rgba(255,220,80,0); }
+  30%  { box-shadow: 0 0 46px 14px rgba(255,220,80,0.95); }
+  100% { box-shadow: 0 0 10px rgba(255,220,80,0.3); }
+}
+
+@media (max-width: 640px) {
+  .gacha-cards { gap: 10px; }
+  .gacha-card { width: 104px; height: 150px; }
+  .gacha-emoji { font-size: 2.4rem; }
+  .gacha-name { font-size: 0.78rem; }
+  .gacha-title { font-size: 1.05rem; }
+}
+
+.join-box {
+  background: linear-gradient(135deg, #1a1a40, #0a1a30);
+  border: 2px solid var(--neon-gold);
+  border-radius: 18px; padding: 28px 36px;
+  max-width: 400px; width: 90%; text-align: center;
+  box-shadow: 0 0 50px rgba(255,204,0,0.35);
+  animation: joinAppear 0.35s ease;
+}
+@keyframes joinAppear {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.join-header {
+  font-size: 0.8rem; color: var(--neon-gold); font-weight: 700;
+  letter-spacing: 0.12em; margin-bottom: 10px;
+  text-transform: uppercase;
+}
+.join-emoji { font-size: 3.2rem; margin-bottom: 6px; }
+.join-name  {
+  font-size: 1.2rem; font-weight: 900; color: #ffffff;
+  text-shadow: 0 0 16px rgba(255,204,0,0.5); margin-bottom: 14px;
+}
+.join-quote {
+  font-size: 0.88rem; color: var(--text-main); font-style: italic;
+  line-height: 1.65; margin-bottom: 18px;
+  padding: 10px 14px;
+  background: rgba(255,204,0,0.07);
+  border-left: 3px solid var(--neon-gold);
+  border-radius: 0 8px 8px 0;
+  text-align: left;
+}
+.join-ok-btn {
+  padding: 10px 36px; font-size: 0.95rem; font-weight: 700;
+  background: linear-gradient(135deg, #2255aa, #4477cc);
+  border: 2px solid var(--neon-blue); color: #fff;
+  border-radius: 8px; cursor: pointer; transition: all 0.2s;
+  letter-spacing: 0.08em;
+}
+.join-ok-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(68,136,255,0.5); }
+
+/* ============================================================
+   CTB PANEL — 行動順表示（全員）
+   ============================================================ */
+.ctb-pos-label {
+  font-size: 0.56rem; color: var(--text-dim);
+  min-width: 16px; flex-shrink: 0; text-align: center;
+}
+.ctb-pos-now { color: var(--neon-gold); font-weight: 700; font-size: 0.7rem; }
+
+.ctb-intent {
+  font-size: 0.56rem; color: #ffcc88;
+  margin-left: auto; flex-shrink: 0;
+  white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; max-width: 88px;
+}
+.ctb-intent-selecting { color: var(--text-dim); font-style: italic; }
+
+/* ============================================================
+   SWAP OVERLAY — 技詳細表示
+   ============================================================ */
+.cand-skill-header {
+  display: flex; align-items: center; gap: 3px;
+  font-size: 0.6rem; color: var(--text-main); line-height: 1.5;
+}
+.cand-skill-tgt {
+  font-size: 0.52rem; color: var(--text-dim);
+  margin-left: auto; flex-shrink: 0;
+}
+.cand-skill-effects {
+  display: flex; flex-wrap: wrap; gap: 2px;
+  margin-top: 1px; margin-bottom: 3px; padding-left: 4px;
+}
+.cand-skill-effect {
+  font-size: 0.52rem; color: #aaddff;
+  background: rgba(100,160,255,0.12);
+  border-radius: 2px; padding: 1px 4px;
+}
+
+/* ============================================================
+   SECONDARY BUTTON
+   ============================================================ */
+.btn-secondary {
+  padding: 10px 28px; font-size: 0.95rem; font-weight: 700;
+  border: 2px solid rgba(100,120,255,0.5);
+  background: rgba(20,20,60,0.8);
+  color: #aabbff; border-radius: 8px; cursor: pointer;
+  transition: all 0.2s; letter-spacing: 0.05em;
+}
+.btn-secondary:hover {
+  background: rgba(40,40,100,0.9);
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 16px rgba(68,136,255,0.4);
+}
+
+/* ============================================================
+   COLLECTION SCREEN
+   ============================================================ */
+#collection-screen {
+  background: radial-gradient(ellipse at top, #0a0a2a 0%, #0a0a14 70%);
+  min-height: 100vh; flex-direction: column !important;
+  padding: 0;
+}
+
+.collection-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px;
+  background: rgba(0,0,0,0.5);
+  border-bottom: 1px solid var(--border-glow);
+  flex-shrink: 0;
+}
+
+.collection-title {
+  font-size: 1.4rem; font-weight: 900; color: var(--neon-gold);
+  text-shadow: 0 0 14px rgba(255,204,0,0.4);
+}
+
+.collection-tabs {
+  display: flex; gap: 0; flex-shrink: 0;
+  background: rgba(0,0,0,0.4);
+  border-bottom: 1px solid var(--border-glow);
+}
+
+.tab-btn {
+  flex: 1; padding: 12px 16px;
+  background: transparent;
+  border: none; border-bottom: 3px solid transparent;
+  color: var(--text-dim); cursor: pointer;
+  font-size: 0.88rem; font-weight: 700; letter-spacing: 0.04em;
+  transition: all 0.15s;
+}
+.tab-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.04); }
+.tab-btn.active {
+  color: var(--neon-gold);
+  border-bottom-color: var(--neon-gold);
+  background: rgba(255,204,0,0.06);
+}
+
+#collection-content {
+  flex: 1; overflow-y: auto; padding: 16px 20px;
+  scrollbar-width: thin; scrollbar-color: var(--border-glow) transparent;
+}
+
+/* キャラ図鑑 */
+.coll-chars {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px 20px;
+  align-items: start;
+}
+
+.coll-origin-group { }
+.coll-origin-title {
+  font-size: 0.8rem; font-weight: 700; color: var(--neon-blue);
+  letter-spacing: 0.06em; margin-bottom: 8px;
+  padding: 4px 8px; background: rgba(68,136,255,0.1);
+  border-left: 3px solid var(--neon-blue); border-radius: 0 4px 4px 0;
+}
+.coll-char-row {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.coll-char-card {
+  width: 72px; text-align: center; padding: 8px 4px;
+  border-radius: 8px; border: 1px solid rgba(100,120,255,0.2);
+  background: rgba(20,20,50,0.8);
+}
+.coll-char-card.seen { border-color: rgba(100,120,255,0.5); }
+.coll-char-card.unseen { opacity: 0.45; filter: grayscale(0.8); }
+.coll-char-emoji { font-size: 1.6rem; line-height: 1; margin-bottom: 3px; }
+.coll-char-name { font-size: 0.55rem; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.coll-char-stars { font-size: 0.55rem; margin-top: 1px; }
+.coll-char-stars.rarity1 { color: #668899; }
+.coll-char-stars.rarity2 { color: #aabbcc; }
+.coll-char-stars.rarity3 { color: var(--neon-gold); }
+
+.coll-total {
+  text-align: center; font-size: 0.8rem; color: var(--text-dim);
+  padding: 12px; margin-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+/* ============================================================
+   全キャラプール
+   ============================================================ */
+.pool-root { display: flex; flex-direction: column; gap: 20px; }
+
+/* --- 登場作品トグル --- */
+.origins-root { padding: 12px; }
+.origins-info { color: #aaa; font-size: 0.85em; margin-bottom: 10px; }
+.origins-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 11px 16px;
+}
+.origin-row {
+  display: flex; align-items: center; gap: 12px;
+  background: #1a2535; border-radius: 8px; padding: 12px 16px;
+  transition: opacity 0.2s;
+}
+.origin-row.origin-off { opacity: 0.4; }
+.origin-name { flex: 1; font-size: 1.05em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.origin-count { color: #778; font-size: 0.9em; min-width: 3.2em; text-align: right; }
+.origin-toggle {
+  padding: 5px 18px; border-radius: 14px; border: none; cursor: pointer;
+  font-weight: bold; font-size: 0.95em; transition: background 0.2s;
+}
+.origin-toggle.tog-on  { background: #22aa55; color: #fff; }
+.origin-toggle.tog-off { background: #444; color: #aaa; }
+.origins-bulk { display: flex; gap: 8px; margin-bottom: 8px; }
+
+/* --- 設定画面 --- */
+.settings-root { padding: 12px; }
+.settings-list { display: flex; flex-direction: column; gap: 10px; }
+.settings-row {
+  display: flex; align-items: center; gap: 16px;
+  background: #1a2535; border-radius: 8px; padding: 14px 18px;
+}
+.settings-label { flex: 1; font-size: 1.05em; line-height: 1.4; }
+.settings-desc { color: #889; font-size: 0.85em; margin-top: 4px; }
+/* スマホ向け設定のまとまり。一括ボタンと、その配下の個別設定を枠で囲って
+   一般設定（通常攻撃の自動選択・BGM・効果音）と区別する */
+.settings-group {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 10px;
+  border: 1px solid rgba(68,136,255,0.35);
+  border-radius: 10px;
+  background: rgba(68,136,255,0.05);
+  margin-top: 4px;
+}
+/* 一括切り替え行。配下の個別設定より上位であることが分かるよう強調する */
+.settings-row-master {
+  background: #16283c;
+  border: 1px solid var(--neon-blue);
+}
+.settings-row-master .settings-label { font-weight: 700; }
+/* 一括ボタンの配下であることを字下げで示す */
+.settings-row-child { margin-left: 14px; }
+.origin-bulk-btn {
+  padding: 4px 18px; border-radius: 12px; border: none; cursor: pointer;
+  font-weight: bold; font-size: 0.85em; background: #22aa55; color: #fff;
+}
+.origin-bulk-btn.tog-off { background: #555; color: #ccc; }
+.series-bonus-row {
+  display: flex; align-items: center; gap: 10px;
+  background: #1a2535; border-radius: 6px; padding: 8px 12px; margin-bottom: 10px;
+}
+.series-bonus-label { flex: 1; font-size: 0.9em; }
+
+.pool-summary {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  padding: 10px 14px; border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.pool-total {
+  font-size: 0.88rem; font-weight: 800; color: var(--neon-gold);
+  margin-right: 4px;
+}
+.pool-summary-badge {
+  font-size: 0.72rem; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px;
+  border: 1px solid transparent;
+}
+
+.pool-group { }
+.pool-group-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 12px; margin-bottom: 10px;
+  background: rgba(30,50,100,0.5);
+  border-left: 4px solid var(--neon-blue); border-radius: 0 8px 8px 0;
+}
+.pool-origin-name {
+  font-size: 0.9rem; font-weight: 800; color: var(--neon-blue);
+  letter-spacing: 0.04em;
+}
+.pool-origin-count {
+  font-size: 0.72rem; color: var(--text-dim);
+  display: flex; align-items: center; gap: 6px;
+}
+
+.pool-char-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.pool-char-card {
+  padding: 10px; border-radius: 10px;
+  background: rgba(10,10,30,0.85);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-top: 3px solid var(--pc-color, #556677);
+  display: flex; flex-direction: column; gap: 6px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.pool-char-card:hover {
+  background: rgba(20,25,60,0.95);
+  border-color: var(--pc-color, #6688aa);
+}
+
+.pool-char-top {
+  display: flex; align-items: center; gap: 8px;
+}
+.pool-char-emoji { font-size: 1.7rem; line-height: 1; flex-shrink: 0; }
+.pool-char-meta { min-width: 0; }
+.pool-char-name {
+  font-size: 0.72rem; font-weight: 800; color: var(--text-main);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pool-char-stars { font-size: 0.65rem; margin-top: 1px; font-weight: 700; }
+
+.pool-role-badge {
+  font-size: 0.68rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px;
+  border: 1px solid transparent;
+  text-align: center; align-self: flex-start;
+}
+
+.pool-char-detail {
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 5px;
+}
+.pool-detail-job { font-size: 0.6rem; color: var(--text-dim); }
+.pool-detail-hp { font-size: 0.62rem; color: #88aacc; font-weight: 700; }
+
+/* レリック図鑑 */
+.coll-relics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+.coll-relic-card {
+  padding: 10px; border-radius: 8px;
+  border: 1px solid rgba(100,120,255,0.25);
+  background: rgba(20,20,50,0.8);
+  text-align: center;
+}
+.coll-relic-card.seen { border-color: rgba(170,68,255,0.5); }
+.coll-relic-card.unseen { opacity: 0.4; filter: grayscale(0.7); }
+.coll-relic-emoji { font-size: 1.8rem; margin-bottom: 4px; }
+.coll-relic-name { font-size: 0.72rem; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
+.coll-relic-origin { font-size: 0.58rem; color: var(--text-dim); margin-bottom: 4px; }
+.coll-relic-desc { font-size: 0.6rem; color: #aaccff; line-height: 1.4; }
+
+/* 実績 */
+.coll-ach-progress {
+  font-size: 0.9rem; font-weight: 700; color: var(--neon-gold);
+  text-align: center; padding: 8px; margin-bottom: 12px;
+}
+.coll-ach-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 6px 10px;
+  align-items: start;
+}
+.coll-ach-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; border-radius: 8px;
+  background: rgba(20,20,50,0.6);
+  border: 1px solid rgba(100,120,255,0.15);
+  opacity: 0.55;
+}
+.coll-ach-item.completed {
+  opacity: 1;
+  border-color: rgba(255,204,0,0.4);
+  background: rgba(40,35,10,0.7);
+}
+.coll-ach-icon { font-size: 1.2rem; flex-shrink: 0; }
+.coll-ach-text { flex: 1; min-width: 0; }
+.coll-ach-name { font-size: 0.76rem; font-weight: 700; color: var(--text-main); }
+.coll-ach-desc { font-size: 0.64rem; color: var(--text-dim); margin-top: 1px; }
+.coll-ach-status { font-size: 0.9rem; flex-shrink: 0; }
+
+/* ============================================================
+   RELIC DROP OVERLAY
+   ============================================================ */
+#relic-overlay, #relic-discard-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  z-index: 820; display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+#relic-overlay.active, #relic-discard-overlay.active {
+  opacity: 1; pointer-events: auto;
+}
+
+.relic-overlay-box {
+  background: linear-gradient(135deg, #1a1040, #0a1025);
+  border: 2px solid var(--neon-purple);
+  border-radius: 18px; padding: 24px 28px;
+  max-width: 580px; width: 95%; text-align: center;
+  box-shadow: 0 0 40px rgba(170,68,255,0.3);
+}
+
+.relic-overlay-title {
+  font-size: 1.3rem; font-weight: 900; color: var(--neon-gold);
+  text-shadow: 0 0 16px rgba(255,204,0,0.6); margin-bottom: 4px;
+}
+
+.relic-overlay-sub {
+  font-size: 0.8rem; color: var(--text-dim); margin-bottom: 16px;
+}
+
+.relic-choices {
+  display: flex; gap: 10px; justify-content: center;
+  flex-wrap: wrap; margin-bottom: 14px;
+}
+
+.relic-card {
+  width: 152px; padding: 12px 10px; border-radius: 10px;
+  border: 2px solid rgba(170,68,255,0.35);
+  background: rgba(20,10,50,0.9);
+  cursor: pointer; transition: all 0.15s; text-align: center;
+}
+.relic-card.relic-hidden { opacity: 0; transform: translateY(20px) scale(0.9); pointer-events: none; }
+.relic-card.relic-reveal { animation: candPop 0.4s ease; }
+.relic-card.relic-flash-gold { animation: candPop 0.4s ease, gachaGoldFlash 0.7s ease-out 0.15s; }
+.relic-card:hover {
+  border-color: var(--neon-purple);
+  box-shadow: 0 0 16px rgba(170,68,255,0.5);
+  transform: translateY(-3px);
+}
+.relic-emoji { font-size: 2rem; margin-bottom: 6px; }
+.relic-name { font-size: 0.78rem; font-weight: 700; color: var(--text-main); margin-bottom: 3px; }
+.relic-origin { font-size: 0.6rem; color: var(--text-dim); margin-bottom: 5px; }
+.relic-desc { font-size: 0.65rem; color: #aaccff; line-height: 1.4; }
+
+/* Relic discard */
+.relic-discard-choices { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.relic-discard-prompt { font-size: 0.78rem; color: var(--text-dim); margin-bottom: 8px; }
+
+.relic-discard-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: 8px;
+  border: 1px solid rgba(100,120,255,0.25);
+  background: rgba(20,20,50,0.8);
+  cursor: pointer; transition: all 0.15s; text-align: left;
+}
+.relic-discard-item:hover {
+  border-color: rgba(255,80,80,0.6);
+  background: rgba(60,10,10,0.8);
+}
+.relic-discard-item.is-new { border-color: rgba(68,255,170,0.5); }
+.relic-discard-name { font-size: 0.8rem; font-weight: 700; color: var(--text-main); }
+.relic-discard-origin { font-size: 0.6rem; color: var(--text-dim); margin-top: 1px; display: block; }
+.relic-discard-desc { font-size: 0.63rem; color: var(--text-dim); margin-top: 2px; }
+.new-badge {
+  font-size: 0.58rem; font-weight: 700;
+  background: var(--neon-green); color: #000;
+  border-radius: 3px; padding: 1px 4px; margin-left: 4px;
+  vertical-align: middle;
+}
+
+/* ============================================================
+   ACHIEVEMENT NOTIFICATION OVERLAY
+   ============================================================ */
+#ach-notif-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+  z-index: 830; display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+#ach-notif-overlay.active { opacity: 1; pointer-events: auto; }
+
+.ach-notif-box {
+  background: linear-gradient(135deg, #0a1a30, #1a1040);
+  border: 2px solid var(--neon-gold);
+  border-radius: 14px; padding: 20px 28px;
+  max-width: 420px; width: 90%; text-align: center;
+  box-shadow: 0 0 30px rgba(255,204,0,0.3);
+}
+.ach-notif-title {
+  font-size: 1.1rem; font-weight: 900; color: var(--neon-gold);
+  margin-bottom: 12px;
+}
+.ach-notif-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; margin-bottom: 6px; border-radius: 8px;
+  background: rgba(255,204,0,0.08); border: 1px solid rgba(255,204,0,0.2);
+  text-align: left;
+}
+.ach-notif-icon { font-size: 1.4rem; flex-shrink: 0; }
+.ach-notif-name { font-size: 0.82rem; font-weight: 700; color: var(--neon-gold); }
+.ach-notif-desc { font-size: 0.67rem; color: var(--text-dim); margin-top: 2px; }
+.ach-notif-ok-btn {
+  margin-top: 12px; padding: 8px 30px; border-radius: 7px;
+  border: 2px solid var(--neon-gold);
+  background: rgba(255,204,0,0.1); color: var(--neon-gold);
+  cursor: pointer; font-size: 0.9rem; font-weight: 700;
+  transition: all 0.15s; letter-spacing: 0.06em;
+}
+.ach-notif-ok-btn:hover {
+  background: rgba(255,204,0,0.25);
+  box-shadow: 0 0 12px rgba(255,204,0,0.4);
+}
+
+/* レリック所持表示（サイドバー用） */
+/* レリック一覧。左サイドパネル(#side-left)と 💎レリックモーダルで共用する。
+   ここは前回の --ui-scale 対応の範囲外だったため拡大から漏れていた。
+   倍率を掛けたうえで、素の値も「読めるサイズ」まで引き上げている */
+.sidebar-relics { display: flex; flex-direction: column; gap: calc(4px * var(--ui-scale)); }
+.relic-held-item {
+  display: flex; align-items: flex-start; gap: calc(5px * var(--ui-scale));
+  font-size: calc(0.72rem * var(--ui-scale)); color: var(--text-main);
+  padding: calc(4px * var(--ui-scale)) calc(6px * var(--ui-scale)); border-radius: 4px;
+  background: rgba(170,68,255,0.1);
+  border: 1px solid rgba(170,68,255,0.25);
+}
+.relic-held-emoji { font-size: calc(1.15rem * var(--ui-scale)); flex-shrink: 0; }
+
+/* 未所持のときの案内。枠自体は常に出しておき、中身だけ差し替える */
+.relic-empty {
+  font-size: calc(0.68rem * var(--ui-scale));
+  color: var(--text-dim);
+  line-height: 1.5;
+  text-align: center;
+  padding: calc(4px * var(--ui-scale)) 0;
+}
+
+/* ============================================================
+   推定ダメージ表示
+   ============================================================ */
+.skill-dmg-estimate {
+  width: 100%;
+  color: #ffcc44;
+  font-weight: 700;
+  font-size: 0.76rem;
+  margin-top: 3px;
+  letter-spacing: 0.02em;
+}
+.skill-dmg-estimate.execute-active {
+  color: #ffe600;
+  text-shadow: 0 0 6px #ffe60099;
+}
+
+/* ============================================================
+   サイドバー ドロップダウン（details/summary）
+   ============================================================ */
+.sidebar-dropdown {
+  border: 1px solid #2a3a4a;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  background: rgba(10, 18, 28, 0.6);
+  overflow: hidden;
+}
+.sidebar-dropdown-title {
+  cursor: pointer;
+  padding: calc(7px * var(--ui-scale)) calc(10px * var(--ui-scale));
+  font-size: calc(0.82rem * var(--ui-scale));
+  font-weight: 700;
+  color: #99bbdd;
+  user-select: none;
+  display: block;
+  list-style: none;
+  transition: color 0.15s;
+}
+.sidebar-dropdown-title::-webkit-details-marker { display: none; }
+.sidebar-dropdown-title::after { content: ' ▸'; font-size: calc(0.65rem * var(--ui-scale)); color: var(--text-dim); }
+details[open] > .sidebar-dropdown-title { color: #aacff0; border-bottom: 1px solid #2a3a4a; }
+details[open] > .sidebar-dropdown-title::after { content: ' ▾'; }
+.sidebar-dropdown-content {
+  padding: calc(6px * var(--ui-scale)) calc(10px * var(--ui-scale)) calc(8px * var(--ui-scale));
+}
+.system-row {
+  font-size: calc(0.72rem * var(--ui-scale));
+  color: #8a9ba8;
+  margin: 4px 0;
+  line-height: 1.4;
+}
+.system-row.role-active {
+  color: #e8f4ff;
+  font-weight: bold;
+  text-shadow: 0 0 6px rgba(120, 200, 255, 0.7), 0 0 12px rgba(80, 160, 255, 0.4);
+}
+
+/* ============================================================
+   所持レリック 効果テキスト
+   ============================================================ */
+.relic-held-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.relic-held-name {
+  font-size: calc(0.86rem * var(--ui-scale));
+  color: #ccddff;
+  font-weight: 600;
+}
+/* レア度の星。以前は heldRelicsHtml() のインライン style で 0.65rem 直書きだったため
+   ここだけ拡大が効かなかった。クラスに切り出して倍率に乗せる（色はインラインのまま） */
+.relic-held-stars {
+  font-size: calc(0.7rem * var(--ui-scale));
+}
+.relic-held-origin {
+  font-size: calc(0.64rem * var(--ui-scale));
+  color: var(--text-dim);
+  margin-bottom: 2px;
+}
+.relic-held-desc {
+  font-size: calc(0.76rem * var(--ui-scale));
+  color: #7a8a99;
+  line-height: 1.4;
+}
+
+/* ============================================================
+   CTB ターン順 — 選択済み行動表示
+   ============================================================ */
+.ctb-intent-done {
+  font-size: 0.56rem;
+  color: var(--neon-green);
+  margin-left: auto;
+  flex-shrink: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 88px;
+}
+
+/* ============================================================
+   致死ダメージ警告
+   ============================================================ */
+#lethal-warning {
+  position: absolute;
+  top: 44px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 250;
+  padding: 5px 18px;
+  border-radius: 20px;
+  background: rgba(120, 0, 0, 0.88);
+  border: 1px solid #ff4444;
+  color: #ffdddd;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+  max-width: 92%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+#lethal-warning.active {
+  opacity: 1;
+  animation: lethalPulse 1.1s ease-in-out infinite;
+}
+@keyframes lethalPulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(255, 60, 60, 0.5); }
+  50%      { box-shadow: 0 0 18px rgba(255, 60, 60, 0.95); }
+}
+.char-card.lethal-danger {
+  animation: lethalCardPulse 0.9s ease-in-out 3;
+}
+@keyframes lethalCardPulse {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(255,40,40,0.4);
+    background-color: transparent;
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255,40,40,0.95);
+    background-color: rgba(255,40,40,0.18);
+  }
+}
+
+/* ============================================================
+   チャージ型危険行動の警告（致死警告の赤と区別するオレンジ系）
+   ============================================================ */
+.next-action-charge {
+  color: #ffcc44;
+  font-weight: 800;
+}
+.char-card.enemy-charging {
+  border-color: #ff9922;
+  animation: chargeCardPulse 0.9s ease-in-out infinite;
+}
+@keyframes chargeCardPulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(255, 160, 30, 0.5); }
+  50%      { box-shadow: 0 0 18px rgba(255, 140, 0, 0.95), inset 0 0 8px rgba(255, 140, 0, 0.35); }
+}
+
+/* ============================================================
+   MOBILE TAB BUTTONS (PC時は非表示)
+   ============================================================ */
+.mobile-tab-btn { display: none; }
+
+/* 📖ガイドだけはPCでも出す。📜ログと💎レリックはPCなら左右のサイドパネルに
+   常時出ているので不要だが、ガイド（システム解説モーダル）だけはPCに入口が無い。
+   見た目はスマホ版のタブボタンに合わせる。
+
+   PC幅に限定しているのは、id指定がモバイルブロックの
+   「.audio-btn, .mobile-tab-btn { padding:3px 4px; font-size:0.6rem }」より強く、
+   スコープを切らないとスマホのトップバーでガイドだけ縮まなくなるため */
+@media (min-width: 641px) {
+  #guide-modal-btn {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 4px 8px; font-size: calc(0.72rem * var(--ui-scale));
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
+    color: var(--text-main); border-radius: 4px; cursor: pointer; transition: all 0.15s;
+  }
+  #guide-modal-btn:hover { background: rgba(255,255,255,0.15); }
+}
+
+/* ============================================================
+   RESPONSIVE — 640px以下（スマホ縦画面）
+   ============================================================ */
+@media (max-width: 640px) {
+
+  /* ---- バトル画面: 縦積みレイアウト ---- */
+  #battle-screen {
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* ---- 右カラムの統合パネルはPC専用 ----
+     モバイルは #battle-log が全画面オーバーレイ、#info-sidebar は非表示（中身は
+     💎/📖モーダルに移設済み）なので、包んでいる箱を display:contents で
+     無かったことにすれば従来とまったく同じ挙動になる */
+  .battle-side { display: contents; }
+  #log-box     { display: contents; }
+  #log-box > summary { display: none; }
+  #relic-box   { display: none; }   /* モバイルは💎レリックモーダル側を使う */
+
+  /* スキルパネルの高さ固定はPC専用。モバイルは #battle-screen が
+     height:auto + overflow-y:auto で flex-grow も切ってあるため揺れが起きず、
+     220px を確保すると縦の狭い画面をただ圧迫するだけになる */
+  /* PC版はカードが揺れないよう、余った縦スペースをスキルパネル自身に
+     flex-grow で吸わせて画面下端まで広げている。
+     モバイルは元から縦が詰まっていて余白を作る余裕が無く、
+     #battle-screen が min-height:100vh なので内容が短い端末・横向きでは
+     パネルだけ間延びして不自然になる。ここでは素直に味方エリアの直後に続けて、
+     あふれた分はページごとスクロールさせる */
+  #skill-panel { min-height: 0; flex: 0 0 auto; overflow-y: visible; }
+  .skill-grid   { flex: 0 0 auto; grid-auto-rows: auto; }
+  .waiting-msg  { margin-block: 0; }
+
+  /* ---- バトルログ: 非表示→ボタンで全画面オーバーレイ ---- */
+  #battle-log {
+    display: none;
+    position: fixed; inset: 0; z-index: 950;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none;          /* 全画面なのでPC側の行数制限を外す */
+    border-right: none;
+    background: rgba(8,8,20,0.97);
+    padding: 50px 16px 20px;
+    overflow-y: auto;
+  }
+  #battle-log.log-visible { display: block; }
+
+  /* ---- 情報サイドバー: 非表示→ボタンで全画面オーバーレイ ---- */
+  #info-sidebar {
+    display: none;
+    position: fixed; inset: 0; z-index: 950;
+    width: 100% !important;
+    height: 100% !important;
+    border-left: none;
+    background: rgba(8,8,20,0.97);
+    padding: 50px 16px 20px;
+    overflow-y: auto;
+  }
+
+  /* ---- モバイルトグルボタン ---- */
+  .mobile-tab-btn {
+    display: flex;
+    padding: 4px 7px;
+    font-size: 0.7rem;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--text-main);
+    border-radius: 4px;
+    cursor: pointer;
+    align-items: center;
+    gap: 3px;
+  }
+  .mobile-tab-btn.active {
+    background: rgba(68,136,255,0.25);
+    border-color: var(--neon-blue);
+  }
+
+  /* オーバーレイに閉じるボタン用スペース確保 */
+  #battle-log::before,
+  #info-sidebar::before {
+    content: '✕ 閉じる（画面外タップ）';
+    display: block;
+    position: fixed;
+    top: 10px; right: 14px;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    pointer-events: none;
+  }
+
+  /* ---- トップバー ---- */
+  /* ログ・情報・レリック・ガイド・設定の5つが並ぶので、詰めて1段に収める */
+  .battle-topbar { padding: 6px 5px; gap: 4px; flex-wrap: wrap; }
+  #battle-num { font-size: 0.78rem; }
+  .audio-controls { gap: 3px; }
+  .audio-btn,
+  .mobile-tab-btn { padding: 3px 4px; font-size: 0.6rem; gap: 2px; }
+
+  /* ---- VS帯（SP同居）: maxSpがレリック等で増えても360px幅に収める ----
+     .sp-seg は rotate(45deg) の菱形でレイアウト幅より視覚幅が約1.4倍大きいので、
+     gapを詰めるより seg 自体を小さくする方を優先する */
+  .vs-divider { gap: 7px; padding: 3px 6px; }
+  #party-sp-gems { gap: 7px; }
+  .sp-seg { width: 11px; height: 11px; }
+
+  /* ---- キャラカード縮小 ---- */
+  .char-card  { width: 90px !important; padding: 7px 5px 5px; }
+  .boss-card  { width: 110px !important; }
+  .char-card .char-emoji { font-size: 1.8rem; }
+  .boss-card  .char-emoji { font-size: 2.2rem; }
+  .char-name  { font-size: 0.62rem; }
+  /* HP表示。従来は .char-hp-text / .char-shield-val を指定していたが、実際のクラスは
+     .bar-value / .shield-val なので効いておらず、0.68remのままだった。
+     そのためシールド付与時に「❤️120/120🛡️25」が90pxのカード幅を超えて右が切れていた */
+  .bar-value { font-size: 0.6rem; }
+  .bar-value .shield-val { font-size: 0.58rem; }
+  /* 端末のフォントによっては絵文字が想定より広くなるので、
+     それでも収まらない場合はシールドだけ次の行へ送って切れないようにする */
+  .bar-value { white-space: normal; }
+  .bar-value .shield-val { display: inline-block; }
+
+  /* ---- エリア余白削減（敵エリアの下余白は行動予告の吹き出し用に確保） ---- */
+  #enemy-area { padding: 6px 6px 52px; gap: 56px 10px; min-height: 110px; }
+  #ally-area  { padding: 6px 6px 4px;  gap: 8px; }
+
+  /* ---- スキルパネル ---- */
+  #skill-panel { padding: 8px; }
+  .skill-grid  { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+  .skill-btn   { font-size: 0.7rem; min-height: 54px; padding: 5px 4px; }
+  .defend-btn  { min-height: 54px; padding: 5px 4px; }
+  /* スキルボタンの文字。従来は .skill-btn-name / .skill-btn-pp を指定していたが、
+     実際のクラスは .skill-name / .skill-mp なので効いておらず、
+     スマホでも技名が0.92remのままで2列のボタンから溢れやすかった */
+  .skill-name { font-size: 0.75rem; }
+  .skill-mp   { font-size: 0.7rem; }
+  .skill-tgt  { font-size: 0.7rem; }
+  .skill-effect-line { white-space: normal; } /* 効果チップの幅あふれ防止 */
+
+  /* ---- キャラ交代オーバーレイ ----
+     以前は .swap-candidate-grid / .swap-card を指定していたが、実際のクラスは
+     .swap-candidates / .swap-candidate-card なので何も効いていなかった。
+     360px幅では候補カード(190px固定)が1列にしか入らないため、幅可変にして
+     1列表示を前提に整える。候補3人＋現パーティ3人が縦に並ぶので、
+     見出しと余白も詰めて全体の長さを抑える */
+  .swap-box    { padding: 12px 10px; }
+  .swap-box-3  { width: 96%; max-height: 92vh; }
+  .swap-title    { font-size: 1rem; margin-bottom: 6px; }
+  .swap-subtitle { font-size: 0.72rem; margin-bottom: 8px; }
+  .swap-candidates { gap: 6px; margin-bottom: 8px; }
+  .swap-candidate-card { width: 100%; padding: 7px 8px; }
+  /* 中央寄せは基本ルール側で指定済み。ここでは余白の圧縮だけ行う */
+  .swap-cand-top { gap: 6px; margin-bottom: 4px; }
+  .swap-cand-emoji { font-size: 1.5rem; }
+  .swap-cand-badges { gap: 4px; margin-bottom: 3px; }
+  .swap-cand-stats  { margin-bottom: 4px; }
+  .swap-cand-passive { margin-bottom: 4px; }
+  .swap-cand-skills-toggle { margin-bottom: 3px; }
+  .swap-select-btn { padding: 5px; }
+  .swap-cm-card { min-width: 0; padding: 4px 8px; }
+  .swap-current-members { gap: 6px; }
+  /* 開いたときに一気に伸びないよう高さを抑えて中でスクロールさせる
+     （スマホでは初期状態を閉じにしている。ui.js の _swapSkillsOpen） */
+  .swap-cand-skills { max-height: 150px; overflow-y: auto; }
+  .swap-cm-skills   { max-height: 150px; overflow-y: auto; }
+
+  /* ---- レリックオーバーレイ ---- */
+  .relic-choices { gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .relic-card    { width: 130px; }
+
+  /* ---- コレクション画面 ---- */
+  .collection-header { flex-direction: column; gap: 10px; align-items: flex-start; }
+  .coll-relics-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+
+  /* ---- システムモーダル ---- */
+  .sys-status-grid { grid-template-columns: 1fr !important; }
+
+  /* パッシブ欄は「名前1行＋説明2行」の計3行で固定する。
+     説明文を全件2行以内に収まるよう短縮したため、PC用のベース指定
+     （.passive-name の1行省略、.passive-desc の2行固定）をそのまま使えば
+     カード高さが完全に揃う。ここでの上書きは不要 */
+  .ctb-intent { max-width: 46vw; }
+
+  /* カード高さを揃える保険 */
+  #ally-area { align-items: stretch; }
+}
+
+/* ============================================================
+   SYSTEM MODAL
+   ============================================================ */
+.system-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.78);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9000;
+}
+.system-modal-box {
+  background: var(--bg-card); border: 1px solid var(--neon-blue);
+  border-radius: 12px; padding: 24px 24px 20px;
+  width: min(600px, 94vw); max-height: 85vh;
+  overflow-y: auto; position: relative;
+}
+.system-modal-title {
+  text-align: center; font-size: 1.15rem; color: var(--neon-blue);
+  margin: 0 0 14px; letter-spacing: 0.05em;
+}
+.system-modal-close {
+  position: absolute; top: 12px; right: 14px;
+  background: none; border: none; color: #778899;
+  font-size: 1.1rem; cursor: pointer; line-height: 1;
+}
+.system-modal-close:hover { color: #fff; }
+
+.system-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+.sys-tab {
+  flex: 1; padding: 7px 4px; font-size: 0.78rem;
+  background: #1a2233; border: 1px solid #334;
+  border-radius: 6px; color: #778899; cursor: pointer;
+}
+.sys-tab.active {
+  background: var(--neon-blue); border-color: var(--neon-blue);
+  color: #000; font-weight: bold;
+}
+.sys-panel { display: none; }
+.sys-panel.active { display: block; }
+
+.sys-flow-row {
+  text-align: center; font-size: 0.82rem; color: #ffcc44;
+  background: #111827; border-radius: 8px; padding: 10px 14px;
+  margin-bottom: 10px; letter-spacing: 0.02em; line-height: 1.7;
+}
+.sys-desc {
+  font-size: 0.78rem; color: #778899; margin-bottom: 12px; text-align: center;
+}
+.sys-rule-item {
+  font-size: 0.82rem; padding: 7px 10px; border-left: 2px solid #334;
+  margin-bottom: 6px; color: #aabbcc; line-height: 1.6;
+}
+
+.sys-role-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 6px; border-bottom: 1px solid #1a2233;
+}
+.sys-role-item:last-child { border-bottom: none; }
+.sys-role-icon { font-size: 1.4rem; min-width: 32px; text-align: center; margin-top: 2px; }
+.sys-role-item strong { color: #e0e8f0; font-size: 0.9rem; display: block; }
+.sys-role-desc { font-size: 0.78rem; color: #778899; margin-top: 3px; }
+
+.sys-status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.sys-status-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 7px 10px; border-radius: 6px;
+}
+.sys-status-item.bad  { background: #1a1020; border: 1px solid #442233; }
+.sys-status-item.good { background: #0f1a20; border: 1px solid #224433; }
+.sys-status-item > span:first-child { font-size: 1.05rem; min-width: 28px; text-align: center; padding-top: 1px; }
+.sys-status-item strong { color: #e0e8f0; display: block; font-size: 0.82rem; margin-bottom: 1px; }
+.sys-status-item span:not(:first-child) { color: #778899; font-size: 0.72rem; line-height: 1.4; }

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>クロスオーバーバトル</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============================================================
+     TITLE SCREEN
+     ============================================================ -->
+<div id="title-screen" class="screen active">
+  <div class="title-logo">クロスオーバーバトル</div>
+  <div class="title-sub">CROSS OVER BATTLE</div>
+  <div class="title-chars">🐉⚔️🍥👊🔮🧊⚡🔥🌙💜⭐🛡️🦋💀🐉🦵</div>
+  <p style="color:#778899;margin-bottom:12px;font-size:0.88rem;">
+    SP共有ターン制バトル
+  </p>
+  <p style="color:#556677;margin-bottom:28px;font-size:0.78rem;">
+    ランダムで選ばれた3人の仲間と挑め！
+  </p>
+  <button id="start-btn" class="btn-primary">⚔️ ゲームスタート</button>
+  <button id="collection-btn" class="btn-secondary" style="margin-top:14px;">📖 図鑑・実績</button>
+  <button id="origins-btn" class="btn-secondary" style="margin-top:8px;">🎬 登場作品</button>
+  <button id="system-btn" class="btn-secondary" style="margin-top:8px;">📋 システムガイド</button>
+  <button id="settings-btn" class="btn-secondary" style="margin-top:8px;">⚙️ 設定</button>
+</div>
+
+<!-- ============================================================
+     SETTINGS SCREEN
+     ============================================================ -->
+<div id="settings-screen" class="screen">
+  <div class="collection-header">
+    <h1 class="collection-title">⚙️ 設定</h1>
+    <button id="settings-back-btn" class="btn-secondary">← タイトルへ</button>
+  </div>
+  <div id="settings-content"></div>
+</div>
+
+<!-- ============================================================
+     COLLECTION SCREEN
+     ============================================================ -->
+<div id="collection-screen" class="screen">
+  <div class="collection-header">
+    <h1 class="collection-title">📖 図鑑・実績</h1>
+    <div>
+      <button id="collection-reset-btn" class="btn-secondary">🗑️ 進捗リセット</button>
+      <button id="collection-back-btn" class="btn-secondary">← タイトルへ</button>
+    </div>
+  </div>
+  <div class="collection-tabs">
+    <button class="tab-btn active" data-tab="chars">👥 キャラ図鑑</button>
+    <button class="tab-btn" data-tab="relics">💎 レリック図鑑</button>
+    <button class="tab-btn" data-tab="achievements">🏆 実績</button>
+  </div>
+  <div id="collection-content"></div>
+</div>
+
+<!-- ============================================================
+     ORIGINS SCREEN
+     ============================================================ -->
+<div id="origins-screen" class="screen">
+  <div class="collection-header">
+    <h1 class="collection-title">🎬 登場作品</h1>
+    <button id="origins-back-btn" class="btn-secondary">← タイトルへ</button>
+  </div>
+  <div id="origins-content"></div>
+</div>
+
+<!-- ============================================================
+     BATTLE SCREEN — flex-row layout
+     ============================================================ -->
+<div id="battle-screen" class="screen">
+
+  <!-- ============================================================
+       Left: 参照情報パネル（📘システム / 💎レリック）
+       サイドパネルはPCのみ。モバイルでは .battle-side を display:contents で
+       箱ごと無かったことにし、💎/📖モーダルという従来の導線を使う
+       ============================================================ -->
+  <div id="side-left" class="battle-side">
+
+    <!-- 📘システム（renderInfoSidebar が中身を描画）。
+         項目数が固定なのでこちらを上に置き、位置を動かさない -->
+    <div id="info-sidebar"></div>
+
+    <!-- レリックは周回で増え続ける唯一のブロックなので最後に置く。
+         上にあると増えるたびに📘📖を下へ押し下げてしまう。
+         renderInfoSidebar で毎ターン作り直すと開閉状態が飛ぶので、
+         外枠は静的に置いて中身(#relic-box-body)だけ差し替える -->
+    <details id="relic-box" class="sidebar-dropdown" open>
+      <summary class="sidebar-dropdown-title" id="relic-box-title">💎 所持レリック</summary>
+      <div class="sidebar-dropdown-content" id="relic-box-body"></div>
+    </details>
+
+  </div><!-- /#side-left -->
+
+  <!-- Center: main battle content -->
+  <div class="battle-main">
+
+    <!-- Top Bar -->
+    <div class="battle-topbar">
+      <div class="topbar-left">
+        <div id="battle-num">⚔️ WAVE 1-1</div>
+      </div>
+      <div class="audio-controls">
+        <button id="log-toggle-btn" class="mobile-tab-btn">📜 ログ</button>
+        <button id="relic-modal-btn" class="mobile-tab-btn">💎 レリック</button>
+        <button id="guide-modal-btn" class="mobile-tab-btn">📖 ガイド</button>
+        <button id="settings-modal-btn" class="audio-btn">⚙️ 設定</button>
+      </div>
+    </div>
+
+    <!-- 致死ダメージ警告バー -->
+    <div id="lethal-warning"></div>
+
+    <!-- Enemy Area -->
+    <div id="enemy-area"></div>
+
+    <!-- 敵味方の区切り帯。パーティSPをここに置いて縦スペースを節約している -->
+    <div class="vs-divider">
+      <span class="party-sp-label">🔋 SP</span>
+      <div id="party-sp-gems"></div>
+    </div>
+
+    <!-- Ally Area -->
+    <div id="ally-area"></div>
+
+    <!-- Skill Panel -->
+    <div id="skill-panel">
+      <div class="waiting-msg">準備中...</div>
+    </div>
+
+  </div><!-- /.battle-main -->
+
+  <!-- ============================================================
+       Right: バトルログ専用パネル
+       ログ行は左揃えなので、右に置くと文字の開始位置がフィールドに接する側に来る
+       ============================================================ -->
+  <div id="side-right" class="battle-side">
+
+    <!-- 中身の #battle-log は ui.js / main.js から id 参照されているので名前を変えないこと。
+         #log-box も main.js がモバイル表示時に open を立てるのに使っている -->
+    <details id="log-box" class="sidebar-dropdown" open>
+      <summary class="sidebar-dropdown-title">📜 バトルログ</summary>
+      <div id="battle-log"></div>
+    </details>
+
+  </div><!-- /#side-right -->
+
+  <!-- Skill animation overlay -->
+  <div id="anim-overlay" class="anim-overlay"></div>
+
+</div><!-- /#battle-screen -->
+
+<!-- ============================================================
+     RESULT OVERLAY (normal battle win/lose)
+     ============================================================ -->
+<div id="result-overlay">
+  <div id="result-msg"></div>
+  <div id="result-relic"></div>
+  <button id="result-btn">次へ</button>
+</div>
+
+<!-- ============================================================
+     BOSS INTRO OVERLAY
+     ============================================================ -->
+<div id="boss-intro-overlay">
+  <div style="font-size:0.75rem;color:#666;letter-spacing:0.3em;">★ BOSS BATTLE ★</div>
+  <div id="boss-intro-name"></div>
+  <div id="boss-intro-quote"></div>
+</div>
+
+<!-- ============================================================
+     BOSS VICTORY OVERLAY (after boss win — continue or title)
+     ============================================================ -->
+<div id="boss-victory-overlay"></div>
+
+<!-- ============================================================
+     SWAP OVERLAY (party swap between battles)
+     ============================================================ -->
+<div id="swap-overlay"></div>
+
+<!-- ============================================================
+     RELIC DROP OVERLAY
+     ============================================================ -->
+<div id="relic-overlay">
+  <div class="relic-overlay-box">
+    <div class="relic-overlay-title">✨ レリック入手！</div>
+    <div class="relic-overlay-sub">1つ選んで持ち帰ろう</div>
+    <div id="relic-choices" class="relic-choices"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     RELIC DISCARD OVERLAY
+     ============================================================ -->
+<div id="relic-discard-overlay">
+  <div class="relic-overlay-box">
+    <div class="relic-overlay-title">⚠️ レリックがいっぱい！</div>
+    <div class="relic-overlay-sub">1つ手放すレリックを選んでください</div>
+    <div id="relic-discard-choices" class="relic-discard-choices"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     ACHIEVEMENT NOTIFICATION OVERLAY
+     ============================================================ -->
+<div id="ach-notif-overlay">
+  <div class="ach-notif-box">
+    <div class="ach-notif-title">🏆 実績解除！</div>
+    <div id="ach-notif-box"></div>
+    <button id="ach-notif-ok" class="ach-notif-ok-btn">OK</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     SYSTEM MODAL
+     ============================================================ -->
+<div id="system-modal" class="system-modal-overlay" style="display:none">
+  <div class="system-modal-box">
+    <button class="system-modal-close" id="system-modal-close">✕</button>
+    <h2 class="system-modal-title">📋 システムガイド</h2>
+
+    <div class="system-tabs">
+      <button class="sys-tab active" data-tab="flow">🗺️ ゲームの流れ</button>
+      <button class="sys-tab" data-tab="role">⚔️ ロール</button>
+      <button class="sys-tab" data-tab="status">📖 バフ・デバフ</button>
+    </div>
+
+    <div class="sys-panel active" id="sys-tab-flow">
+      <div class="sys-flow-row">【雑魚戦×2 → ボス戦】の3waveが3セット</div>
+      <div class="sys-rule-item">🎲 スタート時にランダムで3人の味方が選ばれる</div>
+      <div class="sys-rule-item">🔁 SP共有のサイドターン制：味方全員が行動（行動順は自由） → 敵ターン を繰り返す</div>
+      <div class="sys-rule-item">❤️ HPは戦闘後も引き継ぐ（1セット終了後全回復）</div>
+      <div class="sys-rule-item">⚡ SPは戦闘開始時3にリセットされる</div>
+      <div class="sys-rule-item">💎 レリック：戦闘勝利時に入手。効果は全員に適用</div>
+      <div class="sys-rule-item">👑 キャラ交代：1セット終了時に1人入れ替えられる。</div>
+      <div class="sys-rule-item">⭐ シリーズボーナス：同一作品2人 → 攻撃+20%・被ダメ-10%<br> 　 　 　　　　　　　　　　3人全員 → 攻撃+40%・被ダメ-20%</div>
+    </div>
+
+    <div class="sys-panel" id="sys-tab-role">
+      <div class="sys-role-item"><span class="sys-role-icon">⚔️</span><div><strong>アタッカー</strong><div class="sys-role-desc">敵を撃破したとき、そのターンもう一度行動できる</div></div></div>
+      <div class="sys-role-item"><span class="sys-role-icon">💚</span><div><strong>サポーター</strong><div class="sys-role-desc">通常攻撃ヒット時にSPを2回復する</div></div></div>
+      <div class="sys-role-item"><span class="sys-role-icon">🛡️</span><div><strong>タンク</strong><div class="sys-role-desc">常に敵の単体攻撃とデバフを引き付ける</div></div></div>
+      <div class="sys-role-item"><span class="sys-role-icon">⚡</span><div><strong>ストライカー</strong><div class="sys-role-desc">初回ターンのみ追加で1度行動できる</div></div></div>
+    </div>
+
+    <div class="sys-panel" id="sys-tab-status">
+      <div class="sys-status-grid">
+        <div class="sys-status-item bad"><span>🔥</span><div><strong>燃焼</strong><span>毎ターン最大HP3%ダメージ</span></div></div>
+        <div class="sys-status-item bad"><span>☠️</span><div><strong>毒</strong><span>毎ターン最大HP3%ダメージ</span></div></div>
+        <div class="sys-status-item bad"><span>🖤</span><div><strong>呪い</strong><span>毎ターン最大HP3%ダメージ</span></div></div>
+        <div class="sys-status-item bad"><span>💫</span><div><strong>気絶</strong><span>行動不能（ボスには無効）</span></div></div>
+        <div class="sys-status-item bad"><span>⚡</span><div><strong>麻痺</strong><span>15%の確率で行動不能</span></div></div>
+        <div class="sys-status-item bad"><span>🧊</span><div><strong>凍結</strong><span>15%の確率で行動不能</span></div></div>
+        <div class="sys-status-item good"><span>⬆️攻</span><div><strong>攻撃UP</strong><span>攻撃力×1.3</span></div></div>
+        <div class="sys-status-item bad"><span>⬇️攻</span><div><strong>攻撃DOWN</strong><span>攻撃力×0.7</span></div></div>
+        <div class="sys-status-item good"><span>⬆️防</span><div><strong>防御UP</strong><span>被ダメ×0.7</span></div></div>
+        <div class="sys-status-item bad"><span>⬇️防</span><div><strong>防御DOWN</strong><span>被ダメ×1.3</span></div></div>
+        <div class="sys-status-item good"><span>💚</span><div><strong>リジェネ</strong><span>毎ターン最大HP10%回復</span></div></div>
+        <div class="sys-status-item good"><span>🛡️</span><div><strong>シールド</strong><span>ダメージを肩代わりする追加HP</span></div></div>
+      </div>
+      <div class="sys-rule-item">🔄 <strong>攻撃UP↔攻撃DOWN</strong>、<strong>防御UP↔防御DOWN</strong> は互いに打ち消し合う。<br>片方が付いている状態で逆を受けると、元の効果は消えて後から受けた方だけが残る</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SETTINGS MODAL — 戦闘中トップバーの⚙️から開く。
+     中身は main.js の renderSettingsModal() が描画し、
+     タイトル画面の設定スクリーンと同じ変数・同じ保存先を共用する
+     ============================================================ -->
+<div id="settings-modal" class="system-modal-overlay" style="display:none">
+  <div class="system-modal-box">
+    <button class="system-modal-close" id="settings-modal-close">✕</button>
+    <h2 class="system-modal-title">⚙️ 設定</h2>
+    <div id="settings-modal-body"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     RELIC MODAL — 戦闘中トップバーの💎から開く（スマホ用）。
+     中身は UI.heldRelicsHtml() を情報サイドバーと共用して描画する
+     ============================================================ -->
+<div id="relic-modal" class="system-modal-overlay" style="display:none">
+  <div class="system-modal-box">
+    <button class="system-modal-close" id="relic-modal-close">✕</button>
+    <h2 class="system-modal-title" id="relic-modal-title">💎 所持レリック</h2>
+    <div id="relic-modal-body"></div>
+  </div>
+</div>
+
+<!-- Scripts (load order matters) -->
+<script src="js/characters.js?v=3"></script>
+<script src="js/passives.js?v=3"></script>
+<script src="js/skills.js?v=3"></script>
+
+<script src="js/audio.js?v=3"></script>
+<script src="js/battle.js?v=3"></script>
+<script src="js/ui.js?v=3"></script>
+<script src="js/relics.js?v=3"></script>
+<script src="js/achievements.js?v=3"></script>
+<script src="js/main.js?v=3"></script>
+</body>
+</html>

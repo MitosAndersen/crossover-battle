@@ -1,0 +1,12 @@
+# 作業中に作った手動バックアップ（style.css.bak-2side など）。
+# Git で履歴が残るようになれば、この種のファイルはもう作る必要がない
+*.bak-*
+*.bak
+*.orig
+*.tmp
+
+# エディタ・OS が勝手に作るもの
+.vscode/
+Thumbs.db
+desktop.ini
+.DS_Store
