@@ -1006,6 +1006,9 @@ const SKILL_QUOTES = {
   time_erase: '無駄ァ！無駄！無駄！無駄ァーッ！！',
   jotaro_time_stop: 'やれやれだぜ…スタープラチナ、ザ・ワールドっ！！',
   jotaro_ora_rush: 'オラオラオラオラオラオラオラっ！！',
+  kakyoin_emerald: 'くらえッ！半径20mエメラルド・スプラッシュをーーーッ！',
+  polnareff_armor: 'おれが判決をいうぜ、「死刑」！',
+  avdol_crossfire_sp: 'C・F・H・S！かわせるかッー！！',
 
   // -- 転生したらスライムだった件 --
   megiddo: '――死ね。神の怒りに焼き貫かれて。',
