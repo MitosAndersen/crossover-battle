@@ -554,6 +554,10 @@ body.merge-role-name .char-name      { order: -1; }
 body.hide-card-info .char-card .char-info-row,
 body.hide-card-info .char-card .char-origin-row { display: none; }
 
+/* HPバー（棒グラフ）だけを消す。数値の .bar-value は残すので
+   「❤️12/80」と盾の「🛡️5」でHPは把握できる */
+body.hide-hp-bar .char-card .bar-wrap { display: none; }
+
 /* 設定「〇〇のターン！を表示」OFF時。
    同じ .skill-header を使う「誰を動かす？」は消さないため専用クラスで絞る */
 body.hide-turn-header .actor-turn-header { display: none; }

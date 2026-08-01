@@ -12,6 +12,18 @@ const Battle = (() => {
   let state = null;
   let _phaseActorIsEnemy = false; // 直近の applySkill の行動者が敵か（justApplied 判定用）
 
+  // ストライカーの先制行動（ターン1のみ）で引かれるSP。
+  // 実効コストは負にもなり、その分はSP回復として扱う
+  const STRIKER_PRETURN_SP_DISCOUNT = 2;
+
+  // 実効SPコスト。負ならその絶対値だけSPが回復する。
+  // ui.js のボタン表示と battle.js の実消費で必ず同じ値を使うため、計算はここ1箇所に集約する
+  function getEffectiveSpCost(ally, skill) {
+    if (!skill || skill.noSP || skill.noPP) return 0;
+    const base = skill.spCost ?? 5;
+    return base - (ally?._inPreTurn ? STRIKER_PRETURN_SP_DISCOUNT : 0);
+  }
+
   function initBattle({ allies, enemies, battleNum }) {
     state = {
       allies,
@@ -885,12 +897,22 @@ const Battle = (() => {
     if (!skill) return { results: [], skill: null };
 
     if (!skill.noSP) {
-      const spCost = skill.spCost ?? 5;
       const gs = window.gameState;
-      if ((gs?.sp ?? 5) < spCost) return { results: [], skill: null };
-      const isFree = typeof Relics !== 'undefined' && Relics.hasSpFreeChance() && Math.random() < 0.10;
+      // ストライカーの先制行動（ターン1のみ）はSP消費-2。
+      // マイナスに振り切った分は回復になる（コスト1 → -1 → SP+1、コスト2 → 0、コスト3 → 1）
+      const effCost = getEffectiveSpCost(ally, skill);
+      if ((gs?.sp ?? 5) < effCost) return { results: [], skill: null };
+      // 実効コストが0以下なら既にタダなので、レリックの「SPタダ」抽選は引かない。
+      // 引いてしまうと消費していないのに「✨SPタダ！」と出て紛らわしい
+      const isFree = effCost > 0
+        && typeof Relics !== 'undefined' && Relics.hasSpFreeChance() && Math.random() < 0.10;
       if (isFree) { if (gs) gs._lastSpFree = true; }
-      else { if (gs) gs.sp = (gs.sp ?? 5) - spCost; }
+      else if (gs) {
+        const before = gs.sp ?? 5;
+        gs.sp = Math.max(0, Math.min(gs.maxSp ?? 5, before - effCost));
+        // 割引で増えた分を main.js のフロート表示・ログへ渡す（_lastSpFree と同じ受け渡し方）
+        if (gs.sp > before) gs._lastSpDiscountGain = gs.sp - before;
+      }
     }
 
     const targets = skill.target === 'single'
@@ -922,6 +944,7 @@ const Battle = (() => {
     tickStatusEffects, decrementEffects,
     isStunned, isParalyzed, isFrozen,
     planNextAction, executeEnemyTurn, executeAllySkill, cancelCharge,
+    getEffectiveSpCost, STRIKER_PRETURN_SP_DISCOUNT,
     checkBattleEnd, getLivingAllies, getLivingEnemies,
     getDeadAllies: () => (state?.allies || []).filter(a => a.isDefeated),
     addEnemy: (e) => { state.enemies.push(e); return e; },

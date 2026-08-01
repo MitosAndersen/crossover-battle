@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>クロスオーバーバトル</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 
@@ -235,7 +235,7 @@
       <div class="sys-rule-item">🔁 SP共有のサイドターン制：味方全員が行動（行動順は自由） → 敵ターン を繰り返す</div>
       <div class="sys-rule-item">❤️ HPは戦闘後も引き継ぐ（1セット終了後全回復）</div>
       <div class="sys-rule-item">⚡ SPは戦闘開始時3にリセットされる</div>
-      <div class="sys-rule-item">💎 レリック：戦闘勝利時に入手。効果は全員に適用</div>
+      <div class="sys-rule-item">💎 レリック：<strong>雑魚戦の勝利時のみ</strong>入手。効果は全員に適用</div>
       <div class="sys-rule-item">👑 キャラ交代：1セット終了時に1人入れ替えられる。</div>
       <div class="sys-rule-item">⭐ シリーズボーナス：同一作品2人 → 攻撃+20%・被ダメ-10%<br> 　 　 　　　　　　　　　　3人全員 → 攻撃+40%・被ダメ-20%</div>
     </div>
@@ -244,7 +244,7 @@
       <div class="sys-role-item"><span class="sys-role-icon">⚔️</span><div><strong>アタッカー</strong><div class="sys-role-desc">敵を撃破したとき、そのターンもう一度行動できる</div></div></div>
       <div class="sys-role-item"><span class="sys-role-icon">💚</span><div><strong>サポーター</strong><div class="sys-role-desc">通常攻撃ヒット時にSPを2回復する</div></div></div>
       <div class="sys-role-item"><span class="sys-role-icon">🛡️</span><div><strong>タンク</strong><div class="sys-role-desc">常に敵の単体攻撃とデバフを引き付ける</div></div></div>
-      <div class="sys-role-item"><span class="sys-role-icon">⚡</span><div><strong>ストライカー</strong><div class="sys-role-desc">初回ターンのみ追加で1度行動できる</div></div></div>
+      <div class="sys-role-item"><span class="sys-role-icon">⚡</span><div><strong>ストライカー</strong><div class="sys-role-desc">初回ターンに先制で行動（SP消費ｰ2）する</div></div></div>
     </div>
 
     <div class="sys-panel" id="sys-tab-status">
@@ -293,15 +293,15 @@
 </div>
 
 <!-- Scripts (load order matters) -->
-<script src="js/characters.js?v=3"></script>
-<script src="js/passives.js?v=3"></script>
-<script src="js/skills.js?v=3"></script>
+<script src="js/characters.js?v=4"></script>
+<script src="js/passives.js?v=4"></script>
+<script src="js/skills.js?v=4"></script>
 
-<script src="js/audio.js?v=3"></script>
-<script src="js/battle.js?v=3"></script>
-<script src="js/ui.js?v=3"></script>
-<script src="js/relics.js?v=3"></script>
-<script src="js/achievements.js?v=3"></script>
-<script src="js/main.js?v=3"></script>
+<script src="js/audio.js?v=4"></script>
+<script src="js/battle.js?v=4"></script>
+<script src="js/ui.js?v=4"></script>
+<script src="js/relics.js?v=4"></script>
+<script src="js/achievements.js?v=4"></script>
+<script src="js/main.js?v=4"></script>
 </body>
 </html>

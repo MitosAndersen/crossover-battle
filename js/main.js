@@ -57,6 +57,17 @@ const Game = (() => {
     document.body.classList.toggle('hide-card-info', !showCardInfo);
   }
 
+  // カードのHPバー（棒グラフ）の表示可否。
+  // 数値の「❤️12/80」と盾の「🛡️5」は .bar-value に残るのでHPは分かる。
+  // 棒を消すぶんカードが1行ぶん縮む
+  let showHpBar = JSON.parse(localStorage.getItem('icb_showHpBar') ?? 'true');
+  function saveShowHpBar() {
+    localStorage.setItem('icb_showHpBar', JSON.stringify(showHpBar));
+  }
+  function applyShowHpBar() {
+    document.body.classList.toggle('hide-hp-bar', !showHpBar);
+  }
+
   // スキルパネル上の「〇〇のターン！」見出しの表示可否
   let showTurnHeader = JSON.parse(localStorage.getItem('icb_showTurnHeader') ?? 'true');
   function saveShowTurnHeader() {
@@ -75,8 +86,12 @@ const Game = (() => {
     document.body.classList.toggle('hide-passive-name', !showPassiveName);
   }
 
-  // ロールを名前行と合体表示するか。味方・敵の両方が対象
-  let mergeRoleName = JSON.parse(localStorage.getItem('icb_mergeRoleName') ?? 'true');
+  // ロールを名前行と合体表示するか。味方・敵の両方が対象。
+  // ここだけ他の省略設定と意味が逆で true = 合体させる = 省略ON になる点に注意。
+  // 既定は false（＝独立したロールバッジ行を出すフル表示）。
+  // 省略が要るのは画面の狭い端末だけで、そちらは initDeviceDefaults が
+  // setMobilePreset(true) を呼んで true にする
+  let mergeRoleName = JSON.parse(localStorage.getItem('icb_mergeRoleName') ?? 'false');
   function saveMergeRoleName() {
     localStorage.setItem('icb_mergeRoleName', JSON.stringify(mergeRoleName));
   }
@@ -114,6 +129,7 @@ const Game = (() => {
   function init() {
     initDeviceDefaults();   // 保存値が無ければ端末に応じた既定を決める
     applyShowCardInfo();
+    applyShowHpBar();
     applyShowTurnHeader();
     applyShowPassiveName();
     applyMergeRoleName();
@@ -952,17 +968,14 @@ const Game = (() => {
           UI.queueFloat(_solo.id, '⚔️ 再行動！', 'float-buff');
           UI.log(`⚔️ <strong>${_solo.name}</strong> 撃破！再行動獲得！`, 'log-ally');
           doAllyTurn(_solo, onSelected1);
-        } else if (wasPreemptive && !_solo.isDefeated) {
-          _solo._inPreTurn = false;
-          const _c1 = document.getElementById(`card-${_solo.id}`);
-          _c1?.classList.remove('ally-waiting');
-          doNextAllyAction();
         } else {
+          // 先制行動もこの経路を通る。かつては先制のあとに通常行動もできたが、
+          // 現在は「先制行動＝そのターンの行動」なので actedThisTurn を立てて終える
           _solo.actedThisTurn = true;
           _solo._inPreTurn = false;
           const _c1 = document.getElementById(`card-${_solo.id}`);
           _c1?.classList.add('ally-acted');
-          _c1?.classList.remove('ally-waiting');
+          _c1?.classList.remove('ally-waiting', 'sp-discount-glow');
           doNextAllyAction();
         }
       };
@@ -986,17 +999,13 @@ const Game = (() => {
             UI.queueFloat(selectedAlly.id, '⚔️ 再行動！', 'float-buff');
             UI.log(`⚔️ <strong>${selectedAlly.name}</strong> 撃破！再行動獲得！`, 'log-ally');
             doNextAllyAction(selectedAlly);
-          } else if (wasPreemptive2 && !selectedAlly.isDefeated) {
-            selectedAlly._inPreTurn = false;
-            const _c2 = document.getElementById(`card-${selectedAlly.id}`);
-            _c2?.classList.remove('ally-waiting');
-            doNextAllyAction();
           } else {
+            // 先制行動もこの経路を通る（onSelected1 と同じ理由）
             selectedAlly.actedThisTurn = true;
             selectedAlly._inPreTurn = false;
             const _c2 = document.getElementById(`card-${selectedAlly.id}`);
             _c2?.classList.add('ally-acted');
-            _c2?.classList.remove('ally-waiting');
+            _c2?.classList.remove('ally-waiting', 'sp-discount-glow');
             doNextAllyAction();
           }
         };
@@ -1193,7 +1202,9 @@ const Game = (() => {
     UI.setActiveActor(ally);
     if (ally._inPreTurn) {
       UI.queueFloat(ally.id, '⚡先制行動！', 'float-buff');
-      UI.log(`⚡ <strong>${ally.name}</strong> 先制行動！`, 'log-ally');
+      UI.log(`⚡ <strong>${ally.name}</strong> 先制行動！SP消費-2！`, 'log-ally');
+      // 割引が効いている間だけカードを光らせる。解除は行動確定時（下の onSelected 経路）
+      document.getElementById(`card-${ally.id}`)?.classList.add('sp-discount-glow');
     }
     UI.updatePartySP();
     // 誤射防止: 全スキル共通で「1度目=対象確認 → カードクリック or 同じボタン2度押しで発動」
@@ -1299,6 +1310,14 @@ const Game = (() => {
       gameState._lastSpFree = false;
       UI.floatNumber(ally.id, '✨SPタダ！', 'float-buff');
       UI.log(`✨ <strong>${ally.name}</strong> のSP消費がタダになった！`, 'log-status');
+      Audio.SE.buff();
+    }
+    // ストライカーの先制割引がコストを下回り、SPが増えた場合
+    if (gameState._lastSpDiscountGain) {
+      const _gain = gameState._lastSpDiscountGain;
+      gameState._lastSpDiscountGain = 0;
+      UI.floatNumber(ally.id, `⚡SP+${_gain}`, 'float-buff');
+      UI.log(`⚡ <strong>${ally.name}</strong> の先制行動でSPが${_gain}回復した！`, 'log-status');
       Audio.SE.buff();
     }
     UI.updatePartySP();
@@ -1827,7 +1846,6 @@ const Game = (() => {
           } else {
             candidates = pickWeightedCandidates(pool, 3, makeTierWeights('boss'));
           }
-          const bossRelicCandidates = (typeof Relics !== 'undefined') ? Relics.pickDropCandidates() : [];
           const doSwap = () => {
             UI.showSwapOverlay(candidates, activeAllies, (chosenCharId, swapOutId) => {
               const doFinish = () => {
@@ -1851,11 +1869,8 @@ const Game = (() => {
               doFinish();
             }, '👑 ボス撃破！仲間チェンジのチャンス！');
           };
-          if (bossRelicCandidates.length > 0) {
-            showRelicDropOverlay(bossRelicCandidates, () => doSwap());
-          } else {
-            doSwap();
-          }
+          // ボス戦ではレリックを落とさない。HP・SP全回復と仲間チェンジで報酬は足りている
+          doSwap();
         } else if (isMidBossBattle()) {
           // 中ボス撃破: loopCount++（セット2へ）、HP・PP全回復 ＋ キャラ追加（低レア寄り）
           loopCount++;
@@ -1877,7 +1892,6 @@ const Game = (() => {
           await delay(800);
           const mbPool = getEnabledCharPool().filter(a => !activeAllies.some(p => p.id === a.id));
           const mbCandidates = pickWeightedCandidates(mbPool, 3, makeTierWeights('midboss'));
-          const mbRelicCandidates = (typeof Relics !== 'undefined') ? Relics.pickDropCandidates() : [];
           const doMbSwap = () => {
             UI.showSwapOverlay(mbCandidates, activeAllies, (chosenCharId, swapOutId) => {
               const doMbFinish = () => {
@@ -1901,13 +1915,11 @@ const Game = (() => {
               doMbFinish();
             }, '☆ 中ボス撃破！仲間チェンジのチャンス！');
           };
-          if (mbRelicCandidates.length > 0) {
-            showRelicDropOverlay(mbRelicCandidates, () => doMbSwap());
-          } else {
-            doMbSwap();
-          }
+          // 中ボス戦もボス戦と同じくレリックは落とさない
+          doMbSwap();
         } else {
-          // Normal battle: NO swap, NO relic
+          // 通常戦闘: 仲間チェンジは無いが、レリックはここでのみドロップする。
+          // 中ボス・ボス戦のドロップを廃止したので、ここが唯一の入手経路になっている
           const healPctLabel = 0;
           // 通常戦闘実績
           if (typeof ACH !== 'undefined') {
@@ -2247,17 +2259,18 @@ const Game = (() => {
   // 縦に余裕のある最近のスマホでもアニメーションは止めておきたいため、
   // 一括設定とは独立に initDeviceDefaults でスマホなら常にONにしている
   function isMobilePresetOn() {
-    return !showCardInfo && !showTurnHeader && !showPassiveName
+    return !showCardInfo && !showHpBar && !showTurnHeader && !showPassiveName
         && mergeRoleName;
   }
   function setMobilePreset(on) {
     showCardInfo    = !on;   // 作品名・レア度
+    showHpBar       = !on;   // HPバー（数値は残る）
     showTurnHeader  = !on;   // 「〇〇のターン！」
     showPassiveName = !on;   // パッシブ名
     mergeRoleName   = on;    // ロールを名前と合体（ONで省スペース）
-    saveShowCardInfo(); saveShowTurnHeader(); saveShowPassiveName();
+    saveShowCardInfo(); saveShowHpBar(); saveShowTurnHeader(); saveShowPassiveName();
     saveMergeRoleName();
-    applyShowCardInfo(); applyShowTurnHeader(); applyShowPassiveName();
+    applyShowCardInfo(); applyShowHpBar(); applyShowTurnHeader(); applyShowPassiveName();
     applyMergeRoleName();
   }
 
@@ -2280,7 +2293,7 @@ const Game = (() => {
     // 表示省略: 縦が短い端末だけ既定ON。
     // 省略は1画面に収めるための妥協なので、縦に余裕があるなら最初からフル表示でよい。
     // 730px の根拠: iPhone SE2/SE3 が 667px、iPhone 12〜15 が 844px。その間で切る
-    const DISPLAY_KEYS = ['icb_showCardInfo', 'icb_showTurnHeader',
+    const DISPLAY_KEYS = ['icb_showCardInfo', 'icb_showHpBar', 'icb_showTurnHeader',
                           'icb_showPassiveName', 'icb_mergeRoleName'];
     if (DISPLAY_KEYS.every(k => localStorage.getItem(k) === null)
         && window.matchMedia('(max-height: 730px)').matches) {
@@ -2315,12 +2328,16 @@ const Game = (() => {
 
       <div class="settings-group">
         <div class="settings-row settings-row-master">
-          <span class="settings-label">📱 スマホ設定（一括）<div class="settings-desc">この枠の中の4つをまとめて切り替えます。ONで省スペース表示、OFFでフル表示に戻ります</div></span>
+          <span class="settings-label">📱 小画面スマホ向け設定（一括）<div class="settings-desc">画面の狭い端末で1画面に収めるための表示省略です。この枠の中の5つをまとめて切り替えます。ONで省スペース表示、OFFでフル表示に戻ります。iPhone SEのような縦の短い端末では最初からONになっています</div></span>
           <button class="origin-toggle${mp ? ' tog-on' : ' tog-off'}" data-setting="mobilePreset">${mp ? 'ON' : 'OFF'}</button>
         </div>
         <div class="settings-row settings-row-child">
           <span class="settings-label">🎬 作品名・レア度を省略<div class="settings-desc">ONにすると、キャラカードの名前の下にある登場作品・レア度・性別/職業を隠してカードを小さくします</div></span>
           <button class="origin-toggle${!showCardInfo ? ' tog-on' : ' tog-off'}" data-setting="cardInfo">${!showCardInfo ? 'ON' : 'OFF'}</button>
+        </div>
+        <div class="settings-row settings-row-child">
+          <span class="settings-label">❤️ HPバーを省略<div class="settings-desc">ONにすると、カードのHPバー（棒グラフ）を消して1行分詰めます。「❤️12/80」の数値と盾の残量は残るので、HPは数字で分かります</div></span>
+          <button class="origin-toggle${!showHpBar ? ' tog-on' : ' tog-off'}" data-setting="hpBar">${!showHpBar ? 'ON' : 'OFF'}</button>
         </div>
         <div class="settings-row settings-row-child">
           <span class="settings-label">🗣️ 「〇〇のターン！」を省略<div class="settings-desc">ONにすると、スキルパネル上の行動中キャラの見出しを消して1行分詰めます</div></span>
@@ -2363,6 +2380,10 @@ const Game = (() => {
           showCardInfo = !showCardInfo;
           saveShowCardInfo();
           applyShowCardInfo();   // body クラスを切り替えるだけなので戦闘中でも即座に反映される
+        } else if (btn.dataset.setting === 'hpBar') {
+          showHpBar = !showHpBar;
+          saveShowHpBar();
+          applyShowHpBar();
         } else if (btn.dataset.setting === 'turnHeader') {
           showTurnHeader = !showTurnHeader;
           saveShowTurnHeader();

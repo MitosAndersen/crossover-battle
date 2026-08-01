@@ -812,9 +812,15 @@ const UI = (() => {
 
       const isNoSP    = !!(skill.noSP || skill.noPP);
       const spCost    = isNoSP ? 0 : (skill.spCost ?? 5);
+      // 実効コスト。ストライカーの先制行動中は-2され、負ならその分SPが回復する。
+      // 計算は Battle 側に集約してあるので、表示と実消費が食い違わない
+      const effCost   = isNoSP ? 0 : Battle.getEffectiveSpCost(ally, skill);
+      const isDiscounted = effCost < spCost;
       const partySp   = window.gameState?.sp ?? 5;
       const hasDeadAlly = skill.target !== 'dead_ally' || Battle.getDeadAllies().length > 0;
-      const canUse    = (isNoSP || partySp >= spCost) && hasDeadAlly;
+      // 判定は必ず実効コストで行う。元コストで見ると、実際には撃てるのに
+      // SP不足でボタンが押せない、という食い違いが起きる
+      const canUse    = (isNoSP || partySp >= effCost) && hasDeadAlly;
       const btn = document.createElement('button');
       btn.className = `skill-btn${canUse ? '' : ' skill-disabled'}`;
       btn.dataset.skillId = skillId;
@@ -828,9 +834,20 @@ const UI = (() => {
         : ({ single: singleLabel, self:'自分', all_ally:'味方全体', dead_ally:'倒れた仲間' }[skill.target] || '');
 
       const spGain = ally.role === 'support' ? 2 : 1;
+      // 先制割引の見せ方は3通り。
+      //   effCost < 0 … 消費どころか回復する（コスト1の技）
+      //   effCost = 0 … タダ
+      //   effCost > 0 … 元コストに取り消し線を引いて実効コストを出す
+      const discountLabel = effCost < 0
+        ? `<span class="skill-mp noPP-label">⚡SP+${-effCost}<span class="orig-sp-cost">SP${spCost}</span></span>`
+        : effCost === 0
+          ? `<span class="skill-mp noPP-label">⚡SP0<span class="orig-sp-cost">SP${spCost}</span></span>`
+          : `<span class="skill-mp${canUse ? '' : ' mp-short'}">SP${effCost} ${'◆'.repeat(effCost)}<span class="orig-sp-cost">SP${spCost}</span></span>`;
       const ppLabel = isNoSP
         ? `<span class="skill-mp noPP-label">🔋SP+${spGain}</span>`
-        : `<span class="skill-mp${canUse ? '' : ' mp-short'}">SP${spCost} ${'◆'.repeat(spCost)}</span>`;
+        : isDiscounted
+          ? discountLabel
+          : `<span class="skill-mp${canUse ? '' : ' mp-short'}">SP${spCost} ${'◆'.repeat(spCost)}</span>`;
 
       const effectLines = buildSkillEffectLines(skill);
       const _liveEnemies = typeof Battle !== 'undefined' ? Battle.getLivingEnemies() : [];
@@ -959,8 +976,8 @@ const UI = (() => {
         <div class="sidebar-dropdown-content">
           <div class="system-row${hasAttacker ? ' role-active' : ''}">⚔️ アタッカー：敵撃破時に再行動できる</div>
           <div class="system-row${hasSupport  ? ' role-active' : ''}">💚 サポーター：通常攻撃がSP+2</div>
-          <div class="system-row${hasTank     ? ' role-active' : ''}">🛡️ タンク：常時単体攻撃・デバフを引き付ける</div>
-          <div class="system-row${hasStriker  ? ' role-active' : ''}">⚡ ストライカー：初回のみ追加で先制行動</div>
+          <div class="system-row${hasTank     ? ' role-active' : ''}">🛡️ タンク：単体攻撃・デバフを引き付ける</div>
+          <div class="system-row${hasStriker  ? ' role-active' : ''}">⚡ ストライカー：初回のみ先制行動（SP消費-2）</div>
           <div class="system-row${hasBonus2 ? ' role-active' : ''}">⭐ 同一作品2人→攻撃+20%・被ダメ-10%</div>
           <div class="system-row${hasBonus3 ? ' role-active' : ''}">⭐ 同一作品3人→攻撃+40%・被ダメ-20%</div>
         </div>
