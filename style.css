@@ -558,6 +558,71 @@ body.hide-card-info .char-card .char-origin-row { display: none; }
    「❤️12/80」と盾の「🛡️5」でHPは把握できる */
 body.hide-hp-bar .char-card .bar-wrap { display: none; }
 
+/* ============================================================
+   TUTORIAL — 初回戦闘のスポットライト案内
+   既存の最大 z-index は 9999 なので、それより上に積む
+   ============================================================ */
+/* 背後への操作を全部受け止める受け皿。自身は透明で、暗さは .tut-spot が作る */
+.tut-root {
+  position: fixed; inset: 0; z-index: 10000;
+}
+/* 巨大な box-shadow で「この矩形の外側だけ」を暗くする。
+   SVGマスクを使わずに切り抜きを作れるうえ、中は実画面がそのまま見える。
+   pointer-events:none にしないと、切り抜き部分だけ .tut-root の受け止めが効かなくなる */
+.tut-spot {
+  position: fixed;
+  border-radius: 10px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.78);
+  border: 2px solid rgba(120, 200, 255, 0.9);
+  pointer-events: none;
+  transition: top 0.28s ease, left 0.28s ease, width 0.28s ease, height 0.28s ease;
+}
+.tut-bubble {
+  position: fixed; z-index: 10001;
+  width: min(340px, calc(100vw - 24px));
+  padding: calc(12px * var(--ui-scale)) calc(14px * var(--ui-scale));
+  background: linear-gradient(180deg, #16203a 0%, #0d1424 100%);
+  border: 1px solid rgba(120, 200, 255, 0.5);
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.7);
+  transition: top 0.28s ease, left 0.28s ease;
+}
+.tut-step {
+  font-size: calc(0.62rem * var(--ui-scale));
+  color: var(--text-dim); letter-spacing: 0.08em; margin-bottom: 2px;
+}
+.tut-title {
+  font-size: calc(0.92rem * var(--ui-scale));
+  font-weight: 700; color: #9fd8ff; margin-bottom: calc(6px * var(--ui-scale));
+}
+.tut-body {
+  font-size: calc(0.76rem * var(--ui-scale));
+  color: var(--text-main); line-height: 1.7;
+}
+.tut-body strong { color: #ffe600; }
+.tut-actions {
+  display: flex; justify-content: flex-end; gap: 8px;
+  margin-top: calc(10px * var(--ui-scale));
+}
+.tut-actions button {
+  padding: calc(5px * var(--ui-scale)) calc(14px * var(--ui-scale));
+  font-size: calc(0.74rem * var(--ui-scale));
+  border-radius: 5px; cursor: pointer; transition: all 0.15s;
+}
+.tut-skip {
+  background: transparent; border: 1px solid rgba(255,255,255,0.25); color: var(--text-dim);
+}
+.tut-skip:hover { background: rgba(255,255,255,0.08); color: var(--text-main); }
+.tut-next {
+  background: rgba(80,160,255,0.9); border: 1px solid rgba(140,200,255,0.9);
+  color: #fff; font-weight: 700;
+}
+.tut-next:hover { background: rgba(110,185,255,1); }
+
+/* 省電力モードでは移動アニメを切る（既存の方針に合わせる。案内自体は動く） */
+body.low-power .tut-spot,
+body.low-power .tut-bubble { transition: none; }
+
 /* 設定「〇〇のターン！を表示」OFF時。
    同じ .skill-header を使う「誰を動かす？」は消さないため専用クラスで絞る */
 body.hide-turn-header .actor-turn-header { display: none; }

@@ -19,6 +19,9 @@ const Game = (() => {
   let _runParticipants = new Set();
   let currentActor  = null;
   let isBusy        = false;
+  // チュートリアルを1ラン中に二重で出さないための印。
+  // 「もう見たか」自体は Tutorial 側が localStorage で持つ
+  let _tutorialShown = false;
 
   // ---- バトル用状態 ----
   let currentTurnNum = 0;
@@ -136,6 +139,13 @@ const Game = (() => {
     applyLowPower();
     document.getElementById('start-btn').addEventListener('click', () => {
       try { Audio.SE.battleStart(); } catch(e) {}
+      startGame();
+    });
+    // チュートリアルボタン。案内は戦闘中のUIを指すので、戦闘を始めないと再生できない。
+    // 完了フラグを消してからゲームを始めると、いつもの初回起動の経路に乗る
+    document.getElementById('tutorial-btn')?.addEventListener('click', () => {
+      try { Audio.SE.battleStart(); } catch(e) {}
+      if (typeof Tutorial !== 'undefined') Tutorial.reset();
       startGame();
     });
     // BGM/SE の切り替えは設定モーダル（トップバーの⚙️）へ集約した
@@ -414,6 +424,7 @@ const Game = (() => {
     gameState._lastSpFree = false;
     activeAllies  = pickRandomParty();
     _runParticipants = new Set(activeAllies.map(a => a.id));
+    _tutorialShown = false;
     gameState.maxSp = initSp();
     gameState.sp = 3;
     window.gameState = gameState;
@@ -1256,6 +1267,17 @@ const Game = (() => {
       }
       UI.setSkillBtnPending(skillId, 'もう一度押すと発動');
     }, () => { pendingSkillId = null; });
+
+    // 初回の1戦目・1ターン目だけチュートリアルを出す。
+    // ここまで来ていれば敵カード・味方カード・SP表示・スキルボタンが揃って描画済みなので、
+    // 案内の切り抜きが指す要素がすべて存在する
+    if (!_tutorialShown && currentBattle === 1 && currentTurnNum === 1
+        && typeof Tutorial !== 'undefined' && Tutorial.shouldAutoRun()) {
+      _tutorialShown = true;
+      isBusy = true;                         // 案内中は他の処理を割り込ませない
+      Tutorial.run(() => { isBusy = false; });
+      return;                                // 通常攻撃の自動選択は案内の邪魔になるので走らせない
+    }
 
     if (autoSelectNormalAtk) {
       const _panel = document.getElementById('skill-panel');
