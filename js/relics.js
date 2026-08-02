@@ -92,8 +92,8 @@ const RELIC_DATA = [
     desc:'戦闘開始時にHP30%回復',
     effect:{ type:'battle_start_heal', value:0.30 } },
   { id:'nen_proof',     name:'制約と誓約',             origin:'HUNTER×HUNTER',   emoji:'⛓️', rarity:2,
-    desc:'攻撃力+15%（スキル使用時HP5%消費）',
-    effect:{ type:'atk_skill_hp_cost', atk:0.15, cost:0.05 } },
+    desc:'攻撃力+15%（スキル使用時HP3%消費）',
+    effect:{ type:'atk_skill_hp_cost', atk:0.15, cost:0.03 } },
   { id:'scarlet_chain', name:'クラピカの鎖',           origin:'HUNTER×HUNTER',   emoji:'🔗', rarity:1,
     desc:'攻撃時、ヒットごとに20%で気絶付与(2T)',
     effect:{ type:'status_chance', effect:'stun', value:0.20 } },
@@ -233,8 +233,8 @@ const RELIC_DATA = [
   // ── ポケットモンスター ──
 
   { id:'life_orb',      name:'いのちのたま',             origin:'ポケットモンスター', emoji:'🔴', rarity:2,
-    desc:'攻撃力+15%（スキル使用時HP5%消費）',
-    effect:{ type:'atk_skill_hp_cost', atk:0.15, cost:0.05 } },
+    desc:'攻撃力+15%（スキル使用時HP3%消費）',
+    effect:{ type:'atk_skill_hp_cost', atk:0.15, cost:0.03 } },
   { id:'oran_berry',    name:'オボンのみ',               origin:'ポケットモンスター', emoji:'🫐', rarity:2,
     desc:'HPが50%以下になった人にリジェネ（3T）（1戦闘1回）',
     effect:{ type:'team_regen_on_low_hp', turns:3 } },
