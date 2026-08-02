@@ -150,6 +150,11 @@ const JOIN_QUOTES = {
   // -- 七つの大罪 --
   meliodas: 'オレは強くなる。今守るべきもののために。',
   escanor: '獅子の罪（ライオン・シン）のエスカノール。太陽が昇っている限り、俺は負けん。',
+  ban: 'いつか必ず　お前を奪う',
+  harlequin: 'オイラの故郷で勝手な真似をするな',
+  diane: '辛い記憶の中にも大切な思い出はあるはずだよ',
+  merlin: '考えろ、そして自分たちで答えを見つけるのだ',
+  gowther: 'オレが知りたいのはその先にある感情だ',
 
   // -- FAIRY TAIL --
   natsu: '燃えてきたぞ！行くぜ！',
@@ -256,7 +261,7 @@ const CHAR_RARITY = {
   // -- 進撃の巨人 --
   eren:3, armin:1, levi:2, mikasa:2, erwin:2, hange:2,
   // -- 七つの大罪 --
-  meliodas:3, escanor:2,
+  meliodas:3, escanor:2, ban:2, harlequin:2, diane:2, merlin:2, gowther:2,
   // -- FAIRY TAIL --
   natsu:3, lucy_ft:1, erza:2, gray:2,
   // -- オーバーロード --
@@ -421,6 +426,11 @@ const ALLY_DATA = [
   // -- 七つの大罪 (2) --
   { id:'meliodas',   name:'メリオダス',             origin:'七つの大罪',             emoji:'↩️', maxHp:88,  role:'tank',     gender:'男', job:'騎士団長',      skillIds:['meliodas_basic','meliodas_reflection','meliodas_rising'], color:'#cc8800' },
   { id:'escanor',   name:'エスカノール',          origin:'七つの大罪',           emoji:'🌞', maxHp:92,  role:'attacker', gender:'男', job:'戦士',         skillIds:['escanor_basic','escanor_sunshine','escanor_the_one'],   color:'#ff9900' },
+  { id:'ban',        name:'バン',                   origin:'七つの大罪',           emoji:'🦊', maxHp:92,  role:'tank',     gender:'男', job:'盗賊',         skillIds:['ban_basic','ban_snatch','ban_immortal'],                 color:'#a34a3c' },
+  { id:'harlequin',  name:'キング（ハーレクイン）',   origin:'七つの大罪',           emoji:'🧚', maxHp:76,  role:'support',  gender:'男', job:'妖精王',       skillIds:['harlequin_basic','harlequin_fossil','harlequin_garden'], color:'#5aa06b' },
+  { id:'diane',      name:'ディアンヌ',              origin:'七つの大罪',           emoji:'🪨', maxHp:95,  role:'attacker', gender:'女', job:'巨人族',       skillIds:['diane_basic','diane_rush','diane_catastrophe'],          color:'#8a6b4a' },
+  { id:'merlin',     name:'マーリン',                origin:'七つの大罪',           emoji:'♾️', maxHp:74,  role:'attacker', gender:'女', job:'魔術師',       skillIds:['merlin_basic','merlin_stinger','merlin_javelin'],        color:'#4a5a9a' },
+  { id:'gowther',    name:'ゴウセル',                origin:'七つの大罪',           emoji:'🐐', maxHp:76,  role:'support',  gender:'不明', job:'人形',       skillIds:['gowther_basic','gowther_jack','gowther_blackout'],       color:'#c47a9a' },
   // -- FAIRY TAIL (4) --
   { id:'natsu',      name:'ナツ・ドラグニル',        origin:'FAIRY TAIL',            emoji:'🐉', maxHp:92,  role:'attacker', gender:'男', job:'竜使い',       skillIds:['natsu_basic','natsu_iron','natsu_explode'],                  color:'#dd2200' },
   { id:'erza',       name:'エルザ・スカーレット',    origin:'FAIRY TAIL',            emoji:'👗', maxHp:90,  role:'tank',     gender:'女', job:'剣士',         skillIds:['erza_basic','erza_eight','erza_hero'],                       color:'#cc2244' },

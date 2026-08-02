@@ -32,7 +32,7 @@ const SKILL_DATA = {
   // -- クリリン --
   krillin_basic:       { name:'格闘',              icon:'👊', noSP:true,  power:4,  type:'physical', target:'single', hits:3, animation:'punch' },
   krillin_disc:        { name:'気円斬',            icon:'💿', spCost:1,    power:30, type:'physical', target:'single', hits:1, animation:'slash_heavy', execute:true },
-  krillin_solar:       { name:'太陽拳',            icon:'🌞', spCost:4,    power:0,   type:'support',  target:'all',    effect:'stun', effectChance:1, effectTurns:1, animation:'beam' },
+  krillin_solar:       { name:'太陽拳',            icon:'🌞', spCost:2,    power:0,   type:'support',  target:'all',    effect:'stun', effectChance:1, effectTurns:1, animation:'beam' },
   // -- フリーザ --
   frieza_basic:        { name:'格闘',                 icon:'🪐', noSP:true,  power:3,  type:'magic',    target:'single', hits:3, animation:'punch' },
   frieza_beam:         { name:'デスビーム',           icon:'🪐', spCost:1,    power:32, type:'magic',    target:'single', hits:1, animation:'beam', effect:'stun', effectChance:1, effectTurns:1 },
@@ -411,7 +411,7 @@ const SKILL_DATA = {
   // ============================================================
   // -- 暁美ほむら --
   pistol_shoot:           { name:'拳銃連射',              icon:'⏰', noSP:true,  power:4,  type:'physical', target:'single', hits:3, animation:'slash' },
-  time_stop_hw:           { name:'時間停止',              icon:'⏰', spCost:4,    power:0,   type:'support',  target:'all',    effect:'stun', effectChance:1, effectTurns:1, animation:'dark' },
+  time_stop_hw:           { name:'時間停止',              icon:'⏰', spCost:2,    power:0,   type:'support',  target:'all',    effect:'stun', effectChance:1, effectTurns:1, animation:'dark' },
   barrier_hw:             { name:'全武装展開',            icon:'💥', spCost:2,    power:12, type:'physical', target:'single', hits:5, animation:'explosion' },
   // -- 鹿目まどか --
   madoka_basic:           { name:'ホーミングアロー',      icon:'🎀', noSP:true,   power:6,  type:'physical', target:'single', hits:2, animation:'slash' },
@@ -419,7 +419,7 @@ const SKILL_DATA = {
   madoka_ultimate:        { name:'天上の祈り',            icon:'💚', spCost:2,    power:0,   type:'heal',     target:'all_ally', healPower:30, animation:'heal', effect:'regen', effectChance:1, effectTurns:2 },
   // -- 巴マミ --
   mami_basic:         { name:'マスケット射撃',    icon:'🌼', noSP:true,  power:4,  type:'physical', target:'single', hits:3, animation:'slash' },
-  mami_bind:          { name:'レガーレ・ヴァスタリア', icon:'🌼', spCost:4,    power:0,   type:'support',  target:'all',    effect:'stun', effectChance:1, effectTurns:1, animation:'dark' },
+  mami_bind:          { name:'レガーレ・ヴァスタリア', icon:'🌼', spCost:2,    power:0,   type:'support',  target:'all',    effect:'stun', effectChance:1, effectTurns:1, animation:'dark' },
   mami_finale:        { name:'ティロ・フィナーレ', icon:'💥', spCost:2,   power:62, type:'physical', target:'single', hits:1, animation:'explosion', bossKiller:true },
   // -- 佐倉杏子 --
   kyoko_basic:        { name:'打突',              icon:'🍎', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
@@ -451,7 +451,7 @@ const SKILL_DATA = {
   lancer_gae_throw:   { name:'突き穿つ死翔の槍（ゲイ・ボルク）', icon:'💥', spCost:2,    power:54, type:'physical', target:'all', hits:1, animation:'explosion', execute:true, shieldBreak:true },
   // -- ギルガメッシュ --
   gilgamesh_basic:    { name:'王の財宝（ゲート・オブ・バビロン）',     icon:'👑', noSP:true,  power:1,  type:'magic',    target:'all',    hits:15, animation:'beam', noSpread:true },
-  gilgamesh_chain:    { name:'天の鎖（エルキドゥ）',                   icon:'👑', spCost:3,    power:0,  type:'support',  target:'all',    effect:'stun', effectChance:1, effectTurns:1, animation:'dark' },
+  gilgamesh_chain:    { name:'天の鎖（エルキドゥ）',                   icon:'👑', spCost:1,    power:0,  type:'support',  target:'all',    effect:'atk_down', effectChance:1, effectTurns:3, alsoEffect2:'def_down', animation:'dark' },
   gilgamesh_ea:       { name:'天地乖離す開闢の星（エヌマ・エリシュ）', icon:'💥', spCost:3,    power:120, type:'magic',    target:'all',    hits:1, animation:'explosion', execute:true, shieldBreak:true },
 
   // ============================================================
@@ -517,6 +517,26 @@ const SKILL_DATA = {
   escanor_basic:      { name:'神斧リッタ',                       icon:'🌞', noSP:true,  power:12, type:'physical', target:'single', hits:1, animation:'slash' },
   escanor_sunshine:   { name:'無慈悲な太陽（クルーエル・サン）', icon:'🌞', spCost:1,    power:37, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:2 },
   escanor_the_one:    { name:'天上天下唯我独尊（ザ・ワン）',     icon:'🌞', spCost:2,    power:53, type:'physical', target:'single', hits:1, animation:'explosion', selfEffect:'atk_up', selfEffectTurns:3 },
+  // -- バン --
+  ban_basic:          { name:'聖棍クレシューズ',                 icon:'🦊', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
+  ban_snatch:         { name:'身体狩り（フィジカルハント）',     icon:'🦊', spCost:1,    power:33, type:'physical', target:'single', hits:1, animation:'slash', effect:'atk_down', effectChance:1, effectTurns:1 },
+  ban_immortal:       { name:'不死身',                           icon:'🦊', spCost:1,    power:0,  type:'heal',     target:'self',   healPower:30, animation:'heal' },
+  // -- キング（ハーレクイン） --
+  harlequin_basic:    { name:'霊槍シャスティフォル',             icon:'🧚', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'slash' },
+  harlequin_fossil:   { name:'第三形態「化石化」',               icon:'🧚', spCost:1,    power:33, type:'physical', target:'single', hits:1, animation:'slash', effect:'paralyze', effectChance:1, effectTurns:3 },
+  harlequin_garden:   { name:'第八形態「花粒園」',               icon:'🛡️', spCost:2,    power:0,  type:'support',  target:'all_ally', effect:'shield', shieldPower:15, effectChance:1, animation:'buff' },
+  // -- ディアンヌ --
+  diane_basic:        { name:'戦鎚ギデオン',                     icon:'🪨', noSP:true,  power:14, type:'physical', target:'single', hits:1, animation:'punch_heavy' },
+  diane_rush:         { name:'千の礫（ラッシュ・ロック）',       icon:'🪨', spCost:1,    power:5,  type:'physical', target:'single', hits:7, animation:'punch' },
+  diane_catastrophe:  { name:'大地の怒号（マザー・カタストロフィ）', icon:'🪨', spCost:2, power:62, type:'physical', target:'single', hits:1, animation:'explosion', shieldBreak:true, execute:true },
+  // -- マーリン --
+  merlin_basic:       { name:'明星アルダン',                     icon:'♾️', noSP:true,  power:11, type:'magic',    target:'single', hits:1, animation:'beam' },
+  merlin_stinger:     { name:'衝撃の尾針（ショックスティンガー）', icon:'♾️', spCost:1,   power:34, type:'magic',    target:'single', hits:1, animation:'beam', effect:'stun', effectChance:1, effectTurns:1 },
+  merlin_javelin:     { name:'天雷撃（ブリッツ・ジャベリン）',   icon:'💥', spCost:2,    power:56, type:'magic',    target:'all',    hits:1, animation:'thunder', effect:'paralyze', effectChance:1, effectTurns:3 },
+  // -- ゴウセル --
+  gowther_basic:      { name:'双弓ハーリット',                   icon:'🐐', noSP:true,  power:4,  type:'physical', target:'single', hits:3, animation:'slash' },
+  gowther_jack:       { name:'傀儡縛り（ジャック）',             icon:'🐐', spCost:1,    power:33, type:'magic',    target:'single', hits:1, animation:'dark', effect:'def_down', effectChance:1, effectTurns:2 },
+  gowther_blackout:   { name:'大停電（ブラックアウト）',         icon:'🐐', spCost:2,    power:0,  type:'support',  target:'all',    effect:'stun', effectChance:1, effectTurns:1, animation:'dark' },
 
   // ============================================================
   // FAIRY TAIL
@@ -584,7 +604,7 @@ const SKILL_DATA = {
   // -- マキマ --
   makima_basic:       { name:'「ぱん」',                   icon:'🐕', noSP:true,  power:11,  type:'magic',    target:'single', hits:1, animation:'beam' },
   makima_control:     { name:'「ばん」「ばん」「ばーん」', icon:'🐕', spCost:1,    power:11,  type:'magic',    target:'single', hits:3, animation:'beam' },
-  makima_will:        { name:'支配・服従',                 icon:'🐕', spCost:4,    power:0,   type:'support',  target:'all',    effect:'stun', effectChance:1, effectTurns:1, animation:'dark' },
+  makima_will:        { name:'支配・服従',                 icon:'🐕', spCost:2,    power:0,   type:'support',  target:'all',    effect:'stun', effectChance:1, effectTurns:1, animation:'dark' },
   // -- 早川アキ --
   aki_basic:          { name:'日本刀',            icon:'🪖', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
   aki_fox:            { name:'召喚・狐の悪魔',    icon:'🦊', spCost:1,    power:35, type:'physical', target:'single', hits:1, animation:'slash' },

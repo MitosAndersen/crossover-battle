@@ -151,8 +151,14 @@ const PASSIVE_DATA = {
   hange:        { name:'巨人の生態調査',          type:'enemy_debuff_start',      desc:'開幕 敵全攻↓(1T)', turns:1 },
 
   // ==== 七つの大罪 ====
-  meliodas:     { name:'全反撃',                  type:'counter',                 desc:'被ダメの100%を反射', value:1.0 },
-  escanor:      { name:'太陽の御子',              type:'battle_start_atk',        desc:'開幕 攻↑(2T)', value:0.15, turns:2 },
+  // パッシブ名は7人とも固有魔力で統一している
+  meliodas:     { name:'全反撃（フルカウンター）',  type:'counter',                 desc:'被ダメの100%を反射', value:1.0 },
+  escanor:      { name:'太陽（サンシャイン）',      type:'battle_start_atk',        desc:'開幕 攻↑(2T)', value:0.15, turns:2 },
+  ban:          { name:'強奪（スナッチ）',          type:'lifesteal',               desc:'与ダメの8%を吸収', value:0.08 },
+  harlequin:    { name:'災厄（ディザスター）',      type:'basic_atk_boost',         desc:'通常攻撃+100%', value:1.00 },
+  diane:        { name:'創造（クリエイション）',    type:'shield_start',            desc:'開幕 シールド(HP15%)', value:0.15 },
+  merlin:       { name:'無限（インフィニティ）',    type:'sp_max_up',               desc:'最大SP+1', value:1 },
+  gowther:      { name:'侵入（インベイジョン）',    type:'enemy_debuff_start',      desc:'開幕 敵全攻↓(1T)', turns:1 },
 
   // ==== FAIRY TAIL ====
   natsu:        { name:'火竜の血',                type:'exploit_status',          desc:'燃焼中の敵へ与ダメ+50%', effect:'burn', value:0.50 },
