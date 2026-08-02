@@ -825,7 +825,11 @@ const Battle = (() => {
         const sk = ENEMY_SKILL_DATA[id];
         return sk && sk.target === 'all' && sk.type !== 'support' && sk.type !== 'heal';
       });
-      if (aoeSkills.length > 0 && Math.random() < 0.35) {
+      // ボスだけ全体攻撃を優先的に引く。1体で3人を相手にするので圧が要る。
+      // ただし技構成自体も全体寄り（最頻が単体1・全体2）なため、ここを高くすると
+      // 掛け算で単体がさらに薄まり、タンクの引き付けがボス戦でほぼ発動しなくなる。
+      // 0.35 のとき単体が出る確率は中央値22%（中ボスは50%）だったので 0.25 に下げた
+      if (aoeSkills.length > 0 && Math.random() < 0.25) {
         return aoeSkills[Math.floor(Math.random() * aoeSkills.length)];
       }
     }
