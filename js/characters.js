@@ -361,7 +361,7 @@ const ALLY_DATA = [
   { id:'goodra',         name:'ヌメルゴン',                origin:'ポケモン',              emoji:'🐌', maxHp:94,  role:'tank',     gender:'不明', job:'ポケモン',    skillIds:['goodra_basic','goodra_mud','goodra_pulse'],                        color:'#9988cc' },
   { id:'ampharos',       name:'デンリュウ',                origin:'ポケモン',              emoji:'💡', maxHp:90,  role:'attacker', gender:'不明', job:'ポケモン',    skillIds:['ampharos_basic','ampharos_parabola','ampharos_charge'],            color:'#eecc22' },
   // -- 鋼の錬金術師 (5) --
-  { id:'edward',     name:'エドワード・エルリック',  origin:'鋼の錬金術師',          emoji:'⚗️', maxHp:80,  role:'attacker', gender:'男', job:'錬金術師',      skillIds:['alchemy_fist','alchemy_spear','alchemy_bomb'],             color:'#ddaa00' },
+  { id:'edward',     name:'エドワード・エルリック',  origin:'鋼の錬金術師',          emoji:'⚗️', maxHp:80,  role:'attacker', gender:'男', job:'錬金術師',      skillIds:['alchemy_fist','alchemy_spear','alchemy_arms'],             color:'#ddaa00' },
   { id:'mustang',    name:'ロイ・マスタング',        origin:'鋼の錬金術師',          emoji:'🧤', maxHp:72,  role:'attacker', gender:'男', job:'軍人',         skillIds:['flame_snap','flame_sniper','ryusei_no_hi'],                  color:'#cc4400' },
   { id:'alphonse',   name:'アルフォンス・エルリック',  origin:'鋼の錬金術師',          emoji:'🛡️', maxHp:92,  role:'tank',     gender:'男', job:'錬金術師',      skillIds:['alphonse_basic','alphonse_trap','alphonse_bind'],       color:'#888800' },
   { id:'riza',       name:'リザ・ホークアイ',         origin:'鋼の錬金術師',          emoji:'🎖️', maxHp:74,  role:'attacker', gender:'女', job:'軍人',         skillIds:['riza_basic','riza_snipe','riza_barrage'],               color:'#b8a04a' },
@@ -983,7 +983,7 @@ const SKILL_QUOTES = {
   volt_tackle: 'ピッカァァァ〜〜チュウウウ！！',
 
   // -- 鋼の錬金術師 --
-  alchemy_bomb: '錬成開始だ！！持っていけっ！！',
+  alchemy_arms: '錬成開始だ！！持っていけっ！！',
   ryusei_no_hi: '……焼き尽くす。',
   alphonse_bind: 'いくよ！！撃鉄靠掌っ！！',
 

@@ -252,7 +252,7 @@ const SKILL_DATA = {
   // -- エドワード・エルリック --
   alchemy_fist:           { name:'義手のブレード化',      icon:'⚗️', noSP:true,   power:13, type:'physical', target:'single', hits:1, animation:'punch' },
   alchemy_spear:          { name:'壁の錬成',              icon:'🛡️', spCost:2,    power:0,  type:'support',  target:'all_ally', effect:'shield', shieldPower:20, effectChance:1, animation:'buff' },
-  alchemy_bomb:           { name:'真理の扉',              icon:'💥', spCost:2,    power:66, type:'magic',    target:'single', hits:1, animation:'explosion', recoilPct:0.10, selfEffect:'atk_up', selfEffectTurns:3 },
+  alchemy_arms:           { name:'武具の錬成',            icon:'⚗️', spCost:1,    power:0,  type:'support',  target:'all_ally', effect:'atk_up', effectChance:1, effectTurns:3, animation:'buff', alsoEffect2:'def_up' },
   // -- ロイ・マスタング --
   flame_snap:             { name:'指鳴らし',              icon:'🔥', noSP:true,   power:12, type:'magic',    target:'single', hits:1, animation:'beam' },
   flame_sniper:           { name:'ピンポイント',          icon:'🔥', spCost:1,    power:31, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:2 },
