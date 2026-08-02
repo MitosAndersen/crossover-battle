@@ -526,7 +526,7 @@ const SKILL_DATA = {
   harlequin_fossil:   { name:'第三形態「化石化」',               icon:'🧚', spCost:1,    power:33, type:'physical', target:'single', hits:1, animation:'slash', effect:'paralyze', effectChance:1, effectTurns:3 },
   harlequin_garden:   { name:'第八形態「花粒園」',               icon:'🛡️', spCost:2,    power:0,  type:'support',  target:'all_ally', effect:'shield', shieldPower:15, effectChance:1, animation:'buff' },
   // -- ディアンヌ --
-  diane_basic:        { name:'戦鎚ギデオン',                     icon:'🪨', noSP:true,  power:14, type:'physical', target:'single', hits:1, animation:'punch_heavy' },
+  diane_basic:        { name:'戦鎚ギデオン',                     icon:'🪨', noSP:true,  power:14, type:'physical', target:'single', hits:1, animation:'punch' },
   diane_rush:         { name:'千の礫（ラッシュ・ロック）',       icon:'🪨', spCost:1,    power:5,  type:'physical', target:'single', hits:7, animation:'punch' },
   diane_catastrophe:  { name:'大地の怒号（マザー・カタストロフィ）', icon:'🪨', spCost:2, power:62, type:'physical', target:'single', hits:1, animation:'explosion', shieldBreak:true, execute:true },
   // -- マーリン --
