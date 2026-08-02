@@ -331,7 +331,7 @@ const SKILL_DATA = {
   kanmuru:                { name:'神速（カンムル）',      icon:'💥', spCost:2,    power:58, type:'magic',    target:'single', hits:1, animation:'explosion', effect:'paralyze', effectChance:1, effectTurns:3 },
   // -- ゴン＝フリークス --
   gon_basic:          { name:'ジャジャン拳・パー',   icon:'🖐️', noSP:true,  power:12, type:'physical', target:'single', hits:1, animation:'beam' },
-  gon_rock:           { name:'ジャジャン拳・チョキ', icon:'✌️', spCost:1,    power:35, type:'physical', target:'single', hits:1, animation:'slash', effect:'def_down', effectChance:1, effectTurns:1, shieldBreak:true },
+  gon_rock:           { name:'ジャジャン拳・チョキ', icon:'✌️', spCost:1,    power:35, type:'physical', target:'single', hits:1, animation:'slash', effect:'def_down', effectChance:1, effectTurns:2, shieldBreak:true },
   gon_adult:          { name:'ジャジャン拳・グー',   icon:'✊', spCost:2,    power:67, type:'physical', target:'single', hits:1, animation:'punch_heavy', execute:true, shieldBreak:true },
   // -- ヒソカ＝モロウ --
   hisoka_basic:       { name:'トランプ投げ',                              icon:'🃏', noSP:true,   power:3, type:'physical', target:'single', hits:4, animation:'slash' },
@@ -535,7 +535,7 @@ const SKILL_DATA = {
   merlin_javelin:     { name:'天雷撃（ブリッツ・ジャベリン）',   icon:'💥', spCost:2,    power:56, type:'magic',    target:'all',    hits:1, animation:'thunder', effect:'paralyze', effectChance:1, effectTurns:3 },
   // -- ゴウセル --
   gowther_basic:      { name:'双弓ハーリット',                   icon:'🐐', noSP:true,  power:4,  type:'physical', target:'single', hits:3, animation:'slash' },
-  gowther_jack:       { name:'傀儡縛り（ジャック）',             icon:'🐐', spCost:1,    power:33, type:'magic',    target:'single', hits:1, animation:'dark', effect:'def_down', effectChance:1, effectTurns:2 },
+  gowther_jack:       { name:'傀儡縛り（ジャック）',             icon:'🐐', spCost:1,    power:33, type:'magic',    target:'single', hits:1, animation:'dark', effect:'def_down', effectChance:1, effectTurns:1 },
   gowther_blackout:   { name:'大停電（ブラックアウト）',         icon:'🐐', spCost:2,    power:0,  type:'support',  target:'all',    effect:'stun', effectChance:1, effectTurns:1, animation:'dark' },
 
   // ============================================================
