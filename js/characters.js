@@ -74,6 +74,8 @@ const JOIN_QUOTES = {
   edward: '…格の違いってやつを見せてやる！！',
   mustang: '焔の錬金術師の実力、見せてやろう。',
   alphonse: '兄さんと一緒に、僕も戦います！',
+  riza: '私は私の意志で引き金を引くの　守るべき人のために。',
+  greed: '金も女も部下も、全部オレの所有物なんだよ！',
 
   // -- 呪術廻戦 --
   gojo: '大丈夫。僕、最強だから。',
@@ -237,7 +239,7 @@ const CHAR_RARITY = {
   // -- ポケモン --
   pikachu:3, mewtwo:3, lucario:2, charizard:2, gengar:2, goodra:2, ampharos:2,
   // -- 鋼の錬金術師 --
-  edward:3, mustang:2, alphonse:2,
+  edward:3, mustang:2, alphonse:2, riza:2, greed:2,
   // -- 呪術廻戦 --
   gojo:3, sukuna:2, itadori:3, megumi_ft:2, nanami:2, nobara:2, yuta:2,
   // -- BLEACH --
@@ -358,10 +360,12 @@ const ALLY_DATA = [
   { id:'gengar',         name:'ゲンガー',                  origin:'ポケモン',              emoji:'👻', maxHp:78,  role:'striker',  gender:'不明', job:'ポケモン',    skillIds:['gengar_basic','gengar_lick','gengar_hex'],                          color:'#553388' },
   { id:'goodra',         name:'ヌメルゴン',                origin:'ポケモン',              emoji:'🐌', maxHp:94,  role:'tank',     gender:'不明', job:'ポケモン',    skillIds:['goodra_basic','goodra_mud','goodra_pulse'],                        color:'#9988cc' },
   { id:'ampharos',       name:'デンリュウ',                origin:'ポケモン',              emoji:'💡', maxHp:90,  role:'attacker', gender:'不明', job:'ポケモン',    skillIds:['ampharos_basic','ampharos_parabola','ampharos_charge'],            color:'#eecc22' },
-  // -- 鋼の錬金術師 (3) --
+  // -- 鋼の錬金術師 (5) --
   { id:'edward',     name:'エドワード・エルリック',  origin:'鋼の錬金術師',          emoji:'⚗️', maxHp:80,  role:'attacker', gender:'男', job:'錬金術師',      skillIds:['alchemy_fist','alchemy_spear','alchemy_bomb'],             color:'#ddaa00' },
   { id:'mustang',    name:'ロイ・マスタング',        origin:'鋼の錬金術師',          emoji:'🧤', maxHp:72,  role:'attacker', gender:'男', job:'軍人',         skillIds:['flame_snap','flame_sniper','ryusei_no_hi'],                  color:'#cc4400' },
   { id:'alphonse',   name:'アルフォンス・エルリック',  origin:'鋼の錬金術師',          emoji:'🛡️', maxHp:92,  role:'tank',     gender:'男', job:'錬金術師',      skillIds:['alphonse_basic','alphonse_trap','alphonse_bind'],       color:'#888800' },
+  { id:'riza',       name:'リザ・ホークアイ',         origin:'鋼の錬金術師',          emoji:'🎖️', maxHp:74,  role:'attacker', gender:'女', job:'軍人',         skillIds:['riza_basic','riza_snipe','riza_barrage'],               color:'#b8a04a' },
+  { id:'greed',      name:'グリード',                 origin:'鋼の錬金術師',          emoji:'🖐️', maxHp:100, role:'tank',     gender:'男', job:'ホムンクルス',   skillIds:['greed_basic','greed_hardening','greed_edge'],           color:'#3a3a44' },
   // -- 呪術廻戦 (7) --
   { id:'gojo',       name:'五条悟',                origin:'呪術廻戦',              emoji:'🕶️', maxHp:88,  role:'attacker', gender:'男', job:'呪術師',       skillIds:['jujutsu_basic','mugen','murasaki'],                                 color:'#0088ff' },
   { id:'sukuna',       name:'両面宿儺',               origin:'呪術廻戦',             emoji:'👹', maxHp:95,  role:'attacker', gender:'男', job:'呪術師',       skillIds:['sukuna_basic','sukuna_dismantle','sukuna_domain'],          color:'#880000' },

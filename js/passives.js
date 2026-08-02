@@ -77,6 +77,8 @@ const PASSIVE_DATA = {
   edward:       { name:'機械鎧の義手',            type:'basic_atk_boost',         desc:'通常攻撃+150%', value:1.50 },
   mustang:      { name:'焔の錬金術師',            type:'exploit_status',          desc:'燃焼中の敵へ与ダメ+30%', effect:'burn', value:0.30 },
   alphonse:     { name:'鋼の鎧',                  type:'shield_start',            desc:'開幕 シールド(HP15%)', value:0.15 },
+  riza:         { name:'鷹の眼',                  type:'multi_hit_boost',         desc:'連続ヒット技+20%', value:0.20 },
+  greed:        { name:'最強の盾（アルティメット・シールド）', type:'shield_start',       desc:'開幕 シールド(HP15%)', value:0.15 },
 
   // ==== 呪術廻戦 ====
   gojo:         { name:'六眼',                    type:'sp_regen',                desc:'毎T SP+1' },

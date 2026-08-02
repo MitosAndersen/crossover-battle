@@ -261,6 +261,14 @@ const SKILL_DATA = {
   alphonse_basic:     { name:'鎧の拳',            icon:'🛡️', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'punch' },
   alphonse_trap:      { name:'鉄の茨道',          icon:'⚗️', spCost:2,    power:30, type:'physical', target:'all',    hits:1, animation:'explosion', effect:'atk_down', effectChance:1, effectTurns:2 },
   alphonse_bind:      { name:'撃鉄靠掌',          icon:'💥', spCost:2,    power:56, type:'physical', target:'single', hits:1, animation:'punch_heavy', effect:'stun', effectChance:1, effectTurns:1, shieldBreak:true },
+  // -- リザ・ホークアイ --
+  riza_basic:         { name:'二丁拳銃',          icon:'🎖️', noSP:true,  power:6,  type:'physical', target:'single', hits:2, animation:'slash' },
+  riza_snipe:         { name:'狙撃',              icon:'🎖️', spCost:1,    power:35, type:'physical', target:'single', hits:1, animation:'slash', execute:true },
+  riza_barrage:       { name:'乱射',              icon:'🎖️', spCost:2,    power:11, type:'physical', target:'single', hits:6, animation:'slash' },
+  // -- グリード --
+  greed_basic:        { name:'体術',              icon:'🖐️', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'punch' },
+  greed_hardening:    { name:'全身硬化',          icon:'⬆️', spCost:1,    power:0,  type:'support',  target:'self',   effect:'atk_up', effectChance:1, effectTurns:4, animation:'buff', alsoEffect2:'def_up' },
+  greed_edge:         { name:'炭素の手刀',        icon:'🖐️', spCost:1,    power:35, type:'physical', target:'single', hits:1, animation:'slash', shieldBreak:true },
 
   // ============================================================
   // 呪術廻戦
