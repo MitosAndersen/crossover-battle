@@ -16,7 +16,18 @@
   --text-dim: #778899;
   --red: #ff3344;
   --orange: #ff8833;
-  --font: 'Segoe UI', 'Meiryo', sans-serif;
+  /* Webフォントは読み込まない（このゲームは外部リソース参照ゼロ。日本語Webフォントは
+     数MB規模なので自己完結性と表示速度の両方を壊す）。システムフォントの並び順で解決する。
+     フォールバックは「文字単位」で効くので、仮名を持たない Segoe UI を先頭に置いても
+     仮名だけが後続の日本語フォントへ落ちる。その挙動を利用している。
+     Windows=游ゴシックUI / Mac・iOS=ヒラギノ角ゴ / Android=Noto Sans JP。
+     末尾の絵文字3つはキャラアイコン149個が全部絵文字であるため。♾️🫀 のような新しめの
+     絵文字が文字フォント側のモノクロ字形で拾われるのを防ぐ。
+     ※小さいラベル（最小0.52rem≒7px）が細くて読みにくければ
+       'Yu Gothic UI' と 'Meiryo' の順序を入れ替えると元の見え方に戻る */
+  --font: -apple-system, 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN',
+          'Noto Sans JP', 'Yu Gothic UI', 'Meiryo', sans-serif,
+          'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji';
 
   /* PC版のUI倍率。バトル画面専用CSS（#battle-screen 〜 FLOATING NUMBERS）の
      寸法だけがこの値に連動する。他画面はモーダルやガチャカードが px 固定枠なので
