@@ -223,7 +223,7 @@ const SKILL_DATA = {
   volt_tackle:            { name:'ボルテッカー',          icon:'💥', spCost:3,    power:120,  type:'physical', target:'single', hits:1, animation:'explosion', effect:'paralyze', effectChance:1, effectTurns:3, recoilPct:0.10, execute:true },
   // -- ミュウツー --
   mewtwo_basic:       { name:'ねんりき',          icon:'🔮', noSP:true,  power:13, type:'magic',    target:'single', hits:1, animation:'beam' },
-  mewtwo_psycho:      { name:'バリアー',          icon:'🛡️', spCost:2,    power:0,  type:'support',  target:'all_ally', effect:'shield', shieldPower:15, effectChance:1, animation:'buff' },
+  mewtwo_psycho:      { name:'バリアー',          icon:'🛡️', spCost:2,    power:0,  type:'support',  target:'all_ally', effect:'shield', shieldPower:20, effectChance:1, animation:'buff' },
   mewtwo_psystrike:   { name:'サイコブレイク',    icon:'💥', spCost:2,    power:63, type:'magic',    target:'single', hits:1, animation:'beam', effect:'def_down', effectChance:1, effectTurns:2, shieldBreak:true },
   // -- ルカリオ --
   lucario_basic:      { name:'はっけい',          icon:'🔵', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
@@ -275,7 +275,7 @@ const SKILL_DATA = {
   // ============================================================
   // -- 五条悟 --
   jujutsu_basic:          { name:'術式順転・蒼',          icon:'🔮', noSP:true,  power:13,  type:'physical', target:'single', hits:1, animation:'beam' },
-  mugen:                  { name:'無下限呪術',            icon:'🛡️', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:15, effectChance:1, animation:'buff' },
+  mugen:                  { name:'無下限呪術',            icon:'🛡️', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:20, effectChance:1, animation:'buff' },
   murasaki:               { name:'虚式・茈',              icon:'💥', spCost:2,    power:67,  type:'magic',    target:'single',    hits:1, animation:'explosion', execute:true },
   // -- 両面宿儺 --
   sukuna_basic:           { name:'解（カイ）',            icon:'👹', noSP:true,  power:13,  type:'physical', target:'single', hits:1, animation:'slash' },
@@ -559,7 +559,7 @@ const SKILL_DATA = {
   erza_hero:              { name:'妖精の鎧',          icon:'💥', spCost:2,    power:30, type:'magic', target:'single', hits:2, animation:'explosion', execute:true },
   // -- グレイ・フルバスター --
   gray_basic:             { name:'アイスメイク・ランス',      icon:'🧊', noSP:true,  power:10,  type:'magic',    target:'single', hits:1, animation:'ice' },
-  gray_rampart:           { name:'アイスメイク・ランパート',  icon:'🧊', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:10, effectChance:1, animation:'buff' },
+  gray_rampart:           { name:'アイスメイク・ランパート',  icon:'🧊', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:15, effectChance:1, animation:'buff' },
   gray_ice_emperor:       { name:'銀世界（シルバー）',        icon:'💥', spCost:2,    power:47, type:'magic', target:'all',   hits:1, animation:'ice', effect:'freeze', effectChance:1, effectTurns:2 },
   // -- ルーシィ・ハートフィリア --
   lucy_basic:             { name:'星霊召喚・ニコラ',          icon:'⭐', noSP:true,  power:5,  type:'physical', target:'single', hits:1, animation:'slash' },
@@ -575,7 +575,7 @@ const SKILL_DATA = {
   ainz_annihilate:        { name:'隕石落下（メテオフォール）',    icon:'💥', spCost:3,   power:110, type:'magic', target:'all', hits:1, animation:'explosion', shieldBreak:true },
   // -- アルベド --
   albedo_basic:       { name:'3F',                         icon:'👸', noSP:true,  power:9,  type:'physical', target:'single', hits:1, animation:'slash' },
-  albedo_guardian:    { name:'ウォールズ・オブ・ジェリコ', icon:'🛡️', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:10, effectChance:1, animation:'buff' },
+  albedo_guardian:    { name:'ウォールズ・オブ・ジェリコ', icon:'🛡️', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:15, effectChance:1, animation:'buff' },
   albedo_apocalypse:  { name:'真なる無（ギンヌンガガプ）', icon:'💥', spCost:2,    power:56, type:'physical', target:'single', hits:1, animation:'slash_heavy', effect:'def_down', effectChance:1, effectTurns:2, shieldBreak:true },
 
   // ============================================================
@@ -686,11 +686,11 @@ const SKILL_DATA = {
   // ============================================================
   // -- フリーレン --
   frieren_basic:   { name:'一般攻撃魔法（ゾルトラーク）',           icon:'🧝', noSP:true,  power:14,  type:'magic',   target:'single', hits:1, animation:'beam' },
-  frieren_defense: { name:'防御魔法',                               icon:'🛡️', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:15, effectChance:1, animation:'buff' },
+  frieren_defense: { name:'防御魔法',                               icon:'🛡️', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:20, effectChance:1, animation:'buff' },
   frieren_judradjim:{ name:'破滅の雷を放つ魔法（ジュドラジルム）',  icon:'💥', spCost:2,    power:53, type:'magic',    target:'all',    hits:1, animation:'thunder', effect:'paralyze', effectChance:1, effectTurns:3, noSpread:true },
   // -- フェルン --
   fern_basic:      { name:'一般攻撃魔法（ゾルトラーク）', icon:'🌙', noSP:true,  power:4,  type:'magic',    target:'single', hits:3, animation:'beam' },
-  fern_defense:      { name:'防御魔法',                   icon:'🛡️', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:10, effectChance:1, animation:'buff' },
+  fern_defense:      { name:'防御魔法',                   icon:'🛡️', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:15, effectChance:1, animation:'buff' },
   fern_zoltraak:   { name:'ゾルトラーク・速射',           icon:'💥', spCost:2,    power:6,  type:'magic',    target:'all',    hits:9, animation:'beam', execute:true },
   // -- シュタルク --
   stark_basic:     { name:'斧撃',                 icon:'🪓', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
@@ -725,7 +725,7 @@ const SKILL_DATA = {
   // ============================================================
   // -- 岩谷尚文 --
   naofumi_basic:   { name:'盾の打撃',             icon:'🛡️', noSP:true,  power:6,  type:'physical', target:'single', hits:1, animation:'punch' },
-  naofumi_airst:   { name:'エアストシールド',     icon:'🛡️', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:20, effectChance:1, animation:'buff' },
+  naofumi_meteor:  { name:'流星壁',               icon:'🛡️', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:20, effectChance:1, animation:'buff', alsoEffect2:'def_up', effectTurns:2 },
   naofumi_maiden:  { name:'アイアンメイデン',     icon:'💥', spCost:2,    power:63, type:'physical', target:'single', hits:1, animation:'explosion' },
   // -- ラフタリア --
   raphtalia_basic: { name:'一閃',                     icon:'🦝', noSP:true,  power:11,  type:'physical', target:'single', hits:1, animation:'slash' },

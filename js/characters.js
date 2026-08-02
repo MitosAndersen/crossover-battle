@@ -479,7 +479,7 @@ const ALLY_DATA = [
   { id:'roxy',       name:'ロキシー・ミグルディア',  origin:'無職転生',              emoji:'💧', maxHp:70,  role:'attacker', gender:'女', job:'水聖級魔術師',  skillIds:['roxy_basic','roxy_icicle','roxy_cumulonimbus'],             color:'#4477cc' },
   { id:'sylphiette', name:'シルフィエット',         origin:'無職転生',              emoji:'🍃', maxHp:68,  role:'support',  gender:'女', job:'宮廷魔術師',    skillIds:['sylphie_basic','sylphie_heal','sylphie_wind'],              color:'#88cc99' },
   // -- 盾の勇者の成り上がり (3) --
-  { id:'naofumi',    name:'岩谷尚文',              origin:'盾の勇者の成り上がり',   emoji:'🛡️', maxHp:92,  role:'tank',     gender:'男', job:'盾の勇者',      skillIds:['naofumi_basic','naofumi_airst','naofumi_maiden'],   color:'#336655' },
+  { id:'naofumi',    name:'岩谷尚文',              origin:'盾の勇者の成り上がり',   emoji:'🛡️', maxHp:92,  role:'tank',     gender:'男', job:'盾の勇者',      skillIds:['naofumi_basic','naofumi_meteor','naofumi_maiden'],   color:'#336655' },
   { id:'raphtalia',  name:'ラフタリア',            origin:'盾の勇者の成り上がり',   emoji:'🦝', maxHp:76,  role:'attacker', gender:'女', job:'亜人の剣士',    skillIds:['raphtalia_basic','raphtalia_stardust','raphtalia_tenmei'],         color:'#aa6644' },
   { id:'filo',       name:'フィーロ',              origin:'盾の勇者の成り上がり',   emoji:'🐤', maxHp:72,  role:'striker',  gender:'女', job:'フィロリアル・クイーン', skillIds:['filo_basic','filo_quick','filo_tornado'],                  color:'#ffdd66' },
 ];
