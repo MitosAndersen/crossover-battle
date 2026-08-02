@@ -385,7 +385,7 @@ const Game = (() => {
     // Tier（★レア度）によるHP・威力補正は廃止。atkMult はパッシブATKブーストの保持のみに使う
     let atkMult = 1.0;
     const role = data.role || 'attacker';
-    const roleHpBonus = role === 'tank' ? 1.2 : role === 'striker' ? 0.9 : role === 'support' ? 0.9 : 1.0;
+    const roleHpBonus = role === 'tank' ? 1.4 : role === 'striker' ? 0.9 : role === 'support' ? 0.9 : 1.0;
     // パッシブ静的効果適用
     const p = data.passive;
     if (p?.type === 'atk_boost')  atkMult *= (1 + p.value);
@@ -2505,7 +2505,7 @@ const Game = (() => {
     const role   = (typeof ROLES !== 'undefined' && ROLES[d.role]) || { label: d.role, icon: '', color: '#888' };
     // 実際の戦闘HPはロール補正込み。makeCombatant と同じ式で出さないと
     // 図鑑の数字と戦闘中の数字が食い違う
-    const roleHpBonus = d.role === 'tank' ? 1.2 : d.role === 'striker' ? 0.9 : d.role === 'support' ? 0.9 : 1.0;
+    const roleHpBonus = d.role === 'tank' ? 1.4 : d.role === 'striker' ? 0.9 : d.role === 'support' ? 0.9 : 1.0;
     const shownHp = Math.floor(d.maxHp * roleHpBonus);
 
     const passive = (typeof PASSIVE_DATA !== 'undefined') ? PASSIVE_DATA[d.id] : null;

@@ -1457,7 +1457,7 @@ const UI = (() => {
             </div>
           </div>
           <div class="swap-cand-badges">${roleHtml}<span class="swap-cand-rarity" style="color:${starColor}">${stars}</span></div>
-          <div class="swap-cand-stats">HP ${Math.floor(char.maxHp * (char.role==='tank'?1.2:char.role==='striker'?0.9:char.role==='support'?0.9:1.0))}</div>
+          <div class="swap-cand-stats">HP ${Math.floor(char.maxHp * (char.role==='tank'?1.4:char.role==='striker'?0.9:char.role==='support'?0.9:1.0))}</div>
           ${passiveHtml}
           <div class="swap-cand-skills-toggle">${_swapSkillsOpen ? '▲ わざを閉じる' : '▼ わざを見る'}</div>
           <div class="swap-cand-skills" style="display:${_swapSkillsOpen ? 'block' : 'none'}">${skillsList}</div>

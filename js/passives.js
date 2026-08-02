@@ -147,6 +147,8 @@ const PASSIVE_DATA = {
   eren:         { name:'進撃の巨人',              type:'low_hp_atk',              desc:'HP50%↓ 攻防↑＋リジェネ（3T）', threshold:0.5, buffs:['atk_up','def_up','regen'], turns:3 },
   mikasa:       { name:'104期生首席',             type:'basic_atk_boost',         desc:'通常攻撃+100%', value:1.00 },
   armin:        { name:'戦略家',                  type:'battle_start_team_def',   desc:'開幕 味方全防↑(1T)', turns:1 },
+  erwin:        { name:'第13代団長',              type:'battle_start_team_atk',   desc:'開幕 味方全攻↑(1T)', turns:1 },
+  hange:        { name:'巨人の生態調査',          type:'enemy_debuff_start',      desc:'開幕 敵全攻↓(1T)', turns:1 },
 
   // ==== 七つの大罪 ====
   meliodas:     { name:'全反撃',                  type:'counter',                 desc:'被ダメの100%を反射', value:1.0 },

@@ -494,9 +494,17 @@ const SKILL_DATA = {
   mikasa_thunderspear: { name:'雷槍',                 icon:'⚡', spCost:1,    power:32, type:'physical', target:'single', hits:1, animation:'explosion', effect:'burn',    effectChance:1, effectTurns:2 },
   mikasa_protect:      { name:'アッカーマン家の血筋', icon:'🔴', spCost:1,   power:0,   type:'support', target:'self',   effect:'atk_up', effectChance:1, effectTurns:4, animation:'buff', alsoEffect2:'def_up' },
   // -- アルミン・アルレルト --
-  armin_basic:        { name:'立体機動連撃',      icon:'🧠', noSP:true,  power:3,  type:'physical', target:'single', hits:3, animation:'slash' },
+  armin_basic:        { name:'立体機動斬撃',      icon:'🧠', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'slash' },
   armin_thunderspear: { name:'雷槍',              icon:'⚡', spCost:1,    power:30,  type:'physical', target:'single', hits:1, animation:'explosion', effect:'burn',    effectChance:1, effectTurns:2 },
   armin_plan:         { name:'立案',              icon:'🧠', spCost:1,    power:0,   type:'support',  target:'all_ally', effect:'atk_up', effectChance:1, effectTurns:3, animation:'buff' },
+  // -- エルヴィン・スミス --
+  erwin_basic:        { name:'立体機動斬撃',      icon:'🫀', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
+  erwin_thunderspear: { name:'雷槍',              icon:'⚡', spCost:1,    power:32, type:'physical', target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:2 },
+  erwin_charge:       { name:'心臓を捧げよ！',    icon:'🫀', spCost:2,    power:0,  type:'support',  target:'all_ally', effect:'atk_up', effectChance:1, effectTurns:3, animation:'buff', alsoEffect2:'def_up' },
+  // -- ハンジ・ゾエ --
+  hange_basic:        { name:'立体機動斬撃',      icon:'🥽', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'slash' },
+  hange_thunderspear: { name:'雷槍',              icon:'⚡', spCost:1,    power:32, type:'physical', target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:2 },
+  hange_dissect:      { name:'巨人の解剖',        icon:'🥽', spCost:1,    power:0,  type:'support',  target:'all',    effect:'def_down', effectChance:1, effectTurns:3, animation:'dark' },
 
   // ============================================================
   // 七つの大罪

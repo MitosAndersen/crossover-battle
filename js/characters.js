@@ -144,6 +144,8 @@ const JOIN_QUOTES = {
   eren: '駆逐してやる！！この世から…一匹…残らず！！',
   mikasa: '仕方ないでしょ？世界は残酷なんだから。',
   armin: '何かを変えられるのは、何かを捨てられる者です。僕の策に懸けてください。',
+  erwin: '兵士よ怒れ　兵士よ叫べ　兵士よ！！戦え！！',
+  hange: '何言ってんの？調査兵団は未だ負けたことしかないんだよ？',
 
   // -- 七つの大罪 --
   meliodas: 'オレは強くなる。今守るべきもののために。',
@@ -252,7 +254,7 @@ const CHAR_RARITY = {
   // -- ブラッククローバー --
   asta:3, yami:2,
   // -- 進撃の巨人 --
-  eren:3, armin:1, levi:2, mikasa:2,
+  eren:3, armin:1, levi:2, mikasa:2, erwin:2, hange:2,
   // -- 七つの大罪 --
   meliodas:3, escanor:2,
   // -- FAIRY TAIL --
@@ -414,6 +416,8 @@ const ALLY_DATA = [
   { id:'eren',      name:'エレン・イェーガー',    origin:'進撃の巨人',           emoji:'🦅', maxHp:86,  role:'attacker', gender:'男', job:'調査兵',       skillIds:['eren_basic','eren_thunderspear','eren_rumbling'],                 color:'#223322' },
   { id:'mikasa',    name:'ミカサ・アッカーマン',  origin:'進撃の巨人',           emoji:'🔴', maxHp:75,  role:'striker',  gender:'女', job:'調査兵',       skillIds:['mikasa_basic','mikasa_thunderspear','mikasa_protect'],        color:'#775544' },
   { id:'armin',      name:'アルミン・アルレルト',      origin:'進撃の巨人',           emoji:'🧠', maxHp:72,  role:'support',  gender:'男', job:'調査兵',       skillIds:['armin_basic','armin_thunderspear','armin_plan'],           color:'#667788' },
+  { id:'erwin',      name:'エルヴィン・スミス',        origin:'進撃の巨人',           emoji:'🫀', maxHp:82,  role:'tank',     gender:'男', job:'調査兵団長',    skillIds:['erwin_basic','erwin_thunderspear','erwin_charge'],          color:'#5a6b7a' },
+  { id:'hange',      name:'ハンジ・ゾエ',             origin:'進撃の巨人',           emoji:'🥽', maxHp:80,  role:'support',  gender:'不明', job:'分隊長',      skillIds:['hange_basic','hange_thunderspear','hange_dissect'],        color:'#8a7755' },
   // -- 七つの大罪 (2) --
   { id:'meliodas',   name:'メリオダス',             origin:'七つの大罪',             emoji:'↩️', maxHp:88,  role:'tank',     gender:'男', job:'騎士団長',      skillIds:['meliodas_basic','meliodas_reflection','meliodas_rising'], color:'#cc8800' },
   { id:'escanor',   name:'エスカノール',          origin:'七つの大罪',           emoji:'🌞', maxHp:92,  role:'attacker', gender:'男', job:'戦士',         skillIds:['escanor_basic','escanor_sunshine','escanor_the_one'],   color:'#ff9900' },
