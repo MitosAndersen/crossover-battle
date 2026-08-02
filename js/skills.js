@@ -123,7 +123,7 @@ const SKILL_DATA = {
   tatsumaki_cataclysm: { name:'地獄嵐',            icon:'💥', spCost:3,    power:55, type:'magic',    target:'all',    hits:1, animation:'explosion', noSpread:true },
   // -- キング --
   king_engine:         { name:'キング流気功術',    icon:'👑', noSP:true,  power:3,  type:'physical', target:'single', hits:1, animation:'punch' },
-  king_stare:          { name:'キングアイ',        icon:'👑', spCost:1,    power:0,  type:'support',  target:'all',    effect:'def_down', effectChance:1, effectTurns:2, },
+  king_stare:          { name:'キングアイ',        icon:'👑', spCost:1,    power:0,  type:'support',  target:'all',    effect:'def_down', effectChance:1, effectTurns:3, },
   king_intimidate:     { name:'キングエンジン',    icon:'💥', spCost:2,    power:0,  type:'support',  target:'all',    animation:'dark', effect:'paralyze', effectChance:1, effectTurns:3, alsoEffect2:'atk_down' },
   // -- 音速のソニック --
   sonic_basic:         { name:'音速の蹴撃',           icon:'🌀', noSP:true,  power:6, type:'physical', target:'single', hits:2, animation:'punch' },
@@ -367,12 +367,12 @@ const SKILL_DATA = {
   // ============================================================
   // -- DIO --
   knife_throw:            { name:'ナイフ投擲',                           icon:'🧛', noSP:true,  power:4,  type:'physical', target:'single', hits:3, animation:'slash' },
-  the_world_stop:         { name:'時よ止まれ！',                         icon:'⏰', spCost:3,   power:0,   type:'support',  target:'all',    effect:'stun', effectChance:1, effectTurns:3, animation:'dark' },
-  time_erase:             { name:'無駄無駄無駄無駄無駄無駄ァ─────ッ',  icon:'💥', spCost:2,   power:6,  type:'physical', target:'single', hits:11, animation:'explosion', execute:true, shieldBreak:true },
+  the_world_stop:         { name:'ロードローラーだッ！',                 icon:'💥', spCost:1,   power:36, type:'magic',    target:'single', hits:1, animation:'explosion', execute:true, shieldBreak:true },
+  time_erase:             { name:'無駄無駄無駄無駄無駄無駄ァ───ッ！',   icon:'💥', spCost:2,   power:6,  type:'physical', target:'single', hits:11, animation:'explosion', execute:true, shieldBreak:true },
   // -- 空条承太郎 --
   jotaro_basic:           { name:'オラァ！',                         icon:'⭐', noSP:true,   power:12, type:'physical', target:'single', hits:1, animation:'slash' },
-  jotaro_time_stop:       { name:'スタープラチナ・ザ・ワールド',     icon:'⏰', spCost:3,    power:0, type:'support', target:'all',    effect:'stun', effectChance:1, effectTurns:2, animation:'dark' },
-  jotaro_ora_rush:        { name:'オラオラオラオラオラオラァーッ！', icon:'💥', spCost:2,    power:6,  type:'physical', target:'single', hits:11, animation:'explosion', bossKiller:true, shieldBreak:true },
+  jotaro_time_stop:       { name:'スタープラチナ・ザ・ワールド',     icon:'⏰', spCost:1,    power:0, type:'support', target:'all',    effect:'def_down', effectChance:1, effectTurns:3, animation:'dark' },
+  jotaro_ora_rush:        { name:'オラオラオラオラオラオラァ───ッ！', icon:'💥', spCost:2,    power:6,  type:'physical', target:'single', hits:11, animation:'explosion', bossKiller:true, shieldBreak:true },
   // -- ジョセフ・ジョースター --
   joseph_basic:           { name:'ハーミットパープル',                icon:'🔮', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
   joseph_nensha:          { name:'念写',                             icon:'🔮', spCost:1,    power:0,  type:'support',  target:'all',    effect:'def_down', effectChance:1, effectTurns:3, animation:'dark' },
@@ -383,7 +383,7 @@ const SKILL_DATA = {
   kakyoin_barrier:        { name:'法皇の結界',                       icon:'🕸️', spCost:2,    power:5,  type:'magic',    target:'all',    hits:9, animation:'dark', effect:'atk_down', effectChance:1, effectTurns:2 },
   // -- ジャン＝ピエール・ポルナレフ --
   polnareff_basic:        { name:'レイピア突き',                     icon:'🤺', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
-  polnareff_rush:         { name:'乱れ突き',                         icon:'⚔️', spCost:1,    power:7,  type:'physical', target:'single', hits:5, animation:'slash' },
+  polnareff_rush:         { name:'乱れ突き',                         icon:'🤺', spCost:1,    power:7,  type:'physical', target:'single', hits:5, animation:'slash' },
   polnareff_armor:        { name:'甲冑脱ぎ（アーマーテイクオフ）',    icon:'💥', spCost:2,    power:11, type:'physical', target:'single', hits:6, animation:'slash_heavy', execute:true, selfEffect:'def_down', selfEffectTurns:1 },
   // -- モハメド・アヴドゥル --
   avdol_basic:            { name:'マジシャンズレッド',                icon:'🕯️', noSP:true,  power:12, type:'magic',    target:'single', hits:1, animation:'explosion' },

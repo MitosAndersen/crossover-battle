@@ -337,7 +337,7 @@ const ALLY_DATA = [
   { id:'yuuki',      name:'ユウキ',                  origin:'SAO',                  emoji:'🗡️', maxHp:73,  role:'attacker', gender:'女', job:'剣士',         skillIds:['yuuki_basic','yuuki_11hit','yuuki_sword'],                              color:'#cc44aa' },
   { id:'leafa',          name:'リーファ',                  origin:'SAO',                   emoji:'🌿', maxHp:76,  role:'support',  gender:'女', job:'剣士',         skillIds:['leafa_basic','leafa_heal','leafa_gale'],                                 color:'#228844' },
   // -- Re:ゼロ (6) --
-  { id:'emilia',     name:'エミリア',              origin:'Re:ゼロ',               emoji:'🧊', maxHp:75,  role:'support',  gender:'女', job:'精霊使い',      skillIds:['ice_arrow','ice_blade','emilia_cocytus'],                       color:'#88ccff' },
+  { id:'emilia',     name:'エミリア',              origin:'Re:ゼロ',               emoji:'❄️', maxHp:75,  role:'support',  gender:'女', job:'精霊使い',      skillIds:['ice_arrow','ice_blade','emilia_cocytus'],                       color:'#88ccff' },
   { id:'rem',        name:'レム',                  origin:'Re:ゼロ',               emoji:'💙', maxHp:84,  role:'attacker', gender:'女', job:'メイド',        skillIds:['maid_punch','oni_form','morning_star'],                    color:'#2244cc' },
   { id:'subaru',    name:'菜月昴',               origin:'Re:ゼロ',              emoji:'🔄', maxHp:80,  role:'tank',     gender:'男', job:'召喚者',       skillIds:['subaru_basic','subaru_return','subaru_shadow'],            color:'#334488' },
   { id:'beatrice',     name:'ベアトリス',             origin:'Re:ゼロ',              emoji:'🚪', maxHp:68,  role:'support',  gender:'女', job:'精霊',         skillIds:['beatrice_basic','beatrice_shamak','beatrice_spirit'],       color:'#ffaadd' },
@@ -365,7 +365,7 @@ const ALLY_DATA = [
   { id:'yuta',       name:'乙骨憂太',              origin:'呪術廻戦',              emoji:'💍', maxHp:84,  role:'attacker', gender:'男', job:'特級呪術師',    skillIds:['yuta_basic','yuta_copy','yuta_rika'],                       color:'#8899bb' },
   // -- BLEACH (6) --
   { id:'ichigo',     name:'黒崎一護',              origin:'BLEACH',                emoji:'⚫', maxHp:90,  role:'attacker', gender:'男', job:'死神',         skillIds:['zangetsu_slash','getsuga_tensho','mugetsu'],              color:'#333366' },
-  { id:'rukia',     name:'朽木ルキア',           origin:'BLEACH',               emoji:'🧊', maxHp:78,  role:'attacker', gender:'女', job:'死神',         skillIds:['rukia_basic','rukia_soten','rukia_bankai'],              color:'#9988cc' },
+  { id:'rukia',     name:'朽木ルキア',           origin:'BLEACH',               emoji:'❄️', maxHp:78,  role:'attacker', gender:'女', job:'死神',         skillIds:['rukia_basic','rukia_soten','rukia_bankai'],              color:'#9988cc' },
   { id:'hitsugaya', name:'日番谷冬獅郎',         origin:'BLEACH',               emoji:'🧊', maxHp:76,  role:'attacker', gender:'男', job:'死神',         skillIds:['hitsugaya_basic','hitsugaya_shikai','hitsugaya_bankai'], color:'#66ccee' },
   { id:'byakuya',      name:'朽木白哉',               origin:'BLEACH',               emoji:'🌸', maxHp:88,  role:'attacker', gender:'男', job:'死神',         skillIds:['byakuya_basic','byakuya_cherry','byakuya_bankai'],       color:'#aaaacc' },
   { id:'yoruichi',  name:'四楓院夜一',           origin:'BLEACH',               emoji:'🐱', maxHp:72,  role:'striker',  gender:'女', job:'神速の人',      skillIds:['yoruichi_basic','yoruichi_shunko','yoruichi_raishunko'], color:'#553388' },
@@ -1002,7 +1002,7 @@ const SKILL_QUOTES = {
   bakugo_howitzer: '榴弾砲着弾（ハウザーインパクト）っ！！',
 
   // -- ジョジョの奇妙な冒険 --
-  the_world_stop: 'ザ・ワールドッ！！時よ止まれっ！！',
+  the_world_stop: 'ウリイイイイヤアアアッー',
   time_erase: '無駄ァ！無駄！無駄！無駄ァーッ！！',
   jotaro_time_stop: 'やれやれだぜ…スタープラチナ、ザ・ワールドっ！！',
   jotaro_ora_rush: 'オラオラオラオラオラオラオラっ！！',
