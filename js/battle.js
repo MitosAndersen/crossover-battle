@@ -76,11 +76,11 @@ const Battle = (() => {
         a.hasBarrier = true;
       }
       if (p.type === 'shield_start') {
-        a.shieldHp = Math.min(a.maxHp, (a.shieldHp || 0) + Math.floor(a.maxHp * (p.value || 0.15)));
+        a.shieldHp = Math.min(Math.floor(a.maxHp * 0.5), (a.shieldHp || 0) + Math.floor(a.maxHp * (p.value || 0.15)));
       }
       if (p.type === 'battle_start_team_shield') {
         state.allies.forEach(ally => {
-          ally.shieldHp = Math.min(ally.maxHp, (ally.shieldHp || 0) + Math.floor(ally.maxHp * (p.value || 0.15)));
+          ally.shieldHp = Math.min(Math.floor(ally.maxHp * 0.5), (ally.shieldHp || 0) + Math.floor(ally.maxHp * (p.value || 0.15)));
         });
       }
       // チーム全体パッシブ
@@ -135,7 +135,7 @@ const Battle = (() => {
           if (eff.type === 'battle_start_atk') applyStatusEffect(e, 'atk_up', eff.turns || 2, true);
           if (eff.type === 'battle_start_barrier') e.hasBarrier = true;
           if (eff.type === 'shield_start') {
-            e.shieldHp = Math.min(e.maxHp, (e.shieldHp || 0) + Math.floor(e.maxHp * (eff.value || 0.15)));
+            e.shieldHp = Math.min(Math.floor(e.maxHp * 0.5), (e.shieldHp || 0) + Math.floor(e.maxHp * (eff.value || 0.15)));
           }
         });
       }
@@ -235,7 +235,7 @@ const Battle = (() => {
         target.hp = Math.min(target.maxHp, target.hp + heal);
         results.push({ type: 'heal', target, amount: target.hp - prev });
         if (skill.shieldOnHeal) {
-          target.shieldHp = Math.min(target.maxHp, (target.shieldHp || 0) + skill.shieldOnHeal);
+          target.shieldHp = Math.min(Math.floor(target.maxHp * 0.5), (target.shieldHp || 0) + skill.shieldOnHeal);
           results.push({ type: 'self_shield', target, amount: skill.shieldOnHeal });
         }
         // 回復スキルの付随効果（リジェネ等）を付与
@@ -282,7 +282,13 @@ const Battle = (() => {
           return;
         }
         if (skill.effect === 'shield') {
-          target.shieldHp = Math.min(target.maxHp, (target.shieldHp || 0) + (skill.shieldPower || 20));
+          // シールドの上限は最大HPの半分。以前は最大HPまで貯められたため、
+          // シールド技を撃ち続けると体力バーがもう1本作れてしまっていた。
+          // 付与量は1回15（盾の勇者だけ20）で、ボスの通常の全体攻撃が
+          // 1人あたり中央値15なので、1回の付与で1発ぶんを受け止める設計。
+          // 上限に当たるのは重ねがけしたときだけ。この上限式は
+          // シールドを加算する全8箇所（パッシブ・レリック・回復付随）で揃えている
+          target.shieldHp = Math.min(Math.floor(target.maxHp * 0.5), (target.shieldHp || 0) + (skill.shieldPower || 20));
           results.push({ type: 'status', target, effect: 'shield', tankBlocked, tankProtecting });
           return;
         }
@@ -562,7 +568,7 @@ const Battle = (() => {
     }
     // selfShieldPower: 攻撃と同時に自分へシールド付与
     if (skill.selfShieldPower && !actor.isDefeated) {
-      actor.shieldHp = Math.min(actor.maxHp, (actor.shieldHp || 0) + skill.selfShieldPower);
+      actor.shieldHp = Math.min(Math.floor(actor.maxHp * 0.5), (actor.shieldHp || 0) + skill.selfShieldPower);
       results.push({ type: 'self_shield', target: actor, amount: skill.selfShieldPower });
     }
     // 自傷（recoil）：HP1以下にはならない

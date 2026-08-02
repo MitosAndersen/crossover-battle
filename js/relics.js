@@ -275,7 +275,7 @@ const Relics = (() => {
       }
       if (ef.type === 'shield_start') {
         allies.forEach(a => {
-          a.shieldHp = Math.min(a.maxHp, (a.shieldHp || 0) + Math.floor(a.maxHp * ef.value));
+          a.shieldHp = Math.min(Math.floor(a.maxHp * 0.5), (a.shieldHp || 0) + Math.floor(a.maxHp * ef.value));
         });
         if (typeof UI !== 'undefined') UI.log(`🧸 <strong>${relic.name}</strong> — 味方全体にシールド付与！`, 'log-status');
       }
@@ -334,7 +334,7 @@ const Relics = (() => {
         if (typeof UI !== 'undefined') UI.log(`✨ <strong>${relic.name}</strong> — 戦闘開始時SP+${ef.value || 1}！`, 'log-status');
       }
       if (ef.type === 'shield_start_flat') {
-        allies.forEach(a => { a.shieldHp = Math.min(a.maxHp, (a.shieldHp || 0) + (ef.value || 10)); });
+        allies.forEach(a => { a.shieldHp = Math.min(Math.floor(a.maxHp * 0.5), (a.shieldHp || 0) + (ef.value || 10)); });
         if (typeof UI !== 'undefined') UI.log(`🔷 <strong>${relic.name}</strong> — 全員にシールド${ef.value}付与！`, 'log-status');
       }
     });
