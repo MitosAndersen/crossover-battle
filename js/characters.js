@@ -214,6 +214,11 @@ const JOIN_QUOTES = {
   naofumi: '……信じられるのは、この盾だけだ。',
   raphtalia: 'ラフタリアです。私は、ナオフミ様の剣ですから。',
   filo: 'フィーロだよ！ご主人様のために、いーっぱい蹴っ飛ばすの！',
+  // -- ゼノブレイド2 --
+  rex: '約束だろ？───オレは君のために楽園に行く！',
+  pyra: '私を、楽園に連れて行って',
+  mythra: 'あなたがそうしたいと思うのなら協力はする',
+  nia: 'アタシも見てみたくなったよ、楽園。本当にあるんだろうね？',
 
 };
 
@@ -284,6 +289,8 @@ const CHAR_RARITY = {
   rudeus:3, eris:2, roxy:2, sylphiette:2,
   // -- 盾の勇者の成り上がり --
   naofumi:3, raphtalia:2, filo:2,
+  // -- ゼノブレイド2 --
+  rex:2, pyra:3, mythra:3, nia:2,
 };
 
 // ============================================================
@@ -482,6 +489,11 @@ const ALLY_DATA = [
   { id:'naofumi',    name:'岩谷尚文',              origin:'盾の勇者の成り上がり',   emoji:'🛡️', maxHp:92,  role:'tank',     gender:'男', job:'盾の勇者',      skillIds:['naofumi_basic','naofumi_meteor','naofumi_maiden'],   color:'#336655' },
   { id:'raphtalia',  name:'ラフタリア',            origin:'盾の勇者の成り上がり',   emoji:'🦝', maxHp:76,  role:'attacker', gender:'女', job:'亜人の剣士',    skillIds:['raphtalia_basic','raphtalia_stardust','raphtalia_tenmei'],         color:'#aa6644' },
   { id:'filo',       name:'フィーロ',              origin:'盾の勇者の成り上がり',   emoji:'🐤', maxHp:72,  role:'striker',  gender:'女', job:'フィロリアル・クイーン', skillIds:['filo_basic','filo_quick','filo_tornado'],                  color:'#ffdd66' },
+  // -- ゼノブレイド2 (4) --
+  { id:'rex',        name:'レックス',              origin:'ゼノブレイド2',          emoji:'🚢', maxHp:82,  role:'attacker', gender:'男', job:'サルベージャー', skillIds:['rex_basic','rex_shot','rex_rolling'],                      color:'#3a8a8a' },
+  { id:'pyra',       name:'ホムラ',                origin:'ゼノブレイド2',          emoji:'🔥', maxHp:78,  role:'attacker', gender:'女', job:'天の聖杯',      skillIds:['pyra_basic','pyra_prominence','pyra_burning'],             color:'#cc3322' },
+  { id:'mythra',     name:'ヒカリ',                origin:'ゼノブレイド2',          emoji:'✨', maxHp:72,  role:'striker',  gender:'女', job:'天の聖杯',      skillIds:['mythra_basic','mythra_photon','mythra_sacred'],            color:'#d4b83a' },
+  { id:'nia',        name:'ニア',                  origin:'ゼノブレイド2',          emoji:'🐈', maxHp:74,  role:'support',  gender:'女', job:'ドライバー',    skillIds:['nia_basic','nia_butterfly','nia_healing'],                 color:'#4a8a9a' },
 ];
 
 // ============================================================

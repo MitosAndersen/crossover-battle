@@ -51,7 +51,7 @@ const PASSIVE_DATA = {
 
   // ==== SAO ====
   kirito:       { name:'二刀流',                  type:'multi_hit_boost',         desc:'連続ヒット技+30%', value:0.30 },
-  asuna:        { name:'閃光',                    type:'battle_start_sp',         desc:'開幕 SP+1' },
+  asuna:        { name:'閃光',                    type:'battle_start_atk',        desc:'開幕 攻↑(2T)', turns:2 },
   sinon:        { name:'氷の狙撃手',              type:'exploit_status',          desc:'防御↓中の敵へ与ダメ+20%', effect:'def_down', value:0.20 },
   yuuki:        { name:'絶剣',                    type:'multi_hit_boost',         desc:'連続ヒット技+20%', value:0.20 },
   leafa:        { name:'スピードホリック',        type:'basic_atk_boost',         desc:'通常攻撃+100%', value:1.00 },
@@ -83,7 +83,7 @@ const PASSIVE_DATA = {
   // ==== 呪術廻戦 ====
   gojo:         { name:'六眼',                    type:'sp_regen',                desc:'毎T SP+1' },
   sukuna:       { name:'呪いの王',                type:'exploit_status',          desc:'呪い中の敵へ与ダメ+30%', effect:'curse', value:0.30 },
-  megumi_ft:    { name:'十種影法術',              type:'battle_start_sp',         desc:'開幕 SP+1' },
+  megumi_ft:    { name:'十種影法術',              type:'sp_max_up',               desc:'最大SP+1', value:1 },
   itadori:      { name:'宿儺の器',                type:'compound',                desc:'毎T HP3%回復・毒/呪い無効', effects:[{type:'regen',value:0.03},{type:'status_immune',targets:['poison','curse']}] },
   nanami:       { name:'時間外労働',              type:'low_hp_atk',              desc:'HP50%↓ 防↑（3T）', threshold:0.5, buff:'def_up', turns:3 },
   nobara:       { name:'芻霊呪法',                type:'counter',                 desc:'被ダメの50%を反射', value:0.50 },
@@ -133,7 +133,7 @@ const PASSIVE_DATA = {
   saber:        { name:'直感',                    type:'battle_start_buffs',      desc:'開幕 攻防↑(2T)', buffs:['atk_up','def_up'], turns:2 },
   archer:       { name:'投影魔術',                type:'basic_atk_boost',         desc:'通常攻撃+100%', value:1.00 },
   rin:          { name:'五大元素使い',            type:'sp_max_up',               desc:'最大SP+1', value:1 },
-  lancer_fate:  { name:'クランの猛犬',            type:'battle_start_atk',        desc:'開幕 攻↑(2T)', value:0.15, turns:2 },
+  lancer_fate:  { name:'クランの猛犬',            type:'battle_start_atk',        desc:'開幕 攻↑(2T)', turns:2 },
   gilgamesh:    { name:'慢心',                    type:'battle_start_buffs',      desc:'開幕 自分の攻↓(2T)', buffs:['atk_down'], turns:2 },
 
   // ==== 東京喰種 ====
@@ -155,7 +155,7 @@ const PASSIVE_DATA = {
   // ==== 七つの大罪 ====
   // パッシブ名は7人とも固有魔力で統一している
   meliodas:     { name:'全反撃（フルカウンター）',  type:'counter',                 desc:'被ダメの100%を反射', value:1.0 },
-  escanor:      { name:'太陽（サンシャイン）',      type:'battle_start_atk',        desc:'開幕 攻↑(2T)', value:0.15, turns:2 },
+  escanor:      { name:'太陽（サンシャイン）',      type:'battle_start_atk',        desc:'開幕 攻↑(2T)', turns:2 },
   ban:          { name:'強奪（スナッチ）',          type:'lifesteal',               desc:'与ダメの8%を吸収', value:0.08 },
   harlequin:    { name:'災厄（ディザスター）',      type:'basic_atk_boost',         desc:'通常攻撃+100%', value:1.00 },
   diane:        { name:'創造（クリエイション）',    type:'shield_start',            desc:'開幕 シールド(HP15%)', value:0.15 },
@@ -219,6 +219,12 @@ const PASSIVE_DATA = {
   raphtalia:    { name:'亜人の成長',              type:'on_kill_atk',             desc:'敵撃破時・自分に攻↑(2T)', turns:2 },
   filo:         { name:'竜の天敵',                type:'boss_damage',             desc:'ボスへ与ダメ+15%', value:0.15 },
 
+  // ==== ゼノブレイド2 ====
+  rex:          { name:'マスタードライバー',        type:'battle_start_team_atk',   desc:'開幕 味方全攻↑(1T)', turns:1 },
+  pyra:         { name:'焔の刀身',                  type:'exploit_status',          desc:'燃焼中の敵へ与ダメ+50%', effect:'burn', value:0.50 },
+  mythra:       { name:'因果律予測',                type:'battle_start_sp',         desc:'開幕 SP+1' },
+  nia:          { name:'豊饒の海',                  type:'regen_team',              desc:'毎T 味方全HP2%回復', value:0.02 },
+
   // ==== BOSS / MIDBOSS ====
   frieza_final:     { name:'宇宙帝王の威圧', type:'enemy_debuff_start', desc:'開幕 全員に攻↓(2T)', turns:2 },
   madara:           { name:'神樹の完全再生', type:'regen', desc:'毎T HP3%回復', value:0.03 },
@@ -232,7 +238,7 @@ const PASSIVE_DATA = {
   demon_king_seven: { name:'絶望を糧とする力', type:'low_hp_atk', desc:'HP50%↓ 防↑（3T）', threshold:0.5, buff:'def_up', turns:3 },
   gilgamesh_boss:   { name:'王の財宝',                type:'atk_boost',           desc:'攻撃力常時+15%', value:0.15 },
   muzan_boss:       { name:'鬼の始祖の威圧', type:'enemy_debuff_start', desc:'開幕 全員に攻↓(2T)', turns:2 },
-  kaguya_boss:      { name:'神樹の力', type:'battle_start_atk', desc:'開幕 攻↑(3T)', value:0.30, turns:3 },
+  kaguya_boss:      { name:'神樹の力', type:'battle_start_atk', desc:'開幕 攻↑(3T)', turns:3 },
   meruem_boss:      { name:'完全なる王の進化', type:'low_hp_atk', desc:'HP50%↓ リジェネ（3T）', threshold:0.5, buff:'regen', turns:3 },
   aizen_boss:       { name:'完全催眠',                type:'def_boost',           desc:'被ダメ-15%', value:0.15 },
   acnologia_boss:   { name:'魔竜の咆哮', type:'enemy_debuff_start', desc:'開幕 全員に攻↓(2T)', turns:2 },
@@ -268,7 +274,7 @@ const PASSIVE_DATA = {
   dante_mb:         { name:'重力を操る悪魔', type:'atk_boost', desc:'攻撃力常時+10%', value:0.10 },
   garou_mb:         { name:'怪人化',                  type:'low_hp_atk',          desc:'HP50%↓ リジェネ（2T）', threshold:0.5, buff:'regen', turns:2 },
   roswaal_mb:       { name:'全属性魔法',              type:'exploit_status',      desc:'燃焼中の敵へ与ダメ+25%', effect:'burn', value:0.25 },
-  diavolo_mb:       { name:'未来消去', type:'battle_start_atk', desc:'開幕 攻↑(3T)', value:0.30, turns:3 },
+  diavolo_mb:       { name:'未来消去', type:'battle_start_atk', desc:'開幕 攻↑(3T)', turns:3 },
   kira_mb:          { name:'バイツァ・ダストの猶予', type:'low_hp_atk', desc:'HP50%↓ リジェネ（2T）', threshold:0.5, buff:'regen', turns:2 },
   heracles_mb:      { name:'ゴッドハンドの加護', type:'def_boost', desc:'被ダメ-10%', value:0.10 },
   katana_mb:        { name:'刀の速さ',                type:'atk_boost',           desc:'攻撃力常時+10%', value:0.10 },

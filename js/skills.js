@@ -424,7 +424,7 @@ const SKILL_DATA = {
   // -- 鹿目まどか --
   madoka_basic:           { name:'ホーミングアロー',      icon:'🎀', noSP:true,   power:6,  type:'physical', target:'single', hits:2, animation:'slash' },
   madoka_heal:            { name:'スターライトアロー',    icon:'🎀', spCost:1,    power:7,   type:'physical', target:'all', hits:5, animation:'explosion', shieldBreak:true },
-  madoka_ultimate:        { name:'天上の祈り',            icon:'💚', spCost:2,    power:0,   type:'heal',     target:'all_ally', healPower:30, animation:'heal', effect:'regen', effectChance:1, effectTurns:2 },
+  madoka_ultimate:        { name:'天上の祈り',            icon:'💚', spCost:2,    power:0,   type:'heal',     target:'all_ally', healPower:20, animation:'heal', effect:'regen', effectChance:1, effectTurns:2 },
   // -- 巴マミ --
   mami_basic:         { name:'マスケット射撃',    icon:'🌼', noSP:true,  power:4,  type:'physical', target:'single', hits:3, animation:'slash' },
   mami_bind:          { name:'レガーレ・ヴァスタリア', icon:'🌼', spCost:2,    power:0,   type:'support',  target:'all',    effect:'stun', effectChance:1, effectTurns:1, animation:'dark' },
@@ -735,5 +735,23 @@ const SKILL_DATA = {
   filo_basic:      { name:'フィロリアルの蹴り',     icon:'🐤', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'punch' },
   filo_quick:      { name:'ハイクイック',           icon:'🐤', spCost:1,    power:10,  type:'physical', target:'single', hits:3, animation:'punch', effect:'def_down', effectChance:1, effectTurns:1 },
   filo_tornado:    { name:'ドライファ・トルネード', icon:'💥', spCost:2,    power:48, type:'magic',    target:'all',    hits:1, animation:'explosion' },
+
+  // ============================================================
+  // -- レックス --
+  rex_basic:       { name:'聖杯の剣',               icon:'🚢', noSP:true,  power:12, type:'physical', target:'single', hits:1, animation:'slash' },
+  rex_shot:        { name:'アンカーショット',       icon:'🚢', spCost:1,    power:33, type:'physical', target:'single', hits:1, animation:'slash', effect:'def_down', effectChance:1, effectTurns:1 },
+  rex_rolling:     { name:'ローリングスマッシュ',   icon:'💥', spCost:2,    power:62, type:'physical', target:'single', hits:1, animation:'slash_heavy', effect:'atk_down', effectChance:1, effectTurns:2, shieldBreak:true },
+  // -- ホムラ --
+  pyra_basic:      { name:'聖杯の剣',               icon:'🔥', noSP:true,  power:13, type:'physical', target:'single', hits:1, animation:'slash' },
+  pyra_prominence: { name:'プロミネンスリボルト',   icon:'🔥', spCost:1,    power:35, type:'magic',    target:'all',    hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:2 },
+  pyra_burning:    { name:'バーニングソード',       icon:'💥', spCost:3,    power:110, type:'magic',   target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:3, execute:true, shieldBreak:true },
+  // -- ヒカリ --
+  mythra_basic:    { name:'聖杯の剣',               icon:'✨', noSP:true,  power:13, type:'physical', target:'single', hits:1, animation:'slash' },
+  mythra_photon:   { name:'フォトンエッジ',         icon:'✨', spCost:1,    power:7,  type:'physical', target:'single', hits:5, animation:'slash', effect:'def_down', effectChance:1, effectTurns:2 },
+  mythra_sacred:   { name:'セイクリッドアロー',     icon:'💥', spCost:3,    power:110, type:'magic',   target:'all',    hits:1, animation:'beam' },
+  // -- ニア --
+  nia_basic:       { name:'シミター',               icon:'🐈', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'slash' },
+  nia_butterfly:   { name:'バタフライエッジ',       icon:'🐈', spCost:1,    power:35, type:'physical', target:'single', hits:1, animation:'slash', shieldBreak:true },
+  nia_healing:     { name:'ヒーリングハイロー',     icon:'💚', spCost:2,    power:0,  type:'heal',     target:'all_ally', healPower:20, animation:'heal' },
 };
 
