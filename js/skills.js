@@ -739,7 +739,7 @@ const SKILL_DATA = {
   // ============================================================
   // -- レックス --
   rex_basic:       { name:'聖杯の剣',               icon:'🚢', noSP:true,  power:12, type:'physical', target:'single', hits:1, animation:'slash' },
-  rex_shot:        { name:'アンカーショット',       icon:'🚢', spCost:1,    power:33, type:'physical', target:'single', hits:1, animation:'slash', effect:'def_down', effectChance:1, effectTurns:1 },
+  rex_shot:        { name:'アンカーショット',       icon:'🚢', spCost:1,    power:33, type:'physical', target:'single', hits:1, animation:'slash', effect:'stun', effectChance:1, effectTurns:1 },
   rex_rolling:     { name:'ローリングスマッシュ',   icon:'💥', spCost:2,    power:62, type:'physical', target:'single', hits:1, animation:'slash_heavy', effect:'atk_down', effectChance:1, effectTurns:2, shieldBreak:true },
   // -- ホムラ --
   pyra_basic:      { name:'聖杯の剣',               icon:'🔥', noSP:true,  power:13, type:'physical', target:'single', hits:1, animation:'slash' },
@@ -748,7 +748,7 @@ const SKILL_DATA = {
   // -- ヒカリ --
   mythra_basic:    { name:'聖杯の剣',               icon:'✨', noSP:true,  power:13, type:'physical', target:'single', hits:1, animation:'slash' },
   mythra_photon:   { name:'フォトンエッジ',         icon:'✨', spCost:1,    power:7,  type:'physical', target:'single', hits:5, animation:'slash', effect:'def_down', effectChance:1, effectTurns:2 },
-  mythra_sacred:   { name:'セイクリッドアロー',     icon:'💥', spCost:3,    power:110, type:'magic',   target:'all',    hits:1, animation:'beam' },
+  mythra_sacred:   { name:'セイクリッドアロー',     icon:'💥', spCost:3,    power:11, type:'magic',    target:'all',    hits:10, animation:'beam' },
   // -- ニア --
   nia_basic:       { name:'シミター',               icon:'🐈', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'slash' },
   nia_butterfly:   { name:'バタフライエッジ',       icon:'🐈', spCost:1,    power:35, type:'physical', target:'single', hits:1, animation:'slash', shieldBreak:true },
