@@ -460,7 +460,7 @@ const SKILL_DATA = {
   // -- ギルガメッシュ --
   gilgamesh_basic:    { name:'王の財宝（ゲート・オブ・バビロン）',     icon:'👑', noSP:true,  power:1,  type:'magic',    target:'all',    hits:15, animation:'beam', noSpread:true },
   gilgamesh_chain:    { name:'天の鎖（エルキドゥ）',                   icon:'👑', spCost:1,    power:0,  type:'support',  target:'all',    effect:'atk_down', effectChance:1, effectTurns:3, alsoEffect2:'def_down', animation:'dark' },
-  gilgamesh_ea:       { name:'天地乖離す開闢の星（エヌマ・エリシュ）', icon:'💥', spCost:3,    power:120, type:'magic',    target:'all',    hits:1, animation:'explosion', execute:true, shieldBreak:true },
+  gilgamesh_ea:       { name:'天地乖離す開闢の星（エヌマ・エリシュ）', icon:'💥', spCost:3,    power:60, type:'magic',    target:'all',    hits:1, animation:'explosion', noSpread:true, execute:true, shieldBreak:true },
 
   // ============================================================
   // 東京喰種
@@ -496,7 +496,7 @@ const SKILL_DATA = {
   // -- エレン・イェーガー --
   eren_basic:         { name:'立体機動連撃',      icon:'🦅', noSP:true,  power:4,  type:'physical', target:'single', hits:3, animation:'slash' },
   eren_thunderspear:  { name:'雷槍',              icon:'⚡', spCost:1,    power:35, type:'physical', target:'single', hits:1, animation:'explosion', effect:'burn', effectChance:1, effectTurns:3 },
-  eren_rumbling:      { name:'硬質化パンチ',      icon:'💥', spCost:3,    power:110, type:'physical', target:'all', hits:1, animation:'punch_heavy', shieldBreak:true },
+  eren_rumbling:      { name:'硬質化パンチ',      icon:'💥', spCost:3,    power:57, type:'physical', target:'all', hits:1, animation:'punch_heavy', noSpread:true, shieldBreak:true },
   // -- ミカサ・アッカーマン --
   mikasa_basic:        { name:'立体機動連撃',         icon:'🔴', noSP:true,  power:4,  type:'physical', target:'single', hits:3, animation:'slash' },
   mikasa_thunderspear: { name:'雷槍',                 icon:'⚡', spCost:1,    power:32, type:'physical', target:'single', hits:1, animation:'explosion', effect:'burn',    effectChance:1, effectTurns:2 },
@@ -572,7 +572,7 @@ const SKILL_DATA = {
   // -- アインズ・ウール・ゴウン --
   ainz_basic:             { name:'心臓掌握（グラスプ・ハート）', icon:'💀', noSP:true,  power:14,  type:'physical', target:'single', hits:1, animation:'dark' },
   ainz_timestop:          { name:'上位道具作成',                 icon:'🗡', spCost:1,   power:0,   type:'support', target:'all_ally',   effect:'atk_up', effectChance:1, effectTurns:3, animation:'buff', alsoEffect2:'def_up' },
-  ainz_annihilate:        { name:'隕石落下（メテオフォール）',    icon:'💥', spCost:3,   power:110, type:'magic', target:'all', hits:1, animation:'explosion', shieldBreak:true },
+  ainz_annihilate:        { name:'隕石落下（メテオフォール）',    icon:'💥', spCost:3,   power:57, type:'magic', target:'all', hits:1, animation:'explosion', noSpread:true, shieldBreak:true },
   // -- アルベド --
   albedo_basic:       { name:'3F',                         icon:'👸', noSP:true,  power:9,  type:'physical', target:'single', hits:1, animation:'slash' },
   albedo_guardian:    { name:'ウォールズ・オブ・ジェリコ', icon:'🛡️', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:15, effectChance:1, animation:'buff' },
@@ -687,7 +687,7 @@ const SKILL_DATA = {
   // -- フリーレン --
   frieren_basic:   { name:'一般攻撃魔法（ゾルトラーク）',           icon:'🧝', noSP:true,  power:14,  type:'magic',   target:'single', hits:1, animation:'beam' },
   frieren_defense: { name:'防御魔法',                               icon:'🛡️', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:15, effectChance:1, animation:'buff' },
-  frieren_judradjim:{ name:'破滅の雷を放つ魔法（ジュドラジルム）',  icon:'💥', spCost:2,    power:53, type:'magic',    target:'all',    hits:1, animation:'thunder', effect:'paralyze', effectChance:1, effectTurns:3, noSpread:true },
+  frieren_judradjim:{ name:'破滅の雷を放つ魔法（ジュドラジルム）',  icon:'💥', spCost:3,    power:53, type:'magic',    target:'all',    hits:1, animation:'thunder', effect:'paralyze', effectChance:1, effectTurns:3, noSpread:true },
   // -- フェルン --
   fern_basic:      { name:'一般攻撃魔法（ゾルトラーク）', icon:'🌙', noSP:true,  power:4,  type:'magic',    target:'single', hits:3, animation:'beam' },
   fern_defense:      { name:'防御魔法',                   icon:'🛡️', spCost:2,    power:0,   type:'support',  target:'all_ally', effect:'shield', shieldPower:15, effectChance:1, animation:'buff' },
@@ -707,7 +707,7 @@ const SKILL_DATA = {
   // -- ルーデウス・グレイラット --
   rudeus_basic:    { name:'岩砲弾（ストーンキャノン）',   icon:'🪨', noSP:true, power:13, type:'magic',   target:'single', hits:1, animation:'beam' },
   rudeus_swamp:    { name:'泥沼（クアグマイア）',         icon:'🕳️', spCost:1,   power:0,   type:'support',  target:'all',    effect:'atk_down', effectChance:1, effectTurns:3, alsoEffect2:'def_down', animation:'dark' },
-  rudeus_lightning:{ name:'雷光（ライトニング）',         icon:'💥', spCost:2,   power:56, type:'magic',    target:'all',    hits:1, animation:'thunder', effect:'paralyze', effectChance:1, effectTurns:3, noSpread:true },
+  rudeus_lightning:{ name:'雷光（ライトニング）',         icon:'💥', spCost:3,   power:56, type:'magic',    target:'all',    hits:1, animation:'thunder', effect:'paralyze', effectChance:1, effectTurns:3, noSpread:true },
   // -- エリス・ボレアス・グレイラット --
   eris_basic:      { name:'斬撃',                 icon:'🦁', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
   eris_rengeki:    { name:'苛烈な連撃',           icon:'⚔️', spCost:1,    power:7, type:'physical',  target:'all', hits:5, animation:'slash' },
@@ -748,7 +748,7 @@ const SKILL_DATA = {
   // -- ヒカリ --
   mythra_basic:    { name:'聖杯の剣',               icon:'✨', noSP:true,  power:13, type:'physical', target:'single', hits:1, animation:'slash' },
   mythra_photon:   { name:'フォトンエッジ',         icon:'✨', spCost:1,    power:7,  type:'physical', target:'single', hits:5, animation:'slash', effect:'def_down', effectChance:1, effectTurns:2 },
-  mythra_sacred:   { name:'セイクリッドアロー',     icon:'💥', spCost:3,    power:11, type:'magic',    target:'all',    hits:10, animation:'beam' },
+  mythra_sacred:   { name:'セイクリッドアロー',     icon:'💥', spCost:3,    power:11, type:'magic',    target:'all',    hits:5, animation:'beam', noSpread:true },
   // -- ニア --
   nia_basic:       { name:'シミター',               icon:'🐈', noSP:true,  power:10, type:'physical', target:'single', hits:1, animation:'slash' },
   nia_butterfly:   { name:'バタフライエッジ',       icon:'🐈', spCost:1,    power:35, type:'physical', target:'single', hits:1, animation:'slash', shieldBreak:true },
