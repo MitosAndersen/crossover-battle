@@ -339,6 +339,33 @@ html, body {
   animation: allyTargetPulse 0.5s ease-in-out infinite alternate;
 }
 
+/* 対象選択中の推定ダメージ。HPバーの右端から「これから削れる分」を帯で重ね、
+   数字はバーの直下に右寄せで出す。カードの絵を隠さずに残りHPが直感的に分かる。
+   .bar は overflow:hidden なので帯だけを中に入れ、数字は .bar-wrap 側に置いている */
+.dmg-slice {
+  position: absolute; top: 0; height: 100%;
+  border-radius: 3px; pointer-events: none;
+  background: repeating-linear-gradient(135deg,
+    rgba(255,70,70,0.95) 0 3px, rgba(150,20,20,0.95) 3px 6px);
+  animation: dmgSliceBreathe 1.3s ease-in-out infinite alternate;
+}
+.dmg-slice-lethal {
+  background: repeating-linear-gradient(135deg,
+    rgba(255,240,120,0.98) 0 3px, rgba(255,90,40,0.98) 3px 6px);
+}
+@keyframes dmgSliceBreathe { from { opacity: 0.55; } to { opacity: 1; } }
+
+/* ❤️HP行の中に差し込む行内スパン。別行にするとカードが高くなって
+   フィールドの縦幅が固定なぶんレイアウトが崩れるので、既存の行に同居させている */
+.dmg-num {
+  margin-left: 3px; font-weight: 900; color: #ff9a9a;
+  text-shadow: 0 0 calc(5px * var(--ui-scale)) rgba(255,40,40,0.55);
+  animation: dmgNumBreathe 1.3s ease-in-out infinite alternate;
+}
+/* 撃破できるときは色を変える。数字を読まなくても「落とせる」と分かるのが狙い */
+.dmg-num-lethal { color: #ffe680; text-shadow: 0 0 calc(6px * var(--ui-scale)) rgba(255,150,0,0.85); }
+@keyframes dmgNumBreathe { from { opacity: 0.7; } to { opacity: 1; } }
+
 .char-card.targetable {
   border-color: var(--red) !important;
   cursor: crosshair;
@@ -672,6 +699,8 @@ body.low-power .skill-btn.skill-selected,
 body.low-power .guard-overlay.active,
 body.low-power .aoe-overlay,
 body.low-power .title-glow,
+body.low-power .dmg-slice,
+body.low-power .dmg-num,
 body.low-power .title-chars { animation: none !important; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -687,6 +716,8 @@ body.low-power .title-chars { animation: none !important; }
   #lethal-warning.active,
   .skill-btn.skill-selected,
   .aoe-overlay,
+  .dmg-slice,
+  .dmg-num,
   .title-chars { animation: none !important; }
 }
 
@@ -699,7 +730,7 @@ body.hide-passive-name .passive-name { display: none; }
    バッジだけ消すと空白が残る。コンテナごと畳んで22px分を詰める */
 
 /* ---- Bars ---- */
-.bar-wrap { margin-bottom:1px; display:flex; align-items:center; gap:3px; }
+.bar-wrap { margin-bottom:1px; display:flex; align-items:center; gap:3px; position:relative; }
 .bar {
   flex:1; height:calc(5px * var(--ui-scale)); border-radius:3px;
   background:rgba(255,255,255,0.1); overflow:hidden;

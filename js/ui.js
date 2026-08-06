@@ -1283,8 +1283,55 @@ const UI = (() => {
     }, 2800);
   }
 
+  // 対象選択中に敵カードへ推定ダメージを出す。
+  // 値は calcAllyDamageExact（実ダメージ式の完全ミラー）なので表示＝実際に入る数字。
+  // 連続ヒット技はヒット数を掛けた合計を出す。
+  // 全体技のときエリア中央の「⚔️ 全体」と被る懸念があったが、実機で確認して問題なかったので
+  // 単体・全体とも同じ表示にしている。
+  function addDmgPreview(card, ctx, target, targetCount) {
+    if (!ctx || !ctx.actor || !ctx.skill) return;
+    const skill = ctx.skill;
+    if (!skill.power || skill.power <= 0) return;   // 回復・バフ技には出さない
+    if (typeof calcAllyDamageExact !== 'function') return;
+    const per = calcAllyDamageExact(ctx.actor, skill, target, targetCount);
+    const total = per * (skill.hits || 1);
+    if (!(total > 0)) return;
+
+    // シールドの扱いは battle.js:412 と 423 に合わせる。
+    // 味方のシールド破壊技はシールドを素通りしてHPに入るので、その分を引かない
+    const shield = skill.shieldBreak ? 0 : (target.shieldHp || 0);
+    const hpDmg  = Math.max(0, total - shield);
+
+    const bar = document.getElementById(`hp-${target.id}`)?.parentElement;  // .bar hp-bar-bg
+    if (bar) {
+      // HPバーの右端から hpDmg 分を「これから削れる帯」として重ねる
+      const hpPct   = Math.max(0, (target.hp / target.maxHp) * 100);
+      const lostPct = Math.min(hpPct, (hpDmg / target.maxHp) * 100);
+      const slice = document.createElement('div');
+      slice.className = 'dmg-slice' + (hpDmg >= target.hp ? ' dmg-slice-lethal' : '');
+      slice.style.left  = (hpPct - lostPct) + '%';
+      slice.style.width = lostPct + '%';
+      bar.appendChild(slice);
+    }
+
+    // 数字は既存の ❤️HP/最大 行の中に入れる。
+    // 別行として足すとカードが高くなり、フィールドの縦幅が固定なのでレイアウトが崩れる。
+    // 絶対配置で重ねる案もシールド持ちだと 🛡️ の分だけ行が伸びてぶつかるため採らない。
+    // 「/最大HP」を落として数字の場所を作るので、行の長さはほぼ変わらない
+    const hpVal = document.getElementById(`hpval-${target.id}`);
+    if (hpVal) {
+      if (hpVal.dataset.origHtml == null) hpVal.dataset.origHtml = hpVal.innerHTML;
+      const lethal = hpDmg >= target.hp;
+      const sh = (!skill.shieldBreak && target.shieldHp > 0)
+        ? `<span class="shield-val">🛡️${target.shieldHp}</span>` : '';
+      // 倒せるときは数字ではなく「撃破」と出す。色を変えるだけだと見落とすため
+      hpVal.innerHTML = `❤️${Math.max(0, target.hp)}${sh}`
+        + `<span class="dmg-num${lethal ? ' dmg-num-lethal' : ''}">${lethal ? '撃破' : '−' + total}</span>`;
+    }
+  }
+
   // ---- AoE confirm (any card click fires skill) ----
-  function promptAoeConfirm(targets, isAlly, onConfirm) {
+  function promptAoeConfirm(targets, isAlly, onConfirm, ctx) {
     clearTargetSelect(); // 前回の選択表示が残っていても必ず1つにする
     const areaId = isAlly ? 'ally-area' : 'enemy-area';
     const area = document.getElementById(areaId);
@@ -1296,17 +1343,19 @@ const UI = (() => {
       const card = document.getElementById(`card-${t.id}`);
       if (!card) return;
       card.classList.add('targetable', ...(isAlly ? ['targetable-ally'] : []));
+      if (!isAlly) addDmgPreview(card, ctx, t, targets.length);
       card.onclick = () => { Audio.SE.cursor(); clearTargetSelect(); onConfirm(); };
     });
   }
 
   // ---- Enemy target selection ----
-  function promptTargetSelect(enemies, onSelect) {
+  function promptTargetSelect(enemies, onSelect, ctx) {
     clearTargetSelect();
     enemies.forEach(e => {
       const card = document.getElementById(`card-${e.id}`);
       if (!card || e.isDefeated) return;
       card.classList.add('targetable');
+      addDmgPreview(card, ctx, e, enemies.length);
       card.onclick = () => {
         Audio.SE.cursor();
         clearTargetSelect();
@@ -1347,6 +1396,12 @@ const UI = (() => {
 
   function clearTargetSelect() {
     document.querySelectorAll('.aoe-overlay').forEach(el => el.remove());
+    document.querySelectorAll('.dmg-slice').forEach(el => el.remove());
+    // ❤️HP行は書き換えているので、退避しておいた元のHTMLに戻す
+    document.querySelectorAll('.bar-value[data-orig-html]').forEach(el => {
+      el.innerHTML = el.dataset.origHtml;
+      delete el.dataset.origHtml;
+    });
     document.querySelectorAll('.targetable').forEach(c => {
       c.classList.remove('targetable', 'targetable-ally');
       c.onclick = null;

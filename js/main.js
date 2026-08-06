@@ -1249,7 +1249,7 @@ const Game = (() => {
         }
         pendingSkillId = skillId;
         const prompt = isAllyTarget ? UI.promptAllyTargetSelect : UI.promptTargetSelect;
-        prompt(pool, confirmed);
+        prompt(pool, confirmed, { actor: ally, skill });   // ctx: 敵カードへの推定ダメージ表示に使う
         UI.setSkillBtnPending(skillId, 'もう一度押すとHP最低の相手へ'); // prompt内のclearTargetSelectで消えるため後から付与
         return;
       }
@@ -1263,7 +1263,7 @@ const Game = (() => {
       }
       pendingSkillId = skillId;
       if (skill.target === 'all') {
-        UI.promptAoeConfirm(Battle.getLivingEnemies(), false, () => confirmed());
+        UI.promptAoeConfirm(Battle.getLivingEnemies(), false, () => confirmed(), { actor: ally, skill });
       } else if (skill.target === 'all_ally') {
         UI.promptAoeConfirm(Battle.getLivingAllies(), true, () => confirmed());
       } else if (skill.target === 'dead_ally') {
