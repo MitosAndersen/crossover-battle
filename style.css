@@ -364,6 +364,27 @@ html, body {
 }
 /* 撃破できるときは色を変える。数字を読まなくても「落とせる」と分かるのが狙い */
 .dmg-num-lethal { color: #ffe680; text-shadow: 0 0 calc(6px * var(--ui-scale)) rgba(255,150,0,0.85); }
+
+/* 味方側。回復は緑、シールドは紫で、既存の .hp-fill / .shield-fill と色を揃えている */
+.heal-slice, .shield-slice {
+  position: absolute; top: 0; height: 100%;
+  border-radius: 3px; pointer-events: none;
+  animation: dmgSliceBreathe 1.3s ease-in-out infinite alternate;
+}
+.heal-slice {
+  background: repeating-linear-gradient(135deg,
+    rgba(90,255,160,0.95) 0 3px, rgba(20,150,80,0.95) 3px 6px);
+}
+.shield-slice {
+  background: repeating-linear-gradient(135deg,
+    rgba(200,140,255,0.95) 0 3px, rgba(110,50,180,0.95) 3px 6px);
+}
+.heal-num, .shield-num {
+  margin-left: 3px; font-weight: 900;
+  animation: dmgNumBreathe 1.3s ease-in-out infinite alternate;
+}
+.heal-num   { color: #7dffb0; text-shadow: 0 0 calc(5px * var(--ui-scale)) rgba(40,255,140,0.5); }
+.shield-num { color: #d9a6ff; text-shadow: 0 0 calc(5px * var(--ui-scale)) rgba(180,100,255,0.5); }
 @keyframes dmgNumBreathe { from { opacity: 0.7; } to { opacity: 1; } }
 
 .char-card.targetable {
@@ -700,6 +721,10 @@ body.low-power .guard-overlay.active,
 body.low-power .aoe-overlay,
 body.low-power .title-glow,
 body.low-power .dmg-slice,
+body.low-power .heal-slice,
+body.low-power .shield-slice,
+body.low-power .heal-num,
+body.low-power .shield-num,
 body.low-power .dmg-num,
 body.low-power .title-chars { animation: none !important; }
 
@@ -717,6 +742,10 @@ body.low-power .title-chars { animation: none !important; }
   .skill-btn.skill-selected,
   .aoe-overlay,
   .dmg-slice,
+  .heal-slice,
+  .shield-slice,
+  .heal-num,
+  .shield-num,
   .dmg-num,
   .title-chars { animation: none !important; }
 }

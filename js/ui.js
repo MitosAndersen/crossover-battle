@@ -1330,6 +1330,48 @@ const UI = (() => {
     }
   }
 
+  // 味方カード側。回復量とシールド増加量を敵側と同じ形で出す。
+  // 回復量は既存の estimateDamage（回復側のミラー）をそのまま使う。
+  // シールドは battle.js:285 と同じく「最大HPの半分」で頭打ちになるので、
+  // 上限に当たる場合は実際に増える分だけを出す
+  function addAllyPreview(card, ctx, target) {
+    if (!ctx || !ctx.actor || !ctx.skill) return;
+    const skill = ctx.skill;
+    const bar = document.getElementById(`hp-${target.id}`)?.parentElement;
+    let label = '', cls = '', sliceCls = '', fromPct = 0, gain = 0;
+
+    if (skill.type === 'heal' && (skill.healPower || 0) > 0) {
+      const est = estimateDamage(ctx.actor, skill);
+      gain = Math.max(0, Math.min(target.maxHp - target.hp, est ? est.val : 0));
+      label = gain > 0 ? `+${gain}` : '満タン';
+      cls = 'heal-num'; sliceCls = 'heal-slice';
+      fromPct = (target.hp / target.maxHp) * 100;
+    } else if (skill.effect === 'shield') {
+      const cap = Math.floor(target.maxHp * 0.5);
+      const cur = target.shieldHp || 0;
+      gain = Math.max(0, Math.min(cap, cur + (skill.shieldPower || 20)) - cur);
+      label = gain > 0 ? `+${gain}` : '上限';
+      cls = 'shield-num'; sliceCls = 'shield-slice';
+      fromPct = (cur / target.maxHp) * 100;
+    } else {
+      return;   // バフ・蘇生など数字にならない技には出さない
+    }
+
+    if (bar && gain > 0) {
+      const slice = document.createElement('div');
+      slice.className = sliceCls;
+      slice.style.left  = fromPct + '%';
+      slice.style.width = Math.min(100 - fromPct, (gain / target.maxHp) * 100) + '%';
+      bar.appendChild(slice);
+    }
+    const hpVal = document.getElementById(`hpval-${target.id}`);
+    if (hpVal) {
+      if (hpVal.dataset.origHtml == null) hpVal.dataset.origHtml = hpVal.innerHTML;
+      const sh = (target.shieldHp > 0) ? `<span class="shield-val">🛡️${target.shieldHp}</span>` : '';
+      hpVal.innerHTML = `❤️${Math.max(0, target.hp)}${sh}<span class="${cls}">${label}</span>`;
+    }
+  }
+
   // ---- AoE confirm (any card click fires skill) ----
   function promptAoeConfirm(targets, isAlly, onConfirm, ctx) {
     clearTargetSelect(); // 前回の選択表示が残っていても必ず1つにする
@@ -1343,7 +1385,8 @@ const UI = (() => {
       const card = document.getElementById(`card-${t.id}`);
       if (!card) return;
       card.classList.add('targetable', ...(isAlly ? ['targetable-ally'] : []));
-      if (!isAlly) addDmgPreview(card, ctx, t, targets.length);
+      if (isAlly) addAllyPreview(card, ctx, t);
+      else        addDmgPreview(card, ctx, t, targets.length);
       card.onclick = () => { Audio.SE.cursor(); clearTargetSelect(); onConfirm(); };
     });
   }
@@ -1365,12 +1408,13 @@ const UI = (() => {
   }
 
   // ---- Ally target selection ----
-  function promptAllyTargetSelect(allies, onSelect) {
+  function promptAllyTargetSelect(allies, onSelect, ctx) {
     clearTargetSelect();
     allies.forEach(a => {
       const card = document.getElementById(`card-${a.id}`);
       if (!card || a.isDefeated) return;
       card.classList.add('targetable', 'targetable-ally');
+      addAllyPreview(card, ctx, a);
       card.onclick = () => {
         Audio.SE.cursor();
         clearTargetSelect();
@@ -1396,7 +1440,7 @@ const UI = (() => {
 
   function clearTargetSelect() {
     document.querySelectorAll('.aoe-overlay').forEach(el => el.remove());
-    document.querySelectorAll('.dmg-slice').forEach(el => el.remove());
+    document.querySelectorAll('.dmg-slice, .heal-slice, .shield-slice').forEach(el => el.remove());
     // ❤️HP行は書き換えているので、退避しておいた元のHTMLに戻す
     document.querySelectorAll('.bar-value[data-orig-html]').forEach(el => {
       el.innerHTML = el.dataset.origHtml;

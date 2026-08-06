@@ -1265,7 +1265,7 @@ const Game = (() => {
       if (skill.target === 'all') {
         UI.promptAoeConfirm(Battle.getLivingEnemies(), false, () => confirmed(), { actor: ally, skill });
       } else if (skill.target === 'all_ally') {
-        UI.promptAoeConfirm(Battle.getLivingAllies(), true, () => confirmed());
+        UI.promptAoeConfirm(Battle.getLivingAllies(), true, () => confirmed(), { actor: ally, skill });
       } else if (skill.target === 'dead_ally') {
         const dead = activeAllies.filter(a => a.isDefeated);
         if (dead.length <= 1) {
