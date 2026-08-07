@@ -239,7 +239,7 @@ const PASSIVE_DATA = {
   gilgamesh_boss:   { name:'王の財宝',                type:'atk_boost',           desc:'攻撃力常時+15%', value:0.15 },
   muzan_boss:       { name:'鬼の始祖の威圧', type:'enemy_debuff_start', desc:'開幕 全員に攻↓(2T)', turns:2 },
   kaguya_boss:      { name:'神樹の力', type:'battle_start_atk', desc:'開幕 攻↑(3T)', turns:3 },
-  meruem_boss:      { name:'完全なる王の進化', type:'low_hp_atk', desc:'HP50%↓ リジェネ（3T）', threshold:0.5, buff:'regen', turns:3 },
+  meruem_boss:      { name:'完全なる王の進化', type:'low_hp_atk', desc:'HP50%↓ リジェネ（2T）', threshold:0.5, buff:'regen', turns:2 },
   aizen_boss:       { name:'完全催眠',                type:'def_boost',           desc:'被ダメ-15%', value:0.15 },
   acnologia_boss:   { name:'魔竜の咆哮', type:'enemy_debuff_start', desc:'開幕 全員に攻↓(2T)', turns:2 },
   yhwach_boss:      { name:'全知全能の未来視', type:'enemy_debuff_start', desc:'開幕 全員に攻↓(2T)', turns:2 },
