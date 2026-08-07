@@ -42,6 +42,23 @@ const Game = (() => {
     return ALLY_DATA.filter(d => !disabledOrigins.has(d.origin || 'その他'));
   }
 
+  // ---- 確定加入 ----
+  // 登場作品を絞っていない通常プレイでクリアしたとき、そのとき編成にいた3人を数える。
+  // 規定回数に達したキャラは図鑑から1体だけ「必ず初期メンバーに入る」状態にできる。
+  // 実績（ACH）とは別立てにしている。ACH.resetAll の巻き添えで消えると意図が絡まるため
+  const PIN_REQUIRED_CLEARS = 3;
+  let clearCounts  = JSON.parse(localStorage.getItem('icb_clearCounts') || '{}');  // { charId: 回数 }
+  let pinnedCharId = localStorage.getItem('icb_pinnedChar') || null;               // 1体まで
+  function saveClearCounts() {
+    localStorage.setItem('icb_clearCounts', JSON.stringify(clearCounts));
+  }
+  function savePinnedChar() {
+    // 解除時は消す。'null' という文字列が残ると次回起動で真値になってしまう
+    if (pinnedCharId) localStorage.setItem('icb_pinnedChar', pinnedCharId);
+    else              localStorage.removeItem('icb_pinnedChar');
+  }
+  function getClearCount(id) { return clearCounts[id] || 0; }
+
   let seriesBonusEnabled = JSON.parse(localStorage.getItem('icb_seriesBonus') ?? 'true');
   function saveSeriesBonusEnabled() {
     localStorage.setItem('icb_seriesBonus', JSON.stringify(seriesBonusEnabled));
@@ -215,8 +232,13 @@ const Game = (() => {
     // 図鑑・実績の進捗リセット
     const colReset = document.getElementById('collection-reset-btn');
     if (colReset) colReset.addEventListener('click', () => {
-      if (!confirm('実績と図鑑の進捗をすべてリセットします。よろしいですか？')) return;
+      if (!confirm('実績・図鑑の進捗と、確定加入（クリア回数と指定）をすべてリセットします。よろしいですか？')) return;
       if (typeof ACH !== 'undefined') ACH.resetAll();
+      // 確定加入は ACH とは別立てなので、ここで一緒に消す
+      clearCounts = {};
+      pinnedCharId = null;
+      saveClearCounts();
+      savePinnedChar();
       const activeTab = document.querySelector('.tab-btn.active');
       showCollectionScreen(activeTab ? activeTab.dataset.tab : 'chars');
     });
@@ -377,8 +399,12 @@ const Game = (() => {
   // ---- Pick 3 random allies (weighted by rarity) ----
   function pickRandomParty() {
     const pool = getEnabledCharPool();
-    const picked = pickWeightedCandidates(pool, 3, makeTierWeights('initial'));
-    return picked.map(data => makeCombatant(data));
+    // 確定加入キャラがプールにいれば必ず入れ、残り2枠だけ抽選する。
+    // そのキャラの作品をOFFにしている間はプールにいないので、自動的に無効になる
+    const pinned = pinnedCharId ? pool.find(d => d.id === pinnedCharId) : null;
+    const rest   = pinned ? pool.filter(d => d.id !== pinned.id) : pool;
+    const picked = pickWeightedCandidates(rest, pinned ? 2 : 3, makeTierWeights('initial'));
+    return (pinned ? [pinned, ...picked] : picked).map(data => makeCombatant(data));
   }
 
   function makeCombatant(data) {
@@ -704,8 +730,15 @@ const Game = (() => {
     const HP_SCALES  = [0.8, 0.8, 0.8];
     const ATK_SCALES = [0.8, 0.8, 0.8];
     const idx = Math.min(loopCount, 2);
-    const hpScale  = HP_SCALES[idx];
-    const atkScale = ATK_SCALES[idx];
+    // ボス・中ボスだけHPと攻撃力の両方を0.7にする。
+    // 0.8のままだと「倒すのに7ターン・耐えられるのも7ターン」で余裕がゼロだった
+    // （ボス実HP560 ÷ 毎T90ダメージ、味方3人の実効HP250 ÷ 被ダメ32/T）。
+    // 0.7なら6ターンで倒せて8ターン耐えられ、2ターンの余裕ができる。
+    // HPだけ下げても被ダメが変わらず余裕がほとんど増えなかったので両方下げている。
+    // この倍率はチャージ技にも乗るため3人合計126→110になるが、防御で受ける前提で許容する
+    const bossLike = data.isBoss || data.isMidBoss;
+    const hpScale  = bossLike ? 0.7 : HP_SCALES[idx];
+    const atkScale = bossLike ? 0.7 : ATK_SCALES[idx];
     const p = data.passive;
     let passivePowerMult = p?.type === 'atk_boost' ? (1 + p.value) : 1.0;
     let passiveDefMult   = p?.type === 'def_boost'  ? (1 - p.value) : 1.0;
@@ -1836,6 +1869,13 @@ const Game = (() => {
         if (isFinalBattle()) {
           // 最終決戦勝利 → ゲームクリア
           if (typeof ACH !== 'undefined') ACH.onGameClear();
+          // 確定加入のカウント。登場作品を絞っていない通常プレイのときだけ数える。
+          // 倒れているメンバーも対象（クリア時点の編成にいたことが条件で生死は問わない）。
+          // 次の行で全員を全回復させるので、判定順を入れ替えないこと
+          if (disabledOrigins.size === 0) {
+            activeAllies.forEach(a => { clearCounts[a.id] = (clearCounts[a.id] || 0) + 1; });
+            saveClearCounts();
+          }
           Audio.SE.clearFanfare();
           activeAllies.forEach(a => { a.hp = a.maxHp; a.isDefeated = false; a.statusEffects = []; a.statMods = { atk: 1, defMult: 1 }; a.hasBarrier = false; a.shieldHp = 0; });
           restoreSp();
@@ -2554,9 +2594,59 @@ const Game = (() => {
       ${passive ? `<div class="cm-section-title">◆ パッシブ</div>
         <div class="cm-passive"><div class="cm-passive-name">${passive.name}</div><div class="cm-passive-desc">${passive.desc}</div></div>` : ''}
       <div class="cm-section-title">⚔️ スキル</div>
-      <div class="cm-skills">${skillsHtml}</div>`;
+      <div class="cm-skills">${skillsHtml}</div>
+      ${buildPinSectionHtml(d)}`;
+
+    // 確定加入ボタンは innerHTML を入れ替えた後でないと掴めない
+    const pinBtn = document.getElementById('cm-pin-btn');
+    if (pinBtn) pinBtn.addEventListener('click', () => { togglePinnedChar(d); });
 
     document.getElementById('char-modal').style.display = 'flex';
+  }
+
+  // 図鑑のキャラ詳細に出す「確定加入」欄。3つの状態がある
+  function buildPinSectionHtml(d) {
+    const cnt = getClearCount(d.id);
+    if (pinnedCharId === d.id) {
+      return `<div class="cm-section-title">⭐ 確定加入</div>
+        <div class="cm-pin cm-pin-on">
+          <div class="cm-pin-note">このキャラは必ず初期メンバーに加わります</div>
+          <button id="cm-pin-btn" class="btn-secondary cm-pin-btn">⭐ 確定加入を解除</button>
+        </div>`;
+    }
+    if (cnt >= PIN_REQUIRED_CLEARS) {
+      return `<div class="cm-section-title">⭐ 確定加入</div>
+        <div class="cm-pin">
+          <div class="cm-pin-note">クリア ${cnt}回 — 指定できます（1体まで）</div>
+          <button id="cm-pin-btn" class="btn-secondary cm-pin-btn">⭐ 確定加入にする</button>
+        </div>`;
+    }
+    return `<div class="cm-section-title">⭐ 確定加入</div>
+      <div class="cm-pin">
+        <div class="cm-pin-note">このキャラと <b>${PIN_REQUIRED_CLEARS}回</b> クリアすると指定できます
+          （登場作品を調整していない通常プレイのみ）</div>
+        <div class="cm-pin-progress">クリア ${cnt} / ${PIN_REQUIRED_CLEARS}　あと ${PIN_REQUIRED_CLEARS - cnt}回</div>
+      </div>`;
+  }
+
+  // 指定・解除。1体までなので、他を指定中なら確認のうえ置き換える
+  function togglePinnedChar(d) {
+    Audio.SE.cursor();
+    if (pinnedCharId === d.id) {
+      pinnedCharId = null;
+    } else {
+      if (pinnedCharId) {
+        const prev = ALLY_DATA.find(x => x.id === pinnedCharId);
+        const prevName = prev ? prev.name : '現在のキャラ';
+        if (!confirm(`${prevName} の確定加入を解除して ${d.name} に変更しますか？`)) return;
+      }
+      pinnedCharId = d.id;
+    }
+    savePinnedChar();
+    showCharModal(d.id);   // 表示を今の状態に描き直す
+    // 一覧側の⭐も更新する。図鑑タブを開いている時だけ意味がある
+    const activeTab = document.querySelector('.tab-btn.active');
+    if (activeTab && activeTab.dataset.tab === 'chars') showCollectionScreen('chars');
   }
 
   // ---- 図鑑・実績スクリーン ----
@@ -2592,7 +2682,11 @@ const Game = (() => {
           const stars = '★'.repeat(rarity);
           if (seen) {
             // data-char-id を持つカードだけ詳細モーダルを開ける（未発見は押せない）
-            html += `<div class="coll-char-card seen" title="${d.name}" data-char-id="${d.id}">
+            // 確定加入中は⭐を出す。詳細を開かないと誰を指定中か分からないのを避ける
+            const pinMark = (pinnedCharId === d.id)
+              ? '<div class="coll-char-pin" title="確定加入">⭐</div>' : '';
+            html += `<div class="coll-char-card seen${pinnedCharId === d.id ? ' pinned' : ''}" title="${d.name}" data-char-id="${d.id}">
+              ${pinMark}
               <div class="coll-char-emoji">${d.emoji}</div>
               <div class="coll-char-name">${d.name}</div>
               <div class="coll-char-stars rarity${rarity}">${stars}</div>

@@ -365,6 +365,18 @@ html, body {
 /* 撃破できるときは色を変える。数字を読まなくても「落とせる」と分かるのが狙い */
 .dmg-num-lethal { color: #ffe680; text-shadow: 0 0 calc(6px * var(--ui-scale)) rgba(255,150,0,0.85); }
 
+/* ---- 確定加入（図鑑） ---- */
+.cm-pin {
+  background: rgba(40, 34, 12, 0.5);
+  border: 1px solid rgba(255, 204, 0, 0.35);
+  border-radius: 6px; padding: 8px 10px; margin-top: 4px;
+}
+.cm-pin-on { border-color: rgba(255, 204, 0, 0.9); background: rgba(60, 50, 10, 0.6); }
+.cm-pin-note { font-size: 0.78rem; color: var(--text-main); line-height: 1.5; }
+.cm-pin-note b { color: var(--neon-gold); }
+.cm-pin-progress { font-size: 0.82rem; font-weight: 700; color: var(--neon-gold); margin-top: 5px; }
+.cm-pin-btn { margin-top: 8px; width: 100%; }
+
 /* 味方側。回復は緑、シールドは紫で、既存の .hp-fill / .shield-fill と色を揃えている */
 .heal-slice, .shield-slice {
   position: absolute; top: 0; height: 100%;
@@ -2296,9 +2308,14 @@ body.hide-passive-name .passive-name { display: none; }
   width: 72px; text-align: center; padding: 8px 4px;
   border-radius: 8px; border: 1px solid rgba(100,120,255,0.2);
   background: rgba(20,20,50,0.8);
+  position: relative;   /* 確定加入の⭐を右上に置くため */
 }
 .coll-char-card.seen { border-color: rgba(100,120,255,0.5); }
 .coll-char-card.unseen { opacity: 0.45; filter: grayscale(0.8); }
+/* 確定加入の金枠。.seen と詳細度が同じなので、必ず .seen より後ろに置くこと。
+   前に置くと両方のクラスを持つカードで .seen に負けて金枠が出ない */
+.coll-char-card.pinned { border-color: var(--neon-gold); box-shadow: 0 0 8px rgba(255,204,0,0.45); }
+.coll-char-pin { position: absolute; top: 1px; right: 2px; font-size: 0.75rem; line-height: 1; }
 .coll-char-emoji { font-size: 1.6rem; line-height: 1; margin-bottom: 3px; }
 .coll-char-name { font-size: 0.55rem; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .coll-char-stars { font-size: 0.55rem; margin-top: 1px; }
