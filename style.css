@@ -374,6 +374,21 @@ html, body {
 }
 .patch-new-dot { color: var(--neon-gold); margin-left: 5px; font-size: 0.6rem; vertical-align: super; }
 
+/* 更新履歴は増え続けるので、スクロールしても閉じるボタンと見出しが残るようにする。
+   .system-modal-box は max-height:85vh + overflow-y:auto で箱ごとスクロールする作りで、
+   その中の .system-modal-close は position:absolute。そのままだと下へスクロールした時に
+   ✕が画面外へ流れてしまう。この2つだけ sticky にして上に貼り付ける。
+   システムガイド側の見た目は変えたくないので #patch-modal に限定している */
+#patch-modal .system-modal-close {
+  position: sticky; top: 0; float: right;
+  z-index: 2; margin-top: -8px; margin-right: -6px;
+}
+#patch-modal .system-modal-title {
+  position: sticky; top: 0; z-index: 1;
+  background: var(--bg-card); padding: 4px 0 10px; margin-bottom: 10px;
+  box-shadow: 0 6px 10px -8px rgba(0,0,0,0.9);
+}
+
 .pt-release { margin-bottom: 16px; }
 .pt-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px;
   border-bottom: 1px solid rgba(100,120,255,0.25); padding-bottom: 3px; }
