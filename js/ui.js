@@ -1213,7 +1213,9 @@ const UI = (() => {
   }
 
   // ---- Result overlay ----
-  function showBattleResult(type, healPctLabel, onNext, droppedRelic = null) {
+  // summary はクリア時のみ渡される1周の記録（main.js が組み立てる）。
+  // { party:[{emoji,name}], relics:[{emoji,name}], turns, best:{amount,char,skill} }
+  function showBattleResult(type, healPctLabel, onNext, droppedRelic = null, summary = null) {
     const overlay = document.getElementById('result-overlay');
     const msg     = document.getElementById('result-msg');
     const btn     = document.getElementById('result-btn');
@@ -1238,7 +1240,24 @@ const UI = (() => {
 
     const relicEl = document.getElementById('result-relic');
     if (relicEl) {
-      if (type === 'win' && droppedRelic) {
+      if (type === 'clear' && summary) {
+        // 1周のリザルト。通常戦のレリック入手表示と同じ枠を使い回している
+        const party = summary.party.map(p =>
+          `<span class="rs-chip">${p.emoji} ${p.name}</span>`).join('');
+        const relics = summary.relics.length
+          ? summary.relics.map(r => `<span class="rs-chip">${r.emoji} ${r.name}</span>`).join('')
+          : '<span class="rs-none">なし</span>';
+        const best = summary.best.amount > 0
+          ? `<span class="rs-big">${summary.best.amount}</span>
+             <span class="rs-sub">${summary.best.char}／${summary.best.skill}</span>`
+          : '<span class="rs-none">—</span>';
+        relicEl.innerHTML = `
+          <div class="rs-row"><div class="rs-key">🏅 パーティ</div><div class="rs-val">${party}</div></div>
+          <div class="rs-row"><div class="rs-key">💎 レリック</div><div class="rs-val">${relics}</div></div>
+          <div class="rs-row"><div class="rs-key">⏱️ 総ターン</div><div class="rs-val"><span class="rs-big">${summary.turns}</span></div></div>
+          <div class="rs-row"><div class="rs-key">💥 最大ダメージ</div><div class="rs-val">${best}</div></div>`;
+        relicEl.style.display = '';
+      } else if (type === 'win' && droppedRelic) {
         relicEl.innerHTML = `
           <div class="rr-label">✨ レリック入手！</div>
           <div class="rr-body">

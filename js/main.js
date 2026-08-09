@@ -4,7 +4,9 @@
 // - After normal battle: HP 25% × supporter count heal, no swap, no PP restore
 // - After mid-boss battle: status clear only, relic drop
 // - After boss battle: full restore + swap event (3 candidates), loopCount++
-// - Enemies scale with loopCount (×1.3 per loop, compounding)
+// - 敵の強さは loopCount で倍率をかけていない（HP_SCALES/ATK_SCALES は全て同値）。
+//   セットが進むと雑魚の数が増え、ボス戦は中ボスを両脇に置く配置になるので、
+//   構成そのものが難易度上昇を担っている。倍率は不要と判断して寝かせてある
 // - Side-turn system: player acts with all allies in any order → enemy turn → repeat
 // - Initiative: player first 70%, enemy first 30% (guaranteed_initiative relic: always player first)
 // - No critical hits
@@ -58,6 +60,19 @@ const Game = (() => {
     else              localStorage.removeItem('icb_pinnedChar');
   }
   function getClearCount(id) { return clearCounts[id] || 0; }
+
+  // ---- 1周の記録（クリア画面のリザルト用） ----
+  // 実績（ACH）の統計は全プレイの累計なので、周ごとの数字はここで別に取る。
+  // startGame でリセットされる
+  let _runTurns = 0;                                        // 自軍ターンの通算
+  let _runBest  = { amount: 0, char: '', skill: '' };        // この周の最大ダメージ
+  function resetRunRecord() {
+    _runTurns = 0;
+    _runBest  = { amount: 0, char: '', skill: '' };
+  }
+  function recordRunDamage(amount, charName, skillName) {
+    if (amount > _runBest.amount) _runBest = { amount, char: charName, skill: skillName };
+  }
 
   let seriesBonusEnabled = JSON.parse(localStorage.getItem('icb_seriesBonus') ?? 'true');
   function saveSeriesBonusEnabled() {
@@ -503,6 +518,7 @@ const Game = (() => {
     gameState._lastSpFree = false;
     activeAllies  = pickRandomParty();
     _runParticipants = new Set(activeAllies.map(a => a.id));
+    resetRunRecord();
     _tutorialShown = false;
     gameState.maxSp = initSp();
     gameState.sp = 3;
@@ -825,6 +841,7 @@ const Game = (() => {
 
     isPlayerTurn = true;
     currentTurnNum++;
+    _runTurns++;   // currentTurnNum は戦闘ごとに0へ戻るので、通算は別に数える
     if (currentTurnNum === 1) {
       Battle.getLivingAllies().forEach(a => {
         a._inPreTurn = a.role === 'striker';
@@ -1453,7 +1470,7 @@ const Game = (() => {
       UI.updatePartySP();
       if (_spGain === 2) UI.flashCard(ally.id, 'support-sp-flash', 1200);
     }
-    await processResults(results, ally);
+    await processResults(results, ally, skill);
     if (_spGain > 0) UI.queueFloat(ally.id, `🔋SP+${_spGain}`, 'float-buff');
     Battle.getLivingAllies().forEach(a => UI.updateCharBars(a));
     UI.updateCharBars(ally);
@@ -1558,7 +1575,7 @@ const Game = (() => {
       UI.screenShake('normal'); // 強打・重斬は単体技でも揺らす
     }
 
-    await processResults(results, enemy);
+    await processResults(results, enemy, skill);
     Battle.getLivingEnemies().forEach(e => UI.updateCharBars(e));
     UI.updateCharBars(enemy);
     UI.updateLethalWarning();
@@ -1596,7 +1613,9 @@ const Game = (() => {
   }
 
   // ---- Process skill results (async — stagger multi-hit display) ----
-  async function processResults(results, actor) {
+  // usedSkill はクリア画面のリザルトで「最大ダメージを出した技名」を出すためだけに使う。
+  // 省略されても動くようにしてある
+  async function processResults(results, actor, usedSkill = null) {
     let damageHitIndex = 0;
     // 同一ターゲットへの damage 結果を事前集計（多段ヒットのログ集約用）
     const dmgGroups = new Map();
@@ -1629,6 +1648,8 @@ const Game = (() => {
             if (r.target.isEnemy && !actor.isEnemy) {
               ACH.onDamageDealt(r.amount);
               currentTurnDamage += r.amount;
+              // クリア画面のリザルト用。ACH側は全プレイ累計なので周ごとに別途取る
+              recordRunDamage(r.amount, actor.name, usedSkill?.name || '');
             }
             if (r.tankBlocked) ACH.onTankBlock();
           }
@@ -2134,11 +2155,22 @@ const Game = (() => {
         _runParticipants.forEach(id => ACH.onCharUsed(id));
         if (typeof Relics !== 'undefined') Relics.getHeld().forEach(id => ACH.onRelicObtained(id));
       }
+      // 1周の記録をまとめてクリア画面へ渡す。
+      // レリックは goTitleScreen で消えるので、ここで名前を取っておく
+      const heldRelics = (typeof Relics !== 'undefined')
+        ? Relics.getHeld().map(rid => RELIC_DATA.find(r => r.id === rid)).filter(Boolean)
+        : [];
+      const summary = {
+        party:   activeAllies.map(a => ({ emoji: a.emoji, name: a.name })),
+        relics:  heldRelics.map(r => ({ emoji: r.emoji, name: r.name })),
+        turns:   _runTurns,
+        best:    _runBest,
+      };
       showAchievementNotifs(() => {
         UI.showBattleResult('clear', 0, () => {
           currentBattle = 0; loopCount = 0; activeAllies = [];
           goTitleScreen();
-        });
+        }, null, summary);
       });
     } else {
       currentBattle = 0; loopCount = 0; activeAllies = [];

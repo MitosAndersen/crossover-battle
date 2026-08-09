@@ -365,6 +365,23 @@ html, body {
 /* 撃破できるときは色を変える。数字を読まなくても「落とせる」と分かるのが狙い */
 .dmg-num-lethal { color: #ffe680; text-shadow: 0 0 calc(6px * var(--ui-scale)) rgba(255,150,0,0.85); }
 
+/* ---- クリア時の1周リザルト ---- */
+/* 通常戦のレリック入手（#result-relic）と同じ枠を使い回している */
+.rs-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 7px 0; border-top: 1px solid rgba(100,120,255,0.18);
+}
+.rs-row:first-child { border-top: none; }
+.rs-key { flex: 0 0 6.6em; font-size: 0.74rem; color: var(--text-dim); padding-top: 3px; }
+.rs-val { flex: 1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px; }
+.rs-chip {
+  font-size: 0.74rem; font-weight: 700; color: var(--text-main);
+  background: rgba(40,60,120,0.45); border-radius: 4px; padding: 3px 7px;
+}
+.rs-big  { font-size: 1.25rem; font-weight: 900; color: var(--neon-gold); line-height: 1; }
+.rs-sub  { font-size: 0.7rem; color: var(--text-dim); }
+.rs-none { font-size: 0.74rem; color: var(--text-dim); }
+
 /* ---- 更新履歴 ---- */
 /* 更新履歴と設定を最後の1行に横並びで置く。縦に6段積むとスタートボタンが埋もれるため。
    幅の狭い端末で入りきらない場合に備えて折り返しを許可している */
