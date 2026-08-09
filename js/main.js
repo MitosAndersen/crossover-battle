@@ -139,6 +139,42 @@ const Game = (() => {
   // モーダルは「ボタン以外どこを押しても閉じる」。
   // スマホでは箱が画面いっぱいになり、背景の余白をタップしづらいため
   // （設定のトグル・ガイドのタブ・✕はボタンなので誤爆しない）
+  // ---- 更新履歴 ----
+  // タイトル画面の隅の「vXX 更新履歴」から開く。
+  // バージョンは PATCH_NOTES の先頭から取る。index.html のキャッシュ番号(?v=NN)と
+  // 同じ数字を使う運用にしているので、公開のたびに自然と上がる
+  const PATCH_TAGS = { add:['追加','pt-add'], balance:['調整','pt-balance'], ui:['画面','pt-ui'], fix:['修正','pt-fix'] };
+
+  function latestPatchVersion() {
+    return (typeof PATCH_NOTES !== 'undefined' && PATCH_NOTES.length) ? PATCH_NOTES[0].v : 0;
+  }
+  function initPatchNotes() {
+    // バージョン番号はボタンには出さず、モーダル内の各リリース見出しで見せる
+    const latest = latestPatchVersion();
+    const seen = parseInt(localStorage.getItem('icb_lastSeenPatch') || '0', 10);
+    const dot = document.getElementById('patch-new-dot');
+    if (dot) dot.hidden = !(latest > seen);
+  }
+  function showPatchNotes() {
+    const body = document.getElementById('patch-modal-body');
+    if (!body || typeof PATCH_NOTES === 'undefined') return;
+    body.innerHTML = PATCH_NOTES.map(rel => {
+      const rows = rel.items.map(it => {
+        const [label, cls] = PATCH_TAGS[it.tag] || ['', ''];
+        return `<div class="pt-item"><span class="pt-tag ${cls}">${label}</span><span class="pt-text">${it.text}</span></div>`;
+      }).join('');
+      return `<div class="pt-release">
+        <div class="pt-head"><span class="pt-ver">v${rel.v}</span><span class="pt-date">${rel.date}</span></div>
+        ${rows}
+      </div>`;
+    }).join('');
+    // 開いた時点で既読にする。●はこの後すぐ消える
+    localStorage.setItem('icb_lastSeenPatch', String(latestPatchVersion()));
+    const dot = document.getElementById('patch-new-dot');
+    if (dot) dot.hidden = true;
+    document.getElementById('patch-modal').style.display = 'flex';
+  }
+
   function wireModalDismiss(modalId) {
     const modal = document.getElementById(modalId);
     if (!modal) return;
@@ -219,6 +255,16 @@ const Game = (() => {
       document.getElementById('system-modal').style.display = 'none';
     });
     wireModalDismiss('system-modal');
+
+    initPatchNotes();
+    document.getElementById('patch-btn')?.addEventListener('click', () => {
+      Audio.SE.cursor();
+      showPatchNotes();
+    });
+    document.getElementById('patch-modal-close')?.addEventListener('click', () => {
+      document.getElementById('patch-modal').style.display = 'none';
+    });
+    wireModalDismiss('patch-modal');
     document.querySelectorAll('.sys-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.sys-tab').forEach(t => t.classList.remove('active'));

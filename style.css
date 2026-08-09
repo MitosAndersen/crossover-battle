@@ -365,6 +365,33 @@ html, body {
 /* 撃破できるときは色を変える。数字を読まなくても「落とせる」と分かるのが狙い */
 .dmg-num-lethal { color: #ffe680; text-shadow: 0 0 calc(6px * var(--ui-scale)) rgba(255,150,0,0.85); }
 
+/* ---- 更新履歴 ---- */
+/* 更新履歴と設定を最後の1行に横並びで置く。縦に6段積むとスタートボタンが埋もれるため。
+   幅の狭い端末で入りきらない場合に備えて折り返しを許可している */
+.title-btn-row {
+  display: flex; gap: 8px; margin-top: 8px;
+  justify-content: center; flex-wrap: wrap;
+}
+.patch-new-dot { color: var(--neon-gold); margin-left: 5px; font-size: 0.6rem; vertical-align: super; }
+
+.pt-release { margin-bottom: 16px; }
+.pt-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px;
+  border-bottom: 1px solid rgba(100,120,255,0.25); padding-bottom: 3px; }
+.pt-ver  { font-size: 1rem; font-weight: 900; color: var(--neon-gold); }
+.pt-date { font-size: 0.72rem; color: var(--text-dim); }
+.pt-item { display: flex; gap: 7px; align-items: flex-start; margin: 5px 0; }
+.pt-text { font-size: 0.8rem; line-height: 1.55; color: var(--text-main); }
+/* 種別の色分け。幅を固定して行頭を揃える */
+.pt-tag {
+  flex: 0 0 auto; width: 3.4em; text-align: center;
+  font-size: 0.66rem; font-weight: 700; line-height: 1.7;
+  border-radius: 3px; margin-top: 1px;
+}
+.pt-add     { background: rgba(68,255,170,0.18); color: #7dffb0; }
+.pt-balance { background: rgba(255,204,0,0.18);  color: #ffd84d; }
+.pt-ui      { background: rgba(68,136,255,0.18); color: #8ab6ff; }
+.pt-fix     { background: rgba(255,90,90,0.18);  color: #ff9a9a; }
+
 /* ---- 確定加入（図鑑） ---- */
 .cm-pin {
   background: rgba(40, 34, 12, 0.5);
