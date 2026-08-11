@@ -1428,8 +1428,10 @@ const Game = (() => {
     }
 
     const skill = SKILL_DATA[skillId];
-    // 大技使用追跡
-    if (skill && skill.spCost === 4 && typeof ACH !== 'undefined') ACH.onUltimateUsed();
+    // 大技使用追跡。「大技」は SP3以上 と定義している。
+    // 以前は spCost === 4 ちょうどで、該当する味方スキルが2つしかなく
+    // 実績（10回・50回）がほぼ達成不可能だった
+    if (skill && (skill.spCost || 0) >= 3 && typeof ACH !== 'undefined') ACH.onUltimateUsed();
     UI.log(`✨ <strong>${ally.name}</strong> は <em>${skill.name}</em> を使った！`, 'log-ally');
     const allyQuote = (typeof SKILL_QUOTES !== 'undefined') && SKILL_QUOTES[skillId];
     if (allyQuote) UI.showSkillQuote(ally.id, allyQuote);
@@ -1630,6 +1632,22 @@ const Game = (() => {
     let drainCount = 0;
     results.filter(r => r.type === 'drain').forEach(r => { drainTotal += r.amount; drainCount++; });
     let drainLogged = 0;
+
+    // クリア画面のリザルト用「この周の最大ダメージ」。
+    // r.amount は1ヒットぶんなので、多段技をそのまま渡すと 22x5 が「22」になってしまう。
+    // 上で作った dmgGroups（対象ごとの合計）から取る。
+    // 全体技は対象ごとに分けて比べる。合算すると敵の数で数字が水増しされ、
+    // 単体技との比較にならないため
+    // 実績の「最大ダメージ」も同じ理由でここから渡す。1ヒットずつ渡していたので、
+    // 多段技では 20〜30 しか届かず、単発の大技でしか達成できない実績になっていた
+    if (!actor.isEnemy) {
+      dmgGroups.forEach((g, target) => {
+        if (!target.isEnemy) return;
+        recordRunDamage(g.total, actor.name, usedSkill?.name || '');
+        if (typeof ACH !== 'undefined') ACH.onDamageDealt(g.total);
+      });
+    }
+
     const distinctTargets = new Set(results.map(r => r.target)).size;
     const hitCounters = new Map();
     let _statusDebuffSePlayed = false;
@@ -1646,10 +1664,9 @@ const Game = (() => {
           UI.floatNumber(r.target.id, `${r.amount}`, 'float-dmg');
           if (typeof ACH !== 'undefined') {
             if (r.target.isEnemy && !actor.isEnemy) {
-              ACH.onDamageDealt(r.amount);
+              // onDamageDealt は上で対象ごとの合計から渡している。
+              // currentTurnDamage はターン全体の累計なのでヒット単位のままでよい
               currentTurnDamage += r.amount;
-              // クリア画面のリザルト用。ACH側は全プレイ累計なので周ごとに別途取る
-              recordRunDamage(r.amount, actor.name, usedSkill?.name || '');
             }
             if (r.tankBlocked) ACH.onTankBlock();
           }
