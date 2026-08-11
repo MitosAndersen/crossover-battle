@@ -300,7 +300,7 @@ const SKILL_DATA = {
   // -- 乙骨憂太 --
   yuta_basic:      { name:'剣撃',                 icon:'💍', noSP:true,  power:12,  type:'physical', target:'single', hits:1, animation:'slash' },
   yuta_copy:       { name:'模倣',                 icon:'💍', spCost:1,    power:0,   type:'support',  target:'self',   effect:'atk_up', effectChance:1, effectTurns:4, animation:'buff', alsoEffect2:'def_up' },
-  yuta_rika:       { name:'領域展開・真贋相愛',   icon:'💥', spCost:2,    power:64, type:'magic',    target:'single',    hits:1, animation:'dark', recoilPct:0.10, execute:true },
+  yuta_rika:       { name:'祈本里香・完全顕現',   icon:'💥', spCost:2,    power:67, type:'magic',    target:'single', hits:1, animation:'dark', execute:true, shieldBreak:true },
 
   // ============================================================
   // BLEACH
@@ -329,6 +329,10 @@ const SKILL_DATA = {
   kenpachi_basic:     { name:'野晒',              icon:'🔔', noSP:true,  power:13, type:'physical', target:'single', hits:1, animation:'slash' },
   kenpachi_eyepatch:  { name:'呑め「野晒」',      icon:'💥', spCost:1,    power:30, type:'physical', target:'single', hits:1, animation:'slash_heavy', execute:true, shieldBreak:true },
   kenpachi_nozarashi: { name:'卍解',              icon:'⬆️', spCost:1,    power:0,    type:'support',  target:'self',   effect:'atk_up', effectChance:1, effectTurns:4, animation:'buff', alsoEffect2:'def_up' },
+  // -- 石田雨竜 --
+  ishida_basic:       { name:'弧雀',              icon:'🧵', noSP:true,  power:6,  type:'physical', target:'single', hits:2, animation:'slash' },
+  ishida_regen:       { name:'光の雨（リヒト・レーゲン）', icon:'🧵', spCost:1, power:4,  type:'physical', target:'all',    hits:8, animation:'slash' },
+  ishida_ginto:       { name:'静止の銀',          icon:'🧵', spCost:1,    power:0,  type:'support',  target:'all',    effect:'atk_down', effectChance:1, effectTurns:2, alsoEffect2:'def_down', animation:'dark' },
 
   // ============================================================
   // HUNTER×HUNTER
@@ -349,6 +353,14 @@ const SKILL_DATA = {
   kurapika_basic:         { name:'鎖打撃',                                icon:'🔗', noSP:true,  power:11,  type:'physical', target:'single', hits:1, animation:'punch' },
   kurapika_chain:         { name:'奪う人差し指の鎖（スチールチェーン）',    icon:'🔗', spCost:1,    power:31, type:'magic',    target:'single', hits:1, animation:'dark', effect:'def_down', effectChance:1, effectTurns:1 },
   kurapika_emperor:       { name:'絶対時間（エンペラータイム）',            icon:'💥', spCost:2,    power:61, type:'magic',    target:'single', hits:1, animation:'explosion', recoilPct:0.20, selfEffect:'atk_up', selfEffectTurns:3 },
+  // -- レオリオ --
+  leorio_basic:           { name:'折り畳みナイフ',        icon:'💼', noSP:true,  power:11, type:'physical', target:'single', hits:1, animation:'slash' },
+  leorio_punch:           { name:'オーラの拳',            icon:'💼', spCost:1,    power:31, type:'physical', target:'single', hits:1, animation:'punch', effect:'stun', effectChance:1, effectTurns:1 },
+  leorio_heal:            { name:'治療',                  icon:'💚', spCost:2,    power:0,  type:'heal',     target:'all_ally', healPower:20, animation:'heal' },
+  // -- アイザック＝ネテロ --
+  netero_basic:           { name:'感謝の正拳突き',        icon:'🙏', noSP:true,  power:14, type:'physical', target:'single', hits:1, animation:'punch' },
+  netero_ichi:            { name:'百式観音・壱乃掌',      icon:'🙏', spCost:2,    power:66, type:'physical', target:'single', hits:1, animation:'punch_heavy', bossKiller:true, shieldBreak:true },
+  netero_zero:            { name:'百式観音・零乃掌',      icon:'💥', spCost:3,    power:100, type:'physical', target:'single', hits:1, animation:'explosion', bossKiller:true, shieldBreak:true, selfEffect:'def_down', selfEffectTurns:1 },
 
   // ============================================================
   // 僕のヒーローアカデミア

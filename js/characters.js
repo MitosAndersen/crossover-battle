@@ -93,12 +93,15 @@ const JOIN_QUOTES = {
   byakuya: '散れ、「千本桜」。',
   yoruichi: '瞬神・夜一、参る。わしの速さについてこれるか？',
   kenpachi: '楽しませろよ。死ぬ気で来い。',
+  ishida: '僕らは、友達だからだ',
 
   // -- HUNTER×HUNTER --
   killua: '面白そうだからついてくよ。',
   gon: 'オレ絶対に強くなる！一緒に頑張ろう！',
   hisoka: '♠ 君たちと戦えるとは…武者震いだよ ♠',
   kurapika: '仲間を守るためなら、何でもする。',
+  leorio: 'オレに出来る事があるなら言え、何でもやる！！',
+  netero: 'この歳で挑戦者か、血沸く血沸く♪',
 
   // -- 僕のヒーローアカデミア --
   allmight: '私が来た！',
@@ -248,9 +251,9 @@ const CHAR_RARITY = {
   // -- 呪術廻戦 --
   gojo:3, sukuna:2, itadori:3, megumi_ft:2, nanami:2, nobara:2, yuta:2,
   // -- BLEACH --
-  ichigo:3, rukia:2, hitsugaya:2, byakuya:2, yoruichi:2, kenpachi:2,
+  ichigo:3, rukia:2, hitsugaya:2, byakuya:2, yoruichi:2, kenpachi:2, ishida:2,
   // -- HUNTER×HUNTER --
-  gon:3, killua:2, hisoka:2, kurapika:2,
+  gon:3, killua:2, hisoka:2, kurapika:2, leorio:2, netero:3,
   // -- 僕のヒーローアカデミア --
   allmight:3, deku:3, todoroki:2, bakugo:2,
   // -- ジョジョの奇妙な冒険 --
@@ -381,18 +384,21 @@ const ALLY_DATA = [
   { id:'nanami',       name:'七海建人',               origin:'呪術廻戦',             emoji:'👔', maxHp:88,  role:'tank',     gender:'男', job:'呪術師',       skillIds:['nanami_basic','nanami_ratio','nanami_fulltime'],          color:'#886633' },
   { id:'nobara',       name:'釘崎野薔薇',             origin:'呪術廻戦',             emoji:'🔨', maxHp:78,  role:'attacker', gender:'女', job:'呪術師',       skillIds:['nobara_basic','nobara_doll','nobara_elim'],                  color:'#cc4488' },
   { id:'yuta',       name:'乙骨憂太',              origin:'呪術廻戦',              emoji:'💍', maxHp:84,  role:'attacker', gender:'男', job:'特級呪術師',    skillIds:['yuta_basic','yuta_copy','yuta_rika'],                       color:'#8899bb' },
-  // -- BLEACH (6) --
+  // -- BLEACH (7) --
   { id:'ichigo',     name:'黒崎一護',              origin:'BLEACH',                emoji:'⚫', maxHp:90,  role:'attacker', gender:'男', job:'死神',         skillIds:['zangetsu_slash','getsuga_tensho','mugetsu'],              color:'#333366' },
   { id:'rukia',     name:'朽木ルキア',           origin:'BLEACH',               emoji:'❄️', maxHp:78,  role:'attacker', gender:'女', job:'死神',         skillIds:['rukia_basic','rukia_soten','rukia_bankai'],              color:'#9988cc' },
   { id:'hitsugaya', name:'日番谷冬獅郎',         origin:'BLEACH',               emoji:'🧊', maxHp:76,  role:'attacker', gender:'男', job:'死神',         skillIds:['hitsugaya_basic','hitsugaya_shikai','hitsugaya_bankai'], color:'#66ccee' },
   { id:'byakuya',      name:'朽木白哉',               origin:'BLEACH',               emoji:'🌸', maxHp:88,  role:'attacker', gender:'男', job:'死神',         skillIds:['byakuya_basic','byakuya_cherry','byakuya_bankai'],       color:'#aaaacc' },
   { id:'yoruichi',  name:'四楓院夜一',           origin:'BLEACH',               emoji:'🐱', maxHp:72,  role:'striker',  gender:'女', job:'神速の人',      skillIds:['yoruichi_basic','yoruichi_shunko','yoruichi_raishunko'], color:'#553388' },
   { id:'kenpachi',   name:'更木剣八',              origin:'BLEACH',               emoji:'🔔', maxHp:98,  role:'attacker', gender:'男', job:'十一番隊隊長',  skillIds:['kenpachi_basic','kenpachi_eyepatch','kenpachi_nozarashi'],  color:'#886655' },
+  { id:'ishida',     name:'石田雨竜',              origin:'BLEACH',               emoji:'🧵', maxHp:74,  role:'support',  gender:'男', job:'滅却師',        skillIds:['ishida_basic','ishida_regen','ishida_ginto'],               color:'#5a7a9a' },
   // -- HUNTER×HUNTER (4) --
   { id:'killua',     name:'キルア・ゾルディック',   origin:'HUNTER×HUNTER',        emoji:'⚡', maxHp:70,  role:'striker',  gender:'男', job:'暗殺者',       skillIds:['hand_slice','godspeed','kanmuru'],                       color:'#aaccff' },
   { id:'gon',       name:'ゴン＝フリークス',     origin:'HUNTER×HUNTER',       emoji:'🎣', maxHp:85,  role:'attacker', gender:'男', job:'念能力者',      skillIds:['gon_basic','gon_rock','gon_adult'],                       color:'#228833' },
   { id:'hisoka',    name:'ヒソカ＝モロウ',       origin:'HUNTER×HUNTER',       emoji:'🃏', maxHp:82,  role:'attacker', gender:'男', job:'奇術師',       skillIds:['hisoka_basic','hisoka_bungee','hisoka_card'],           color:'#cc1133' },
   { id:'kurapika',     name:'クラピカ',               origin:'HUNTER×HUNTER',       emoji:'🔗', maxHp:82,  role:'attacker', gender:'男', job:'念能力者',      skillIds:['kurapika_basic','kurapika_chain','kurapika_emperor'],     color:'#cc8800' },
+  { id:'leorio',       name:'レオリオ',               origin:'HUNTER×HUNTER',       emoji:'💼', maxHp:78,  role:'support',  gender:'男', job:'医者志望',      skillIds:['leorio_basic','leorio_punch','leorio_heal'],              color:'#3a6a8a' },
+  { id:'netero',       name:'ネテロ会長',              origin:'HUNTER×HUNTER',       emoji:'🙏', maxHp:88,  role:'attacker', gender:'男', job:'ハンター協会会長', skillIds:['netero_basic','netero_ichi','netero_zero'],            color:'#c8a04a' },
   // -- 僕のヒーローアカデミア (4) --
   { id:'allmight',   name:'オールマイト',           origin:'僕のヒーローアカデミア',  emoji:'💪', maxHp:105, role:'tank',     gender:'男', job:'ヒーロー',      skillIds:['smash_basic','detroit_smash','plus_ultra'],                color:'#ddcc00' },
   { id:'deku',       name:'緑谷出久',              origin:'僕のヒーローアカデミア',  emoji:'🥦', maxHp:82,  role:'attacker', gender:'男', job:'ヒーロー',      skillIds:['blackwhip_basic','deku_airforce','deku_100percent'],           color:'#228833' },
@@ -1008,7 +1014,7 @@ const SKILL_QUOTES = {
   sukuna_domain: '領域展開……伏魔御厨子。',
   megumi_domain: '領域展開……嵌合暗翳庭。',
   nanami_fulltime: '……瓦落瓦落（がらがら）。',
-  yuta_rika: '領域展開……真贋相愛。',
+  yuta_rika: '駄目だよリカちゃん、やりすぎは',
 
   // -- BLEACH --
   getsuga_tensho: '月牙、天衝！！',
@@ -1026,6 +1032,7 @@ const SKILL_QUOTES = {
   gon_adult: 'もうこれで終わってもいい。……だから、ありったけを！！',
   hisoka_bungee: '♠ バンジーガム。もう逃げられないよ ♥',
   kurapika_emperor: '……絶対時間！！',
+  leorio_punch: 'くそ野郎！！',
 
   // -- 僕のヒーローアカデミア --
   plus_ultra: 'ユナイテッド・ステイツ・オブ・スマッーーーッシュ！！！',

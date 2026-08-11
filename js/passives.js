@@ -96,12 +96,15 @@ const PASSIVE_DATA = {
   byakuya:      { name:'千本桜',                  type:'shield_start',            desc:'開幕 シールド(HP15%)', value:0.15 },
   yoruichi:     { name:'神速',                    type:'exploit_status',          desc:'麻痺中の敵へ与ダメ+30%', effect:'paralyze', value:0.30 },
   kenpachi:     { name:'戦闘狂',                  type:'low_hp_atk',              desc:'HP50%↓ 攻↑（3T）', threshold:0.5, turns:3 },
+  ishida:       { name:'滅却師',                  type:'multi_hit_boost',         desc:'連続ヒット技+20%', value:0.20 },
 
   // ==== HUNTER×HUNTER ====
   killua:       { name:'神速の稲妻',              type:'exploit_status',          desc:'麻痺中の敵へ与ダメ+30%', effect:'paralyze', value:0.30 },
   gon:          { name:'強制的成長',              type:'low_hp_atk',              desc:'HP50%↓ 攻防↑＋リジェネ（3T）', threshold:0.5, buffs:['atk_up','def_up','regen'], turns:3 },
   hisoka:       { name:'伸縮自在の愛',            type:'counter',                 desc:'被ダメの50%を反射', value:0.50 },
   kurapika:     { name:'緋の眼',                  type:'low_hp_atk',              desc:'HP50%↓ 防↑（3T）', threshold:0.5, buff:'def_up', turns:3 },
+  leorio:       { name:'医学知識',                type:'regen_team',              desc:'毎T 味方全HP2%回復', value:0.02 },
+  netero:       { name:'感謝',                    type:'basic_atk_boost',         desc:'通常攻撃+150%', value:1.50 },
 
   // ==== 僕のヒーローアカデミア ====
   allmight:     { name:'平和の象徴',              type:'battle_start_team_def',   desc:'開幕 味方全防↑(2T)', turns:2 },
