@@ -185,6 +185,12 @@ const SKILL_DATA = {
   leafa_basic:        { name:'ソニックリープ',     icon:'🌿', noSP:true,  power:13,  type:'physical', target:'single', hits:1, animation:'slash' },
   leafa_heal:         { name:'フェアリィ・ダンス', icon:'🍃', spCost:1,    power:0,   type:'support',  target:'all_ally', effect:'atk_up', effectChance:1, effectTurns:3, animation:'buff' },
   leafa_gale:         { name:'ヒール',             icon:'💚', spCost:2,    power:0,   type:'heal',     target:'all_ally', healPower:20, animation:'heal' },
+  // -- アリス・シンセシス・サーティ --
+  // selfShieldPower は battle.js に前からあるが、味方スキルで使うのはこれが初めて。
+  // 敵スキル側では14件が使っている（上限は他のシールドと同じく最大HPの半分）
+  alice_basic:        { name:'雷閃斬',             icon:'🏵️', noSP:true,  power:12, type:'physical', target:'single', hits:1, animation:'thunder' },
+  alice_enhance:      { name:'武装完全支配術（エンハンス・アーマメント）', icon:'🏵️', spCost:1, power:5, type:'physical', target:'all', hits:6, animation:'slash', selfShieldPower:10 },
+  alice_release:      { name:'記憶解放術（リリース・リコレクション）',     icon:'💥', spCost:2, power:54, type:'physical', target:'all', hits:1, animation:'explosion', execute:true, shieldBreak:true },
 
   // ============================================================
   // Re:ゼロ

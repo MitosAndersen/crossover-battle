@@ -55,6 +55,7 @@ const PASSIVE_DATA = {
   sinon:        { name:'氷の狙撃手',              type:'exploit_status',          desc:'防御↓中の敵へ与ダメ+20%', effect:'def_down', value:0.20 },
   yuuki:        { name:'絶剣',                    type:'multi_hit_boost',         desc:'連続ヒット技+20%', value:0.20 },
   leafa:        { name:'スピードホリック',        type:'basic_atk_boost',         desc:'通常攻撃+100%', value:1.00 },
+  alice:        { name:'整合騎士',                type:'battle_start_team_def',   desc:'開幕 味方全防↑(1T)', turns:1 },
 
   // ==== Re:ゼロ ====
   emilia:       { name:'精霊の祝福',              type:'regen_team',              desc:'毎T 味方全HP3%回復', value:0.03 },

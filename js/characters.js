@@ -52,6 +52,7 @@ const JOIN_QUOTES = {
   sinon: 'たかがワンマッチ。あんたがそう思うのは勝手よ。',
   yuuki: '一緒に戦えるなんて嬉しいな！ボクの剣技、見せてあげる！',
   leafa: 'リーファです！あたしも一緒に戦うわ！',
+  alice: '私は、私の成すべきことを成すために、あなたと戦います！',
 
   // -- Re:ゼロ --
   emilia: '私はエミリア。ただのエミリアよ。',
@@ -241,7 +242,7 @@ const CHAR_RARITY = {
   // -- 鬼滅の刃 --
   tanjiro:3, zenitsu:1, inosuke:1, rengoku:2, nezuko:2, tomioka:2, mitsuri:2,
   // -- SAO --
-  kirito:3, asuna:2, sinon:2, yuuki:2, leafa:2,
+  kirito:3, asuna:2, sinon:2, yuuki:2, leafa:2, alice:2,
   // -- Re:ゼロ --
   emilia:3, beatrice:1, ram:1, rem:2, subaru:2, reinhard:2,
   // -- ポケモン --
@@ -349,12 +350,13 @@ const ALLY_DATA = [
   { id:'tomioka',    name:'冨岡義勇',              origin:'鬼滅の刃',              emoji:'🌊', maxHp:83,  role:'attacker', gender:'男', job:'水柱',         skillIds:['water_basic','water_breath_4','water_breath_11'],            color:'#2266aa' },
   { id:'inosuke',      name:'嘴平伊之助',             origin:'鬼滅の刃',             emoji:'🐗', maxHp:79,  role:'striker',  gender:'男', job:'鬼殺隊士',         skillIds:['inosuke_basic','inosuke_double','inosuke_beast'],         color:'#557744' },
   { id:'mitsuri',    name:'甘露寺蜜璃',            origin:'鬼滅の刃',              emoji:'💞', maxHp:78,  role:'striker',  gender:'女', job:'恋柱',         skillIds:['mitsuri_basic','mitsuri_five','mitsuri_six'],               color:'#ff88aa' },
-  // -- SAO (5) --
+  // -- SAO (6) --
   { id:'kirito',     name:'キリト',                origin:'SAO',                   emoji:'⚔️', maxHp:80,  role:'attacker', gender:'男', job:'剣士',         skillIds:['kirito_basic','vorpal_strike','starburst_stream'],          color:'#220088' },
   { id:'asuna',      name:'アスナ',                origin:'SAO',                   emoji:'✨', maxHp:71,  role:'striker',  gender:'女', job:'剣士',         skillIds:['rapier_basic','healing_asuna','mother_rosario'],        color:'#cc88ff' },
   { id:'sinon',     name:'シノン',               origin:'SAO',                  emoji:'🎯', maxHp:68,  role:'attacker', gender:'女', job:'スナイパー',    skillIds:['sinon_basic','sinon_rifle','sinon_bullet'],                             color:'#228877' },
   { id:'yuuki',      name:'ユウキ',                  origin:'SAO',                  emoji:'🗡️', maxHp:73,  role:'attacker', gender:'女', job:'剣士',         skillIds:['yuuki_basic','yuuki_11hit','yuuki_sword'],                              color:'#cc44aa' },
   { id:'leafa',          name:'リーファ',                  origin:'SAO',                   emoji:'🌿', maxHp:76,  role:'support',  gender:'女', job:'剣士',         skillIds:['leafa_basic','leafa_heal','leafa_gale'],                                 color:'#228844' },
+  { id:'alice',      name:'アリス・シンセシス・サーティ', origin:'SAO',                   emoji:'🏵️', maxHp:90,  role:'tank',     gender:'女', job:'整合騎士',      skillIds:['alice_basic','alice_enhance','alice_release'],                           color:'#d4a017' },
   // -- Re:ゼロ (6) --
   { id:'emilia',     name:'エミリア',              origin:'Re:ゼロ',               emoji:'❄️', maxHp:75,  role:'support',  gender:'女', job:'精霊使い',      skillIds:['ice_arrow','ice_blade','emilia_cocytus'],                       color:'#88ccff' },
   { id:'rem',        name:'レム',                  origin:'Re:ゼロ',               emoji:'💙', maxHp:84,  role:'attacker', gender:'女', job:'メイド',        skillIds:['maid_punch','oni_form','morning_star'],                    color:'#2244cc' },

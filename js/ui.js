@@ -208,7 +208,11 @@ const UI = (() => {
 
     const shieldFill = document.getElementById(`shield-${char.id}`);
     if (shieldFill) {
-      const pct = Math.min(100, ((char.shieldHp || 0) / char.maxHp) * 100);
+      // シールドの上限は最大HPの半分（battle.js の付与処理と揃えている）。
+      // 以前は最大HPで割っていたため、上限まで貯めてもバーは半分までしか伸びず、
+      // 「まだ増やせる」ように見えていた。上限を満タンとして描く
+      const cap = Math.max(1, Math.floor(char.maxHp * 0.5));
+      const pct = Math.min(100, ((char.shieldHp || 0) / cap) * 100);
       shieldFill.style.width = pct + '%';
       shieldFill.style.display = (char.shieldHp > 0) ? '' : 'none';
     }
@@ -1358,6 +1362,7 @@ const UI = (() => {
     const skill = ctx.skill;
     const bar = document.getElementById(`hp-${target.id}`)?.parentElement;
     let label = '', cls = '', sliceCls = '', fromPct = 0, gain = 0;
+    let shieldCap = 0;   // シールド技のときだけ入る。帯の幅を割る分母に使う
 
     if (skill.type === 'heal' && (skill.healPower || 0) > 0) {
       const est = estimateDamage(ctx.actor, skill);
@@ -1366,21 +1371,24 @@ const UI = (() => {
       cls = 'heal-num'; sliceCls = 'heal-slice';
       fromPct = (target.hp / target.maxHp) * 100;
     } else if (skill.effect === 'shield') {
-      const cap = Math.floor(target.maxHp * 0.5);
+      // シールドのバーは上限（最大HPの半分）を満タンとして描いているので、
+      // 予測の帯も同じ物差しで割る。HPの帯とは分母が違う点に注意
+      shieldCap = Math.max(1, Math.floor(target.maxHp * 0.5));
       const cur = target.shieldHp || 0;
-      gain = Math.max(0, Math.min(cap, cur + (skill.shieldPower || 20)) - cur);
+      gain = Math.max(0, Math.min(shieldCap, cur + (skill.shieldPower || 20)) - cur);
       label = gain > 0 ? `+${gain}` : '上限';
       cls = 'shield-num'; sliceCls = 'shield-slice';
-      fromPct = (cur / target.maxHp) * 100;
+      fromPct = (cur / shieldCap) * 100;
     } else {
       return;   // バフ・蘇生など数字にならない技には出さない
     }
 
     if (bar && gain > 0) {
+      const denom = shieldCap || target.maxHp;
       const slice = document.createElement('div');
       slice.className = sliceCls;
       slice.style.left  = fromPct + '%';
-      slice.style.width = Math.min(100 - fromPct, (gain / target.maxHp) * 100) + '%';
+      slice.style.width = Math.min(100 - fromPct, (gain / denom) * 100) + '%';
       bar.appendChild(slice);
     }
     const hpVal = document.getElementById(`hpval-${target.id}`);
