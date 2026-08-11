@@ -1,0 +1,439 @@
+/* ============================================================
+   SRPG — スタイル
+   ============================================================
+   ターン制側の style.css とは完全に別物。共有していない。
+   （見た目まで共有すると、片方の調整でもう片方が崩れるため）
+
+   前半は data.html（データ確認ページ）、後半の「GAME」以降が
+   index.html（ゲーム本体）のもの。body.game で切り替えている。
+   ============================================================ */
+
+:root {
+  --bg:      #0d1117;
+  --panel:   #161b22;
+  --line:    #2a3140;
+  --text:    #c9d4e0;
+  --dim:     #6b7a8d;
+  --accent:  #4a9eda;
+  --ok:      #3fb950;
+  --warn:    #d29922;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 20px 16px 60px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+h1 { font-size: 1.3rem; margin: 0 0 4px; }
+h2 { font-size: 1.0rem; margin: 28px 0 10px; color: var(--accent); border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+.sub { color: var(--dim); font-size: 0.82rem; margin: 0 0 20px; }
+.wrap { max-width: 1000px; margin: 0 auto; }
+
+/* ---- 読み込み確認パネル ---- */
+.check { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; }
+.check-row { display: flex; gap: 10px; align-items: baseline; padding: 3px 0; }
+.check-row .k { width: 190px; color: var(--dim); flex-shrink: 0; }
+.check-row .v { font-variant-numeric: tabular-nums; }
+.ok   { color: var(--ok); }
+.ng   { color: #f85149; }
+
+/* ---- 変換表 ---- */
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; }
+th { background: var(--panel); color: var(--dim); font-weight: normal; font-size: 0.82rem; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ---- 絞り込み ---- */
+.filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+select, input[type=text] {
+  background: var(--panel); color: var(--text);
+  border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; font-size: 0.88rem;
+}
+
+/* ---- ユニット一覧（data.html） ---- */
+.units { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.unit {
+  background: var(--panel); border: 1px solid var(--line); border-left-width: 3px;
+  border-radius: 6px; padding: 8px 10px; cursor: pointer;
+}
+.unit:hover { border-color: var(--accent); }
+.unit .nm { font-size: 0.9rem; }
+.unit .or { color: var(--dim); font-size: 0.72rem; }
+.unit .st { color: var(--dim); font-size: 0.74rem; font-variant-numeric: tabular-nums; margin-top: 3px; }
+
+/* ---- 詳細 ---- */
+.detail { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; margin-top: 14px; }
+.detail .hd { font-size: 1.05rem; margin-bottom: 2px; }
+.detail .quote { color: var(--warn); font-size: 0.85rem; margin: 6px 0 12px; }
+.tag { display: inline-block; background: #21262d; border: 1px solid var(--line); border-radius: 4px;
+       padding: 0 6px; font-size: 0.72rem; color: var(--dim); margin-right: 4px; }
+.empty { color: var(--dim); padding: 20px 0; }
+
+/* ---- 画面が狭いとき ---- */
+@media (max-width: 560px) {
+  .check-row { flex-direction: column; gap: 0; }
+  .check-row .k { width: auto; }
+  .units { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .scroll-x { overflow-x: auto; }
+}
+
+
+/* ============================================================
+   GAME — ここから下は index.html（ゲーム本体）
+   ============================================================
+   マスの大きさは --tile 1つで決まる。盤面の列数・行数は
+   grid.js の COLS / ROWS が JS 側から --cols / --rows に入れる。
+   ============================================================ */
+
+body.game {
+  --tile: 34px;               /* 10列 × 34px = 340px。360px幅の端末に収まる */
+  padding: 0;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (min-width: 620px) {
+  body.game { --tile: 44px; }
+}
+
+.screen { display: none; }
+.screen.active { display: block; }
+
+body.game .wrap { padding: 18px 14px 40px; }
+.center { text-align: center; }
+.small { font-size: 0.76rem; }
+body.game h1 { font-size: 1.35rem; line-height: 1.4; margin: 24px 0 10px; }
+body.game h2 { margin-top: 18px; }
+body.game a { color: var(--accent); }
+
+.big-btn {
+  display: block; width: 100%; max-width: 320px; margin: 14px auto;
+  background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 13px 16px; font-size: 1rem; font-weight: 700; cursor: pointer;
+}
+.big-btn:disabled { background: #2a3140; color: var(--dim); cursor: default; }
+.small-btn {
+  background: var(--panel); color: var(--text); border: 1px solid var(--line);
+  border-radius: 6px; padding: 6px 12px; font-size: 0.8rem; cursor: pointer;
+}
+
+/* ---- 出撃選択 ---- */
+.slots { display: flex; flex-wrap: wrap; gap: 6px; min-height: 30px; margin-bottom: 10px; }
+.slot {
+  background: #1d2634; border: 1px solid var(--accent); border-radius: 6px;
+  padding: 3px 8px; font-size: 0.8rem;
+}
+.pick-list {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 6px; max-height: 52vh; overflow-y: auto; padding-right: 4px;
+}
+.pick {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+  padding: 6px; text-align: center; cursor: pointer;
+}
+.pick.on { border-color: var(--accent); background: #16283a; }
+.pick .p-face { font-size: 1.5rem; line-height: 1.2; }
+.pick .p-name { font-size: 0.78rem; }
+.pick .p-meta { font-size: 0.66rem; color: var(--dim); }
+.select-foot { position: sticky; bottom: 0; padding-top: 10px; background: var(--bg); }
+
+/* ---- 戦闘：上のバー ---- */
+.battle-top {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; padding: 8px 10px; border-bottom: 1px solid var(--line);
+}
+.phase { font-size: 0.9rem; font-weight: 700; }
+.phase.ally  { color: var(--accent); }
+.phase.enemy { color: #f0776a; }
+.top-btns { display: flex; gap: 6px; }
+.sound-btn {
+  background: var(--panel); color: var(--text); border: 1px solid var(--line);
+  border-radius: 6px; padding: 5px 8px; font-size: 0.72rem; cursor: pointer; white-space: nowrap;
+}
+.sound-btn.off { color: var(--dim); }
+
+/* ---- 盤面 ---- */
+#board {
+  position: relative;
+  width: calc(var(--tile) * var(--cols));
+  height: calc(var(--tile) * var(--rows));
+  margin: 10px auto;
+}
+#tiles {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--tile));
+  grid-template-rows: repeat(var(--rows), var(--tile));
+}
+.tile {
+  border: 1px solid #1c2430;
+  background: #11161f;
+}
+.tile.alt { background: #141b26; }   /* 市松模様。目で距離を数えられるようにする */
+.tile.hi-move  { background: #14314d; border-color: #2f6ea8; }
+.tile.hi-range { background: #3a1a1a; border-color: #703030; }
+.tile.hi-burst { background: #5c2418; border-color: #c05a35; }
+.tile.hi-self  { outline: 2px solid var(--warn); outline-offset: -2px; }
+
+#units-layer { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+
+/* 駒は必ず #units-layer の下で指定する。
+   data.html が同じ .unit というクラス名をキャラ一覧に使っているため、
+   裸の .unit で書くとあちらの表示を壊す */
+#units-layer .unit {
+  position: absolute;
+  width: var(--tile); height: var(--tile);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: left 0.07s linear, top 0.07s linear;
+}
+#units-layer .u-face { font-size: calc(var(--tile) * 0.62); line-height: 1; }
+#units-layer .unit.side-ally  { filter: drop-shadow(0 0 2px #4a9eda); }
+#units-layer .unit.side-enemy { filter: drop-shadow(0 0 2px #d05555); }
+#units-layer .unit.acted { opacity: 0.45; }
+#units-layer .unit.dead  { display: none; }
+
+#units-layer .u-hp {
+  width: 82%; height: 3px; background: #000; border-radius: 2px; overflow: hidden; margin-top: 1px;
+}
+#units-layer .u-hp i { display: block; height: 100%; background: var(--ok); }
+#units-layer .u-hp i.mid { background: var(--warn); }
+#units-layer .u-hp i.low { background: #f0776a; }
+#units-layer .u-sp { font-size: 5px; letter-spacing: 0.5px; color: var(--accent); line-height: 1; }
+#units-layer .u-sp .off { color: #2a3140; }
+#units-layer .u-status { position: absolute; top: -2px; right: -2px; font-size: 8px; }
+#units-layer .u-shield { position: absolute; top: -3px; left: -2px; font-size: 7px; color: #9fd2ff; }
+
+#units-layer .unit.hit-flash { animation: hitFlash 0.34s ease-out; }
+@keyframes hitFlash {
+  0%   { filter: brightness(3) drop-shadow(0 0 6px #fff); transform: translateX(2px); }
+  40%  { filter: brightness(1.6) drop-shadow(0 0 4px #ff6a5a); transform: translateX(-2px); }
+  100% { filter: none; transform: none; }
+}
+
+/* ============================================================
+   技のエフェクト
+   ============================================================
+   共有データの animation（11種）をそのまま鍵にしている。
+   配色とモチーフはターン制側の .anim-* に合わせてあるが、
+   あちらが画面全体に出すのに対し、こちらは着弾したマスの上に出す。
+   ============================================================ */
+
+/* 駒より下に敷く。エフェクトで絵文字やHPバー、ダメージ数字が隠れないようにする */
+#fx-layer { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.fx { position: absolute; width: var(--tile); height: var(--tile); }
+/* inset:0 + margin:auto なら、大きさを指定した箱もマスの中心に来る。
+   transform はアニメ側で自由に使いたいので、中央寄せに transform は使わない */
+.fx::before, .fx::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* 斬撃：白い一閃 */
+.fx-slash::after {
+  width: 260%; height: 3px;
+  background: linear-gradient(90deg, transparent, #fff, transparent);
+  box-shadow: 0 0 12px 4px rgba(255, 255, 255, 0.6);
+  animation: fxSlash 0.4s ease-out;
+}
+@keyframes fxSlash {
+  0%   { opacity: 0; transform: rotate(-20deg) scaleX(0); }
+  20%  { opacity: 1; transform: rotate(-20deg) scaleX(1); }
+  100% { opacity: 0; transform: rotate(-20deg) scaleX(1) translateY(16px); }
+}
+
+/* 大斬撃：金色の二連 */
+.fx-slash_heavy::before {
+  width: 300%; height: 6px; margin-bottom: 16px;
+  background: linear-gradient(90deg, transparent, #ffcc44, #fff, #ffcc44, transparent);
+  box-shadow: 0 0 20px 8px rgba(255, 180, 0, 0.7);
+  animation: fxSlash 0.45s ease-out;
+}
+.fx-slash_heavy::after {
+  width: 240%; height: 3px; margin-top: 16px;
+  background: linear-gradient(90deg, transparent, rgba(255, 220, 100, 0.9), transparent);
+  animation: fxSlash 0.45s ease-out 0.07s backwards;
+}
+
+/* 爆発 */
+.fx-explosion::before {
+  width: 190%; height: 190%; border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, #ffcc00 20%, #ff4400 60%, transparent 100%);
+  animation: fxExplode 0.55s ease-out forwards;
+}
+.fx-explosion.wide::before { width: 300%; height: 300%; }
+@keyframes fxExplode {
+  0%   { transform: scale(0);   opacity: 1; }
+  60%  { transform: scale(1);   opacity: 0.9; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+/* ビーム：着弾マスを貫く横一線 */
+.fx-beam::after {
+  width: 700%; height: 8px;
+  background: linear-gradient(90deg, transparent, #aa44ff, #fff, #aa44ff, transparent);
+  box-shadow: 0 0 24px 10px rgba(170, 68, 255, 0.6);
+  animation: fxBeam 0.5s ease-out;
+}
+@keyframes fxBeam {
+  0%   { opacity: 0; transform: scaleX(0); }
+  30%  { opacity: 1; transform: scaleX(1); }
+  100% { opacity: 0; transform: scaleX(1); }
+}
+
+/* 打撃 */
+.fx-punch::before {
+  content: '💥'; font-size: calc(var(--tile) * 0.9);
+  animation: fxPop 0.4s ease-out;
+}
+.fx-punch_heavy::before {
+  content: '💥'; font-size: calc(var(--tile) * 1.4);
+  animation: fxPop 0.5s ease-out;
+}
+.fx-punch_heavy::after {
+  width: 200%; height: 200%; border-radius: 50%;
+  border: 3px solid rgba(255, 220, 120, 0.8);
+  animation: fxRing 0.5s ease-out forwards;
+}
+@keyframes fxPop {
+  0%   { opacity: 0; transform: scale(0.4); }
+  35%  { opacity: 1; transform: scale(1.25); }
+  100% { opacity: 0; transform: scale(1); }
+}
+@keyframes fxRing {
+  0%   { transform: scale(0.2); opacity: 1; }
+  100% { transform: scale(1);   opacity: 0; }
+}
+
+/* 雷 */
+.fx-thunder::before {
+  content: '⚡'; font-size: calc(var(--tile) * 1.1);
+  filter: drop-shadow(0 0 10px #ffee55);
+  animation: fxThunder 0.45s ease-out;
+}
+@keyframes fxThunder {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  20%, 60% { opacity: 1; transform: scale(1.15); }
+}
+
+/* 氷 */
+.fx-ice::before {
+  width: 260%; height: 260%; border-radius: 50%;
+  background: radial-gradient(circle, rgba(160, 225, 255, 0.85) 0%, rgba(100, 200, 255, 0.35) 40%, transparent 70%);
+  animation: fxFade 0.55s ease-out;
+}
+@keyframes fxFade { 0% { opacity: 0; } 30% { opacity: 1; } 100% { opacity: 0; } }
+
+/* 闇 */
+.fx-dark::before {
+  width: 260%; height: 260%; border-radius: 50%;
+  background: radial-gradient(circle, rgba(150, 0, 210, 0.85) 0%, rgba(100, 0, 150, 0.5) 45%, transparent 72%);
+  animation: fxVortex 0.55s ease-out;
+}
+@keyframes fxVortex {
+  0%   { opacity: 0; transform: scale(0)   rotate(0deg); }
+  50%  { opacity: 1; transform: scale(1)   rotate(180deg); }
+  100% { opacity: 0; transform: scale(1.4) rotate(360deg); }
+}
+
+/* 回復・強化 */
+.fx-heal::before {
+  content: '💚'; font-size: calc(var(--tile) * 0.8);
+  animation: fxRise 0.6s ease-out forwards;
+}
+.fx-buff::before {
+  content: '✨'; font-size: calc(var(--tile) * 0.8);
+  animation: fxPop 0.6s ease-out;
+}
+@keyframes fxRise {
+  0%   { opacity: 1; transform: translateY(6px); }
+  100% { opacity: 0; transform: translateY(-26px); }
+}
+
+/* ---- 浮かぶ数字 ---- */
+#units-layer .float {
+  position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+  font-size: 0.78rem; font-weight: 700; white-space: nowrap;
+  animation: floatUp 0.9s ease-out forwards; pointer-events: none;
+}
+#units-layer .float.dmg  { color: #ff8a7a; }
+#units-layer .float.heal { color: #7ee08a; }
+@keyframes floatUp {
+  from { opacity: 1; transform: translate(-50%, 0); }
+  to   { opacity: 0; transform: translate(-50%, -22px); }
+}
+
+.banner {
+  position: absolute; inset: 0; display: none;
+  align-items: center; justify-content: center;
+  font-size: 1.4rem; font-weight: 800; letter-spacing: 2px;
+  background: rgba(0, 0, 0, 0.55); pointer-events: none;
+  z-index: 4;
+}
+.banner.show { display: flex; }
+.banner.ally  { color: #7fc2f5; }
+.banner.enemy { color: #f0776a; }
+
+/* ---- 情報・ログ ---- */
+.info {
+  background: var(--panel); border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line); padding: 7px 10px; font-size: 0.8rem; min-height: 54px;
+}
+.info .i-head { font-size: 0.88rem; }
+.info .i-row { display: flex; flex-wrap: wrap; gap: 10px; color: var(--dim); font-size: 0.76rem; }
+.info .i-passive { font-size: 0.74rem; margin-top: 2px; }
+.dim { color: var(--dim); }
+
+.log {
+  height: 86px; overflow-y: auto; padding: 6px 10px;
+  font-size: 0.76rem; line-height: 1.5; color: var(--dim);
+}
+.log div:last-child { color: var(--text); }
+
+/* ---- 対象選択の案内 ---- */
+.aim-bar {
+  display: none; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 7px 10px; background: #3a1a1a; border-top: 1px solid #703030; font-size: 0.82rem;
+}
+.aim-bar.show { display: flex; }
+.aim-bar button {
+  background: var(--panel); color: var(--text); border: 1px solid var(--line);
+  border-radius: 5px; padding: 4px 10px; font-size: 0.78rem; cursor: pointer;
+}
+
+/* ---- 行動メニュー ---- */
+.action-menu {
+  display: none;
+  position: fixed; left: 0; right: 0; bottom: 0;
+  background: var(--panel); border-top: 1px solid var(--line);
+  padding: 8px 10px 12px; max-height: 58vh; overflow-y: auto;
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.5);
+}
+.action-menu.show { display: block; }
+.am-title { font-size: 0.9rem; margin-bottom: 6px; }
+.am-skill {
+  display: grid; grid-template-columns: 52px 1fr; grid-template-areas: "cost name" "cost meta";
+  width: 100%; text-align: left; gap: 0 8px;
+  background: #1b2230; color: var(--text); border: 1px solid var(--line);
+  border-radius: 6px; padding: 7px 9px; margin-bottom: 5px; cursor: pointer;
+}
+.am-skill:disabled { opacity: 0.45; cursor: default; }
+.am-cost { grid-area: cost; align-self: center; font-size: 0.74rem; color: var(--accent); }
+.am-name { grid-area: name; font-size: 0.88rem; }
+.am-meta { grid-area: meta; font-size: 0.7rem; color: var(--dim); }
+.am-meta .ng { color: #f0776a; }
+.am-foot { display: flex; gap: 8px; margin-top: 4px; }
+.am-sub {
+  flex: 1; background: #232c3c; color: var(--text); border: 1px solid var(--line);
+  border-radius: 6px; padding: 9px; font-size: 0.84rem; cursor: pointer;
+}
+.am-sub:disabled { opacity: 0.4; cursor: default; }
+
+/* ---- リザルト ---- */
+#result-title.win  { color: var(--warn); }
+#result-title.lose { color: #f0776a; }

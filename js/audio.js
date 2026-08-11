@@ -363,40 +363,76 @@ const Audio = (() => {
     _scheduleBattleBGM(type === 'boss', myGen, false);
   }
 
+  // ---- タイトル/メニューのBGM ----
+  // 戦闘BGMが「16ステップ×6変奏」で刻むのに対して、こちらは
+  // 和音進行を土台にした8小節ループ。ずっと流れっぱなしになる場所なので、
+  // 変奏は付けず、音数も抑えて聴き疲れしないようにしている。
+  //
+  // 進行は C - G - Am - Em - F - C - F - G（いわゆるカノン進行）。
+  // 4声部の役割:
+  //   ベース … 小節のあたまで根音を長く伸ばす（土台）
+  //   パッド … 和音を薄く重ねる。立ち上がりを遅くして角を取る
+  //   アルペジオ … 8分音符で和音の構成音をなぞる（動きを出す）
+  //   メロディ … 小節の頭と半ばだけ。和音の構成音しか置いていない
   function _scheduleTitleBGM(myGen) {
     const c = getCtx();
-    // Gentle major-key arpeggio
-    const arpeggioNotes = [262, 330, 392, 523, 659, 523, 392, 330,
-                            294, 370, 440, 587, 740, 587, 440, 370];
-    const tempo = 0.22;
+
+    const BEAT = 0.30;              // 8分音符
+    const BAR  = BEAT * 8;          // 1小節 = 2.4秒。8小節で約19秒のループ
+
+    // tones は下から3つの構成音。mel は [小節の頭, 半ば]（0 は休符）
+    const CHORDS = [
+      { bass:  65.4, tones: [261.6, 329.6, 392.0], mel: [523.3, 0    ] }, // C
+      { bass:  98.0, tones: [196.0, 246.9, 293.7], mel: [493.9, 0    ] }, // G
+      { bass: 110.0, tones: [220.0, 261.6, 329.6], mel: [440.0, 523.3] }, // Am
+      { bass:  82.4, tones: [164.8, 196.0, 246.9], mel: [493.9, 0    ] }, // Em
+      { bass:  87.3, tones: [174.6, 220.0, 261.6], mel: [440.0, 392.0] }, // F
+      { bass:  65.4, tones: [261.6, 329.6, 392.0], mel: [392.0, 329.6] }, // C
+      { bass:  87.3, tones: [174.6, 220.0, 261.6], mel: [349.2, 440.0] }, // F
+      { bass:  98.0, tones: [196.0, 246.9, 293.7], mel: [392.0, 0    ] }  // G
+    ];
+    // アルペジオが構成音をなぞる順番。3 は最低音の1オクターブ上（頂点）
+    const ARP = [0, 1, 2, 3, 2, 1, 2, 1];
+
+    // 1音鳴らす。attack を長めに取ると角が取れて、タイトルらしい柔らかさになる。
+    // exponentialRamp は 0 を扱えないので、両端は 0.0001 から始める
+    function note(freq, type, t, dur, vol, attack) {
+      const o = c.createOscillator(); const g = c.createGain();
+      o.connect(g); g.connect(c.destination);
+      o.type = type; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + attack);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.start(t); o.stop(t + dur + 0.02);
+      trackNodes(o, g);
+    }
+
     let startT = c.currentTime + 0.1;
 
     function scheduleLoop() {
       if (!bgmPlaying || bgmGeneration !== myGen) return;
       const now = c.currentTime;
       if (startT < now) startT = now + 0.05;
-      arpeggioNotes.forEach((freq, i) => {
-        const t = startT + i * tempo;
-        const mo = c.createOscillator(); const mg = c.createGain();
-        mo.connect(mg); mg.connect(c.destination);
-        mo.type = 'triangle'; mo.frequency.value = freq;
-        mg.gain.setValueAtTime(0.07, t);
-        mg.gain.exponentialRampToValueAtTime(0.001, t + tempo * 0.9);
-        mo.start(t); mo.stop(t + tempo);
-        trackNodes(mo, mg);
 
-        // Bass note (every 4 steps)
-        if (i % 4 === 0) {
-          const bo = c.createOscillator(); const bg = c.createGain();
-          bo.connect(bg); bg.connect(c.destination);
-          bo.type = 'sine'; bo.frequency.value = freq * 0.5;
-          bg.gain.setValueAtTime(0.05, t);
-          bg.gain.exponentialRampToValueAtTime(0.001, t + tempo * 3.5);
-          bo.start(t); bo.stop(t + tempo * 4);
-          trackNodes(bo, bg);
-        }
+      CHORDS.forEach((ch, bar) => {
+        const t0 = startT + bar * BAR;
+
+        note(ch.bass, 'sine', t0, BAR * 0.95, 0.075, 0.04);
+
+        ch.tones.forEach(f => note(f, 'triangle', t0, BAR * 0.92, 0.028, 0.5));
+
+        ARP.forEach((idx, i) => {
+          const f = idx < 3 ? ch.tones[idx] * 2 : ch.tones[0] * 4;
+          note(f, 'triangle', t0 + i * BEAT, BEAT * 0.9, 0.040, 0.012);
+        });
+
+        ch.mel.forEach((f, i) => {
+          if (!f) return;
+          note(f, 'sine', t0 + i * BEAT * 4, BEAT * 3.4, 0.055, 0.06);
+        });
       });
-      startT += arpeggioNotes.length * tempo;
+
+      startT += CHORDS.length * BAR;
       const delay = (startT - c.currentTime - 0.5) * 1000;
       if (delay > 0) setTimeout(scheduleLoop, delay);
       else scheduleLoop();

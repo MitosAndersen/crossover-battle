@@ -336,6 +336,24 @@ const Game = (() => {
       });
     }
     initTitleAmbience();
+    armFirstGestureBGM();
+  }
+
+  // 読み込み直後はブラウザが音を鳴らさせてくれない（AudioContext が suspended のまま）。
+  // そのため最初の操作を待ってからタイトルBGMを鳴らし始める。
+  // 250ms 待つのは「ゲームスタートを押した」場合に一瞬だけ鳴るのを避けるため。
+  // その頃には画面が切り替わっていて、タイトルではないので鳴らさずに済む
+  function armFirstGestureBGM() {
+    const kick = () => {
+      document.removeEventListener('pointerdown', kick);
+      document.removeEventListener('keydown', kick);
+      setTimeout(() => {
+        const inBattle = document.getElementById('battle-screen')?.classList.contains('active');
+        if (!inBattle) startTitleBGM();
+      }, 250);
+    };
+    document.addEventListener('pointerdown', kick);
+    document.addEventListener('keydown', kick);
   }
 
   // ---- タイトル画面演出（ランダムアイコン＋浮かぶセリフ）----
@@ -349,6 +367,21 @@ const Game = (() => {
   function goTitleScreen() {
     UI.showScreen('title-screen');
     initTitleAmbience();
+    startTitleBGM();
+  }
+
+  // タイトル/メニューのBGM。戦闘中に呼ばれても何もしない。
+  // 同じ曲が既に鳴っているときに鳴らし直すと頭から戻ってしまうので、
+  // 画面を行き来しても曲が途切れないよう isBGMOn だけを見て一度だけ鳴らす
+  let _titleBgmOn = false;
+  function startTitleBGM() {
+    if (!Audio.isBGMOn()) { _titleBgmOn = false; return; }
+    if (_titleBgmOn) return;
+    _titleBgmOn = true;
+    Audio.startBGM('title', true);
+  }
+  function stopTitleBGM() {
+    _titleBgmOn = false;
   }
 
   let _titleAmbienceTimer = null;
@@ -575,6 +608,7 @@ const Game = (() => {
       enemies.forEach(e => UI.updateCharBars(e));
 
       Audio.stopBGM();
+      stopTitleBGM();
       if (isFinalBattle())                Audio.startBGM('final');
       else if (boss || isMidBossBattle()) Audio.startBGM('boss');
       else if (loopCount === 2)           Audio.startBGM('third');
@@ -1942,6 +1976,7 @@ const Game = (() => {
   // ---- Battle End ----
   function handleBattleEnd(result) {
     Audio.stopBGM();
+    stopTitleBGM();
     isBusy = true;
     const boss = isBossBattle();
 
@@ -2555,10 +2590,11 @@ const Game = (() => {
   }
 
   // BGMをONに戻したとき、今の状況に合った曲を鳴らし直す
-  // （戦闘開始時と同じ分岐ルール。戦闘外なら鳴らさない）
+  // （戦闘開始時と同じ分岐ルール。戦闘外ならタイトル/メニューの曲）
   function startContextBGM() {
     const inBattle = document.getElementById('battle-screen')?.classList.contains('active');
-    if (!inBattle) return;
+    if (!inBattle) { startTitleBGM(); return; }
+    stopTitleBGM();
     if (isFinalBattle())                          Audio.startBGM('final');
     else if (isBossBattle() || isMidBossBattle()) Audio.startBGM('boss');
     else if (loopCount === 2)                     Audio.startBGM('third');
@@ -2600,6 +2636,9 @@ const Game = (() => {
           saveLowPower();
           applyLowPower();
         } else if (btn.dataset.setting === 'bgm') {
+          // OFFにするときも呼ぶ。「もう鳴らした」印を消しておかないと
+          // 次にONへ戻したときに鳴り直さない
+          stopTitleBGM();
           if (Audio.toggleBGM()) startContextBGM();
         } else if (btn.dataset.setting === 'se') {
           Audio.toggleSE();

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>SRPG — 共有データ読み込み確認</title>
+<link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+
+<!-- ============================================================
+     共有データの読み込み
+     ============================================================
+     ../js/ の3つはターン制側と同じ実体を読んでいる。1つ足せば両方に出る。
+     このページはロジック（battle.js / main.js / ui.js）を一切読まない。
+     データファイルには関数が1つも入っていないので、これで完結する。
+
+     【?v= について】共有データを更新したら、ルートの index.html と
+     こちらの両方で番号を上げること。片方だけだと、もう片方が
+     古いデータをキャッシュから掴んだままになる。
+     ============================================================ -->
+<script src="../js/characters.js?v=1"></script>
+<script src="../js/passives.js?v=1"></script>
+<script src="../js/skills.js?v=1"></script>
+
+<!-- SRPG専用。共有データを移動力・射程に変換する -->
+<script src="js/units.js?v=2"></script>
+
+<div class="wrap">
+
+  <h1>⬛ SRPG — データ確認</h1>
+  <p class="sub">
+    クロスオーバーバトルのデータをそのまま読んでいる。<br>
+    このページはターン制側のファイルを1つも書き換えていない。
+    ゲーム本体は <a href="index.html" style="color:var(--accent)">こちら</a>。
+  </p>
+
+  <h2>1. 共有データが読めているか</h2>
+  <div class="check" id="check"></div>
+
+  <h2>2. role から移動力・射程を導いている表</h2>
+  <p class="sub">
+    158体ぶんの移動力を手で書く代わりに、この4行だけを持つ。<br>
+    個別に変えたいキャラが出てきたら <code>units.js</code> の <code>OVERRIDES</code> に書き足す。
+  </p>
+  <div class="scroll-x"><table id="role-table"></table></div>
+
+  <h2>3. 変換された全ユニット</h2>
+  <div class="filters">
+    <select id="f-origin"></select>
+    <select id="f-role"></select>
+    <input type="text" id="f-name" placeholder="名前で絞り込み">
+  </div>
+  <div class="units" id="units"></div>
+  <div id="detail"></div>
+
+</div>
+
+<script>
+// ============================================================
+// このページの表示だけを担当する。ゲームロジックはまだ何もない。
+// ============================================================
+(function () {
+  'use strict';
+
+  // ---- 1. 読み込み確認 ------------------------------------
+  // データが取れなければ、それ以降を動かしても意味がないので先に出す。
+  const checks = [
+    ['ALLY_DATA（味方）',        () => typeof ALLY_DATA    !== 'undefined' && ALLY_DATA.length,    '体'],
+    ['ENEMY_DATA（敵）',         () => typeof ENEMY_DATA   !== 'undefined' && ENEMY_DATA.length,   '体'],
+    ['BOSS_DATA（ボス）',        () => typeof BOSS_DATA    !== 'undefined' && BOSS_DATA.length,    '体'],
+    ['MIDBOSS_DATA（中ボス）',   () => typeof MIDBOSS_DATA !== 'undefined' && MIDBOSS_DATA.length, '体'],
+    ['SKILL_DATA（スキル）',     () => typeof SKILL_DATA   !== 'undefined' && Object.keys(SKILL_DATA).length,   '個'],
+    ['PASSIVE_DATA（パッシブ）', () => typeof PASSIVE_DATA !== 'undefined' && Object.keys(PASSIVE_DATA).length, '個'],
+    ['CHAR_RARITY（レア度）',    () => typeof CHAR_RARITY  !== 'undefined' && Object.keys(CHAR_RARITY).length,  '件'],
+    ['JOIN_QUOTES（セリフ）',    () => typeof JOIN_QUOTES  !== 'undefined' && Object.keys(JOIN_QUOTES).length,  '件'],
+    ['ALL_STATUS（状態異常）',   () => typeof ALL_STATUS   !== 'undefined' && ALL_STATUS.length,   '種']
+  ];
+  document.getElementById('check').innerHTML = checks.map(([label, fn, unit]) => {
+    let n = 0;
+    try { n = fn() || 0; } catch (e) { n = 0; }
+    const cls = n > 0 ? 'ok' : 'ng';
+    const mark = n > 0 ? '✔' : '✘';
+    return `<div class="check-row"><span class="k">${label}</span>` +
+           `<span class="v ${cls}">${mark} ${n}${unit}</span></div>`;
+  }).join('');
+
+  const units = SRPG_Units.build();
+  if (!units.length) return;   // データが読めていないなら以降は出さない
+
+  // ---- 2. 変換表 -------------------------------------------
+  const order = ['striker', 'attacker', 'support', 'tank'];
+  document.getElementById('role-table').innerHTML =
+    '<tr><th>role</th><th>移動力</th><th>射程</th><th>HP補正</th><th>該当</th><th>考え方</th></tr>' +
+    order.map(r => {
+      const u = SRPG_Units.ROLE_UNIT[r];
+      const n = units.filter(x => x.role === r).length;
+      const label = (typeof ROLES !== 'undefined' && ROLES[r]) ? ROLES[r].icon + ' ' + ROLES[r].label : r;
+      return `<tr><td>${label}</td><td class="num">${u.move}</td><td class="num">${u.range}</td>` +
+             `<td class="num">×${SRPG_Units.ROLE_HP[r]}</td><td class="num">${n}体</td>` +
+             `<td style="color:var(--dim)">${u.note}</td></tr>`;
+    }).join('');
+
+  // ---- 3. 一覧と絞り込み -----------------------------------
+  const fOrigin = document.getElementById('f-origin');
+  const fRole   = document.getElementById('f-role');
+  const fName   = document.getElementById('f-name');
+
+  const origins = [...new Set(units.map(u => u.origin))].sort();
+  fOrigin.innerHTML = `<option value="">全作品（${origins.length}）</option>` +
+    origins.map(o => `<option value="${o}">${o}（${units.filter(u => u.origin === o).length}）</option>`).join('');
+  fRole.innerHTML = '<option value="">全ロール</option>' +
+    order.map(r => `<option value="${r}">${(typeof ROLES !== 'undefined' && ROLES[r]) ? ROLES[r].label : r}</option>`).join('');
+
+  function render() {
+    const o = fOrigin.value, r = fRole.value, q = fName.value.trim();
+    const list = units.filter(u =>
+      (!o || u.origin === o) && (!r || u.role === r) && (!q || u.name.includes(q)));
+    document.getElementById('units').innerHTML = list.length ? list.map(u => {
+      const col = (typeof ROLES !== 'undefined' && ROLES[u.role]) ? ROLES[u.role].color : '#666';
+      return `<div class="unit" data-id="${u.id}" style="border-left-color:${col}">` +
+             `<div class="nm">${u.emoji} ${u.name}</div>` +
+             `<div class="or">${u.origin}</div>` +
+             `<div class="st">HP${u.hp}　移動${u.move}　射程${u.range}</div></div>`;
+    }).join('') : '<div class="empty">該当なし</div>';
+  }
+
+  function detail(id) {
+    const u = units.find(x => x.id === id);
+    if (!u) return;
+    const acts = u.skillIds.map(sid => SRPG_Units.toAction(sid)).filter(Boolean);
+    document.getElementById('detail').innerHTML =
+      `<div class="detail">` +
+      `<div class="hd">${u.emoji} ${u.name}　<span style="color:var(--dim);font-size:.8rem">` +
+      `${'★'.repeat(u.rarity)}　${u.origin}　${u.job || ''}</span></div>` +
+      (u.joinQuote ? `<div class="quote">「${u.joinQuote}」</div>` : '') +
+      `<div style="margin-bottom:10px">` +
+      `<span class="tag">HP ${u.hp}（素${u.baseHp}）</span>` +
+      `<span class="tag">移動 ${u.move}</span>` +
+      `<span class="tag">射程 ${u.range}</span>` +
+      `<span class="tag">${u.derived ? 'role から導出' : '個別指定'}</span></div>` +
+      (u.passive ? `<div style="margin-bottom:10px">🔹 <b>${u.passive.name}</b>` +
+                   `<span style="color:var(--dim)"> … ${u.passive.desc}</span>` +
+                   `<span class="tag" style="margin-left:6px">${u.passive.type}</span></div>` : '') +
+      `<div class="scroll-x"><table>` +
+      `<tr><th>コスト</th><th>技</th><th>当たり方</th><th>威力</th><th>付加</th></tr>` +
+      acts.map(a => {
+        const eff = [a.effect && a.effect + (a.effectTurns ? `(${a.effectTurns}T)` : ''), a.effect2]
+                      .filter(Boolean).concat(a.tags).join('・');
+        const pw = a.total ? (a.hits > 1 ? `${a.total}（${a.power}×${a.hits}）` : String(a.total))
+                 : a.healPower ? `回復${a.healPower}` : a.shieldPower ? `盾${a.shieldPower}` : '—';
+        return `<tr><td>${a.isBasic ? '通常' : 'SP' + a.cost}</td><td>${a.icon} ${a.name}</td>` +
+               `<td>${a.shapeLabel}<span style="color:var(--dim);font-size:.78rem"> ${a.shapeDesc}</span></td>` +
+               `<td class="num">${pw}</td><td style="color:var(--dim)">${eff || '—'}</td></tr>`;
+      }).join('') + `</table></div></div>`;
+  }
+
+  document.getElementById('units').addEventListener('click', e => {
+    const card = e.target.closest('.unit');
+    if (card) detail(card.dataset.id);
+  });
+  [fOrigin, fRole].forEach(el => el.addEventListener('change', render));
+  fName.addEventListener('input', render);
+  render();
+})();
+</script>
+
+</body>
+</html>

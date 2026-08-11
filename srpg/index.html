@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>SRPG版 クロスオーバーバトル（開発中）</title>
+<link rel="stylesheet" href="style.css?v=2">
+</head>
+<body class="game">
+
+<!-- ============================================================
+     共有データの読み込み
+     ============================================================
+     ../js/ の3つはターン制側と同じ実体を読んでいる。1つ足せば両方に出る。
+     ロジック（battle.js / main.js / ui.js）は共有しない。同名のファイルが
+     こちらの js/ にもあるが、中身は完全に別物。
+
+     【?v= について】共有データを更新したら、ルートの index.html と
+     こちらの両方で番号を上げること。片方だけだと、もう片方が
+     古いデータをキャッシュから掴んだままになる。
+     ============================================================ -->
+<script src="../js/characters.js?v=1"></script>
+<script src="../js/passives.js?v=1"></script>
+<script src="../js/skills.js?v=1"></script>
+
+<!-- 音もターン制側と同じ実体を読む。
+     audio.js は WebAudio で音を合成しているだけで、DOMにも他のモジュールにも
+     依存していない純粋な部品なので、そのまま流用できる。SEを1つ足せば両方で鳴る。
+     ※ 音のON/OFFは audio.js が localStorage の icb_seOn / icb_bgmOn に持つ。
+       同一オリジンなので設定は2つのゲームで共通になる（意図どおり） -->
+<script src="../js/audio.js?v=1"></script>
+
+<!-- SRPG専用 -->
+<script src="js/units.js?v=2"></script>
+<script src="js/grid.js?v=2"></script>
+<script src="js/battle.js?v=2"></script>
+<script src="js/ai.js?v=2"></script>
+<script src="js/ui.js?v=2"></script>
+<script src="js/main.js?v=2"></script>
+
+<!-- ============================================================
+     タイトル
+     ============================================================ -->
+<section id="title-screen" class="screen active">
+  <div class="wrap center">
+    <h1>⬛ SRPG版<br>クロスオーバーバトル</h1>
+    <p class="sub">マス目で戦う。キャラクターはターン制版と同じデータを読んでいる。</p>
+    <button id="start-select-btn" class="big-btn">▶ 出撃メンバーを選ぶ</button>
+    <div class="top-btns" style="justify-content:center;margin-bottom:14px;">
+      <button class="sound-btn" data-kind="se">🔊効果音</button>
+      <button class="sound-btn" data-kind="bgm">🎵BGM</button>
+    </div>
+    <p class="sub small">
+      1マップの遭遇戦だけの最小版。パッシブの効果・地形・ボスはまだ入っていない。<br>
+      <a href="data.html">データ読み込みの確認ページ</a>
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================
+     出撃選択
+     ============================================================ -->
+<section id="select-screen" class="screen">
+  <div class="wrap">
+    <h2>出撃メンバー <span id="pick-count" class="dim">0 / 4</span></h2>
+    <div id="pick-slots" class="slots"></div>
+    <div class="filters">
+      <select id="f-origin"></select>
+      <select id="f-role"></select>
+      <input type="text" id="f-name" placeholder="名前で絞り込み">
+    </div>
+    <div id="pick-list" class="pick-list"></div>
+    <div class="select-foot">
+      <button id="start-btn" class="big-btn" disabled>⚔️ 出撃</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     戦闘
+     ============================================================ -->
+<section id="battle-screen" class="screen">
+  <div class="battle-top">
+    <div id="phase" class="phase">—</div>
+    <div class="top-btns">
+      <button class="sound-btn" data-kind="se">🔊効果音</button>
+      <button class="sound-btn" data-kind="bgm">🎵BGM</button>
+      <button id="end-phase-btn" class="small-btn">フェイズ終了</button>
+    </div>
+  </div>
+
+  <div id="board">
+    <div id="tiles"></div>
+    <div id="fx-layer"></div>
+    <div id="units-layer"></div>
+    <div id="banner" class="banner"></div>
+  </div>
+
+  <div id="info" class="info"></div>
+  <div id="aim-bar" class="aim-bar"></div>
+  <div id="log" class="log"></div>
+  <div id="action-menu" class="action-menu"></div>
+</section>
+
+<!-- ============================================================
+     リザルト
+     ============================================================ -->
+<section id="result-screen" class="screen">
+  <div class="wrap center">
+    <h1 id="result-title">—</h1>
+    <p id="result-sub" class="sub"></p>
+    <button id="retry-btn" class="big-btn">↻ 同じ編成でもう一度</button>
+    <button id="to-title-btn" class="small-btn">タイトルへ</button>
+  </div>
+</section>
+
+</body>
+</html>
