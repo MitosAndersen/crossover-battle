@@ -1049,12 +1049,16 @@ const Game = (() => {
               ? `✋ <strong>${tick.target.name}</strong> は「${dotSurvRelic.name}」の力でHP1で耐えた！`
               : `✋ <strong>${tick.target.name}</strong> はHP1で耐えた！`, 'log-status');
           } else if (tick.type === 'revive_relic') {
-            const dotRevRelic = tick.target._lastReviveRelic;
-            if (dotRevRelic) { delete tick.target._lastReviveRelic; }
-            const dotRevIcon = dotRevRelic ? dotRevRelic.emoji : '💒';
-            const dotRevLabel = dotRevRelic ? `${dotRevIcon}${dotRevRelic.name}で復活！` : '💒復活！';
-            const dotRevLog = dotRevRelic
-              ? `${dotRevIcon} <strong>${tick.target.name}</strong> は「${dotRevRelic.name}」の力で復活した！`
+            // 毒・燃焼で落ちたときの復活。レリックとパッシブの両方から来る
+            const dotRevRelic   = tick.target._lastReviveRelic;
+            const dotRevPassive = tick.target._lastRevivePassive;
+            if (dotRevRelic)   { delete tick.target._lastReviveRelic; }
+            if (dotRevPassive) { delete tick.target._lastRevivePassive; }
+            const dotRevSrc  = dotRevRelic || dotRevPassive;
+            const dotRevIcon = dotRevRelic ? dotRevRelic.emoji : (dotRevPassive ? '🔄' : '💒');
+            const dotRevLabel = dotRevSrc ? `${dotRevIcon}${dotRevSrc.name}で復活！` : '💒復活！';
+            const dotRevLog = dotRevSrc
+              ? `${dotRevIcon} <strong>${tick.target.name}</strong> は「${dotRevSrc.name}」の力で復活した！`
               : `💒 <strong>${tick.target.name}</strong> はレリックの力で復活した！`;
             UI.flashCard(tick.target.id, 'revive-flash', 1400);
             UI.queueFloat(tick.target.id, dotRevLabel, 'float-revive');
@@ -1769,12 +1773,17 @@ const Game = (() => {
         }
 
         case 'revive': {
-          const revRelic = r.target._lastReviveRelic;
-          if (revRelic) { delete r.target._lastReviveRelic; }
-          const revIcon = revRelic ? revRelic.emoji : '✨';
-          const revLabel = revRelic ? `${revIcon}${revRelic.name}で復活！` : '✨復活！';
-          const revLog = revRelic
-            ? `${revIcon} <strong>${r.target.name}</strong> は「${revRelic.name}」の力で復活した！`
+          // 復活はレリックとパッシブの両方から来る。どちらも「何で復活したか」を
+          // 名前で出したいので、発動元を r.target に置いてもらって拾う
+          const revRelic   = r.target._lastReviveRelic;
+          const revPassive = r.target._lastRevivePassive;
+          if (revRelic)   { delete r.target._lastReviveRelic; }
+          if (revPassive) { delete r.target._lastRevivePassive; }
+          const revSrc  = revRelic || revPassive;
+          const revIcon = revRelic ? revRelic.emoji : (revPassive ? '🔄' : '✨');
+          const revLabel = revSrc ? `${revIcon}${revSrc.name}で復活！` : '✨復活！';
+          const revLog = revSrc
+            ? `${revIcon} <strong>${r.target.name}</strong> は「${revSrc.name}」の力で復活した！`
             : `✨ <strong>${r.target.name}</strong> が復活した！`;
           UI.flashCard(r.target.id, 'revive-flash', 1400);
           UI.floatNumber(r.target.id, revLabel, 'float-revive');

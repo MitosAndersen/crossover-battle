@@ -199,6 +199,17 @@ const Battle = (() => {
     }
   }
 
+  // 追加効果（alsoEffect2/3）を [効果名, 持続] の組で返す。
+  // 持続は既定で effectTurns を共有するが、alsoEffect2Turns / alsoEffect3Turns を
+  // 書けばその効果だけ別にできる。攻↓は3T・気絶は1T のように重さが違う場合に使う。
+  // 書かれていない効果は組ごと落とすので、呼ぶ側で undefined を気にしなくてよい
+  function extraEffectPairs(skill, fallback = 3) {
+    return [
+      [skill.alsoEffect2, skill.alsoEffect2Turns || skill.effectTurns || fallback],
+      [skill.alsoEffect3, skill.alsoEffect3Turns || skill.effectTurns || fallback]
+    ].filter(pair => !!pair[0]);
+  }
+
   function applySkill(actor, skill, targets, usedSkillId = null) {
     const results = [];
     _phaseActorIsEnemy = actor.isEnemy; // justApplied判定用（敵ターン中の付与のみ初回減算をスキップ）
@@ -239,10 +250,11 @@ const Battle = (() => {
           results.push({ type: 'self_shield', target, amount: skill.shieldOnHeal });
         }
         // 回復スキルの付随効果（リジェネ等）を付与
-        [skill.effect, skill.alsoEffect2, skill.alsoEffect3].forEach(ef => {
+        const healEffects = [[skill.effect, skill.effectTurns || 3]].concat(extraEffectPairs(skill));
+        healEffects.forEach(([ef, turns]) => {
           if (!ef) return;
           if (Math.random() < (skill.effectChance || 1)) {
-            const applied = applyStatusEffect(target, ef, skill.effectTurns || 3);
+            const applied = applyStatusEffect(target, ef, turns);
             if (applied) results.push({ type: 'status', target, effect: ef });
           }
         });
@@ -305,15 +317,23 @@ const Battle = (() => {
           }
         }
       });
-      [skill.alsoEffect2, skill.alsoEffect3].forEach(extraEf => {
-        if (!extraEf) return;
+      // 追加効果は既定では effectTurns を共有するが、alsoEffect2Turns /
+      // alsoEffect3Turns を書けばその効果だけ持続を変えられる。
+      // 攻↓は長く、気絶は1Tだけ、のように種類ごとに重さが違うときに使う
+      extraEffectPairs(skill).forEach(([extraEf, extraTurns]) => {
         targets.forEach(t => {
           if (t.isDefeated) return;
-          const applied = applyStatusEffect(t, extraEf, skill.effectTurns || 3);
+          const applied = applyStatusEffect(t, extraEf, extraTurns);
           if (applied) results.push({ type: 'status', target: t, effect: extraEf });
           else results.push({ type: 'status_miss', target: t, effect: extraEf });
         });
       });
+      // 支援技にも selfShieldPower を効かせる。攻撃技の側にしか無かったため、
+      // バフ技に書いても黙って無視されていた（上限は他のシールドと同じ最大HPの半分）
+      if (skill.selfShieldPower && !actor.isDefeated) {
+        actor.shieldHp = Math.min(Math.floor(actor.maxHp * 0.5), (actor.shieldHp || 0) + skill.selfShieldPower);
+        results.push({ type: 'self_shield', target: actor, amount: skill.selfShieldPower });
+      }
       return results;
     }
 
@@ -370,10 +390,14 @@ const Battle = (() => {
         if (_ap?.type === 'boss_damage' && (target.isBoss || target.isMidBoss)) dmg *= (1 + _ap.value);
         // スキル固有ボス特攻
         if (skill.bossBonus && (target.isBoss || target.isMidBoss)) dmg *= (1 + skill.bossBonus);
+        // compound（複合パッシブ）の中の火力補正。単体パッシブとして書いたときと
+        // 同じ条件で掛ける。ここに無い型（multi_hit_boost・boss_damage・
+        // exploit_status）は compound に入れても効かないので、使うときは足すこと
         if (_ap?.type === 'compound') {
           _ap.effects?.forEach(eff => {
             if (eff.type === 'atk_boost') dmg *= (1 + eff.value);
             if (eff.type === 'low_hp_atk' && actor.hp <= actor.maxHp * (eff.threshold || 0.5)) dmg *= (1 + eff.value);
+            if (eff.type === 'basic_atk_boost' && skill.noSP) dmg *= (1 + eff.value);
           });
         }
         dmg = Math.max(1, Math.floor(dmg));
@@ -548,9 +572,8 @@ const Battle = (() => {
                 reportMiss(skill.effect);
               }
               // 追加効果（alsoEffect2/3）：メイン効果がブロックされても独立に判定
-              [skill.alsoEffect2, skill.alsoEffect3].forEach(extraEf => {
-                if (!extraEf) return;
-                const applied2 = applyStatusEffect(target, extraEf, skill.effectTurns || 2);
+              extraEffectPairs(skill, 2).forEach(([extraEf, extraTurns]) => {
+                const applied2 = applyStatusEffect(target, extraEf, extraTurns);
                 if (applied2) {
                   results.push({ type: 'status', target, effect: extraEf });
                   effectApplied.add(target);
@@ -654,6 +677,16 @@ const Battle = (() => {
       target._gutsUsed = true;
       target.hp = 1;
       return 'guts';
+    }
+    // 復活パッシブ（菜月昴の死に戻り）。仙豆レリックと同じ型を使うが、
+    // こちらはレリックより先に判定する。無料の1回を先に使い、
+    // レリックの復活は後の危機まで温存されるほうが得なため。
+    // 使用済みフラグは _gutsUsed を共用しているので、戦闘ごとのリセットもそのまま効く
+    if (!target.isEnemy && target.passive?.type === 'revive_once' && !target._gutsUsed) {
+      target._gutsUsed = true;
+      target.hp = Math.max(1, Math.floor(target.maxHp * (target.passive.value || 0.5)));
+      target._lastRevivePassive = target.passive;   // ログで名前を出す（_lastReviveRelic と同じ流儀）
+      return 'revive';
     }
     const survivedByRelic = !target.isEnemy && typeof Relics !== 'undefined' && Relics.trySurviveFatal(target);
     if (survivedByRelic) {

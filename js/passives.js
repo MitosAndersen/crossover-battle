@@ -7,8 +7,8 @@ const PASSIVE_DATA = {
 
   // ==== ドラゴンボール ====
   goku:         { name:'超サイヤ人',              type:'low_hp_atk',              desc:'HP50%↓ 攻防↑＋リジェネ（3T）', threshold:0.5, buffs:['atk_up','def_up','regen'], turns:3 },
-  vegeta:       { name:'エリートの誇り',          type:'low_hp_atk',              desc:'HP50%↓ 攻↑（3T）', threshold:0.5, turns:3 },
-  gohan:        { name:'潜在能力解放',            type:'low_hp_atk',              desc:'HP50%↓ 攻↑（3T）', threshold:0.5, turns:3 },
+  vegeta:       { name:'エリートの誇り',          type:'low_hp_atk',              desc:'HP50%↓ 攻防↑（3T）', threshold:0.5, buffs:['atk_up','def_up'], turns:3 },
+  gohan:        { name:'潜在能力解放',            type:'low_hp_atk',              desc:'HP50%↓ 攻防↑（3T）', threshold:0.5, buffs:['atk_up','def_up'], turns:3 },
   piccolo:      { name:'ナメック星人',            type:'regen',                   desc:'毎T HP3%回復', value:0.03 },
   trunks:       { name:'ゼットソード',            type:'boss_damage',             desc:'ボスへ与ダメ+15%', value:0.15 },
   krillin:      { name:'最強の地球人',            type:'basic_atk_boost',         desc:'通常攻撃+100%', value:1.00 },
@@ -35,7 +35,7 @@ const PASSIVE_DATA = {
   // ==== ワンパンマン ====
   saitama:      { name:'ハゲマント',              type:'compound',                desc:'状態異常無効', effects:[{type:'status_immune',targets:['stun','paralyze','poison','burn','atk_down','def_down','freeze','curse']}] },
   genos:        { name:'鬼サイボーグ',            type:'basic_atk_boost',         desc:'通常攻撃+100%', value:1.00 },
-  garou:        { name:'怪人覚醒',                type:'low_hp_atk',              desc:'HP50%↓ 攻↑（3T）', threshold:0.5, turns:3 },
+  garou:        { name:'怪人覚醒',                type:'low_hp_atk',              desc:'HP50%↓ 攻防↑（3T）', threshold:0.5, buffs:['atk_up','def_up'], turns:3 },
   tatsumaki:    { name:'念動力バリア',            type:'shield_start',            desc:'開幕 シールド(HP15%)', value:0.15 },
   king:         { name:'キングエンジン',          type:'enemy_debuff_start',      desc:'開幕 敵全攻↓(1T)', turns:1 },
   sonic:        { name:'音速',                    type:'multi_hit_boost',         desc:'連続ヒット技+20%', value:0.20 },
@@ -44,7 +44,7 @@ const PASSIVE_DATA = {
   rengoku:      { name:'心を燃やせ',              type:'battle_start_team_atk',   desc:'開幕 味方全攻↑(1T)', turns:1 },
   tanjiro:      { name:'全集中の呼吸',            type:'battle_start_buffs',      desc:'開幕 攻防↑(2T)', buffs:['atk_up','def_up'], turns:2 },
   nezuko:       { name:'鬼の再生力',              type:'regen',                   desc:'毎T HP3%回復', value:0.03 },
-  zenitsu:      { name:'覚悟',                    type:'low_hp_atk',              desc:'HP50%↓ 攻↑（3T）', threshold:0.5, turns:3 },
+  zenitsu:      { name:'覚悟',                    type:'low_hp_atk',              desc:'HP50%↓ 攻防↑（3T）', threshold:0.5, buffs:['atk_up','def_up'], turns:3 },
   tomioka:      { name:'水柱',                    type:'status_immune',           desc:'味方全の燃焼・呪い無効', targets:['burn','curse'] },
   inosuke:      { name:'猪突猛進',                type:'battle_start_buffs',      desc:'開幕 自分に攻↑(2T)', buffs:['atk_up'], turns:2 },
   mitsuri:      { name:'恋柱',                    type:'multi_hit_boost',         desc:'連続ヒット技+20%', value:0.20 },
@@ -58,18 +58,19 @@ const PASSIVE_DATA = {
   alice:        { name:'整合騎士',                type:'battle_start_team_def',   desc:'開幕 味方全防↑(1T)', turns:1 },
 
   // ==== Re:ゼロ ====
-  emilia:       { name:'精霊の祝福',              type:'regen_team',              desc:'毎T 味方全HP3%回復', value:0.03 },
-  rem:          { name:'鬼化',                    type:'low_hp_atk',              desc:'HP50%↓ 攻↑（3T）', threshold:0.5, turns:3 },
-  subaru:       { name:'死に戻り',                type:'survive_fatal',           desc:'致死ダメージをHP1で耐える' },
-  beatrice:     { name:'禁書庫の叡智',            type:'sp_max_up',               desc:'最大SP+1', value:1 },
-  ram:          { name:'鬼神の血',                type:'low_hp_atk',              desc:'HP50%↓ 攻↑（3T）', threshold:0.5, turns:3 },
-  reinhard:     { name:'無数の加護',              type:'compound',                desc:'気絶・攻↓・防↓無効', effects:[{type:'status_immune',targets:['stun','atk_down','def_down']}] },
+  emilia:       { name:'大精霊パック',            type:'basic_atk_boost',         desc:'通常攻撃+150%', value:1.50 },
+  rem:          { name:'鬼化',                    type:'low_hp_atk',              desc:'HP50%↓ 攻↑＋リジェネ（3T）', threshold:0.5, buffs:['atk_up','regen'], turns:3 },
+  subaru:       { name:'死に戻り',                type:'revive_once',             desc:'HP0時 HP30%で復活（1戦闘1回）', value:0.30 },
+  beatrice:     { name:'禁書庫の司書',            type:'battle_start_team_atk',   desc:'開幕 味方全攻↑(1T)', turns:1 },
+  ram:          { name:'千里眼',                  type:'battle_start_team_def',   desc:'開幕 味方全防↑(1T)', turns:1 },
+  reinhard:     { name:'無数の加護',              type:'compound',                desc:'状態異常無効', effects:[{type:'status_immune',targets:['stun','paralyze','poison','burn','atk_down','def_down','freeze','curse']}] },
+  garfiel:      { name:'地霊の加護',              type:'regen',                   desc:'毎T HP3%回復', value:0.03 },
 
   // ==== ポケモン ====
   pikachu:      { name:'せいでんき',              type:'counter_status',          desc:'被弾時、攻撃した敵を麻痺(3T)', effect:'paralyze', chance:1.0, turns:3 },
   mewtwo:       { name:'プレッシャー',            type:'enemy_debuff_start',      desc:'開幕 敵全攻↓(2T)', turns:2 },
   lucario:      { name:'せいしんりょく',          type:'compound',                desc:'気絶・攻↓・防↓無効', effects:[{type:'status_immune',targets:['stun','atk_down','def_down']}] },
-  charizard:    { name:'もうか',                  type:'low_hp_atk',              desc:'HP50%↓ 攻↑（3T）', threshold:0.5, turns:3 },
+  charizard:    { name:'もうか',                  type:'low_hp_atk',              desc:'HP50%↓ 攻防↑（3T）', threshold:0.5, buffs:['atk_up','def_up'], turns:3 },
   gengar:       { name:'のろわれボディ',          type:'counter_status',          desc:'被弾時、攻撃した敵を呪う(2T)', effect:'curse', chance:1.0, turns:2 },
   goodra:       { name:'ぬめぬめ',                type:'counter_status',          desc:'被弾時、攻撃した敵の攻↓(2T)', effect:'atk_down', chance:1.0, turns:2 },
   ampharos:     { name:'プラス',                  type:'battle_start_team_atk',   desc:'開幕 味方全攻↑(1T)', turns:1 },
@@ -86,7 +87,7 @@ const PASSIVE_DATA = {
   sukuna:       { name:'呪いの王',                type:'exploit_status',          desc:'呪い中の敵へ与ダメ+30%', effect:'curse', value:0.30 },
   megumi_ft:    { name:'十種影法術',              type:'sp_max_up',               desc:'最大SP+1', value:1 },
   itadori:      { name:'宿儺の器',                type:'compound',                desc:'毎T HP3%回復・毒/呪い無効', effects:[{type:'regen',value:0.03},{type:'status_immune',targets:['poison','curse']}] },
-  nanami:       { name:'時間外労働',              type:'low_hp_atk',              desc:'HP50%↓ 防↑（3T）', threshold:0.5, buff:'def_up', turns:3 },
+  nanami:       { name:'時間外労働',              type:'low_hp_atk',              desc:'HP50%↓ 攻防↑（3T）', threshold:0.5, buffs:['def_up','atk_up'], turns:3 },
   nobara:       { name:'芻霊呪法',                type:'counter',                 desc:'被ダメの50%を反射', value:0.50 },
   yuta:         { name:'里香の加護',              type:'compound',                desc:'気絶・攻↓・防↓無効', effects:[{type:'status_immune',targets:['stun','atk_down','def_down']}] },
 
@@ -96,14 +97,14 @@ const PASSIVE_DATA = {
   hitsugaya:    { name:'氷輪丸',                  type:'exploit_status',          desc:'凍結中の敵へ与ダメ+30%', effect:'freeze', value:0.30 },
   byakuya:      { name:'千本桜',                  type:'shield_start',            desc:'開幕 シールド(HP15%)', value:0.15 },
   yoruichi:     { name:'神速',                    type:'exploit_status',          desc:'麻痺中の敵へ与ダメ+30%', effect:'paralyze', value:0.30 },
-  kenpachi:     { name:'戦闘狂',                  type:'low_hp_atk',              desc:'HP50%↓ 攻↑（3T）', threshold:0.5, turns:3 },
+  kenpachi:     { name:'戦闘狂',                  type:'low_hp_atk',              desc:'HP50%↓ 攻防↑（3T）', threshold:0.5, buffs:['atk_up','def_up'], turns:3 },
   ishida:       { name:'滅却師',                  type:'multi_hit_boost',         desc:'連続ヒット技+20%', value:0.20 },
 
   // ==== HUNTER×HUNTER ====
   killua:       { name:'神速の稲妻',              type:'exploit_status',          desc:'麻痺中の敵へ与ダメ+30%', effect:'paralyze', value:0.30 },
   gon:          { name:'強制的成長',              type:'low_hp_atk',              desc:'HP50%↓ 攻防↑＋リジェネ（3T）', threshold:0.5, buffs:['atk_up','def_up','regen'], turns:3 },
   hisoka:       { name:'伸縮自在の愛',            type:'counter',                 desc:'被ダメの50%を反射', value:0.50 },
-  kurapika:     { name:'緋の眼',                  type:'low_hp_atk',              desc:'HP50%↓ 防↑（3T）', threshold:0.5, buff:'def_up', turns:3 },
+  kurapika:     { name:'緋の眼',                  type:'low_hp_atk',              desc:'HP50%↓ 攻防↑（3T）', threshold:0.5, buffs:['def_up','atk_up'], turns:3 },
   leorio:       { name:'医学知識',                type:'regen_team',              desc:'毎T 味方全HP2%回復', value:0.02 },
   netero:       { name:'感謝',                    type:'basic_atk_boost',         desc:'通常攻撃+150%', value:1.50 },
 
@@ -179,7 +180,7 @@ const PASSIVE_DATA = {
   // ==== この素晴らしい世界 ====
   aqua_kb:      { name:'女神',                    type:'regen_team',              desc:'毎T 味方全HP2%回復', value:0.02 },
   darkness_kb:  { name:'クルセイダー',            type:'survive_fatal',           desc:'致死ダメージをHP1で耐える' },
-  megumin:      { name:'紅魔族',                  type:'low_hp_atk',              desc:'HP50%↓ 攻↑（3T）', threshold:0.5, turns:3 },
+  megumin:      { name:'紅魔族',                  type:'low_hp_atk',              desc:'HP50%↓ 攻防↑（3T）', threshold:0.5, buffs:['atk_up','def_up'], turns:3 },
   kazuma:       { name:'幸運',                    type:'sp_regen_on_basic',       desc:'通常攻撃時SP+1' },
 
   // ==== チェンソーマン ====

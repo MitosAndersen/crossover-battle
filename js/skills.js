@@ -196,29 +196,40 @@ const SKILL_DATA = {
   // Re:ゼロ
   // ============================================================
   // -- エミリア --
-  ice_arrow:              { name:'アイシクルライン',       icon:'🧊', noSP:true,  power:2,  type:'magic',    target:'single', hits:6, animation:'ice' },
-  ice_blade:              { name:'アイスブランド・アーツ', icon:'🧊', spCost:1,    power:30, type:'physical', target:'single', hits:1, animation:'ice', selfEffect:'atk_up', selfEffectTurns:2 },
-  emilia_cocytus:         { name:'コキュートス',           icon:'💥', spCost:2,    power:55, type:'magic',    target:'all',    hits:1, animation:'ice', effect:'freeze', effectChance:1, effectTurns:3, alsoEffect2:'atk_down' },
+  // 通常はパッシブ「大精霊パック」（通常攻撃+150%）が乗るので、実質30相当になる
+  ice_arrow:              { name:'ヒューマ',               icon:'🧊', noSP:true,  power:4,  type:'magic',    target:'single', hits:3, animation:'ice' },
+  // 氷の武具を錬成して配る技。中身はアインズの上位道具作成・エドワードの武具の錬成と同じ
+  ice_blade:              { name:'アイスブランド・アーツ', icon:'🧊', spCost:1,    power:0,  type:'support',  target:'all_ally', effect:'atk_up', effectChance:1, effectTurns:3, animation:'buff', alsoEffect2:'def_up' },
+  emilia_cocytus:         { name:'アイシクルライン',       icon:'💥', spCost:2,    power:11, type:'magic',    target:'all',    hits:5, animation:'ice', effect:'freeze', effectChance:1, effectTurns:3, alsoEffect2:'atk_down' },
   // -- レム --
-  maid_punch:             { name:'モーニングスター',       icon:'💙', noSP:true,  power:14, type:'physical', target:'single', hits:1, animation:'slash' },
-  oni_form:               { name:'振り回し',               icon:'💙', spCost:1,    power:18, type:'physical', target:'all',    hits:2, animation:'slash', shieldBreak:true },
-  morning_star:           { name:'アル・ヒューマ',         icon:'💥', spCost:2,    power:15, type:'physical', target:'single', hits:4, animation:'ice', effect:'freeze', effectChance:1, effectTurns:3 },
+  rem_basic:              { name:'モーニングスター',       icon:'💙', noSP:true,  power:14, type:'physical', target:'single', hits:1, animation:'slash' },
+  rem_swing:              { name:'ぶん回し',               icon:'💙', spCost:1,    power:18, type:'physical', target:'all',    hits:2, animation:'slash', shieldBreak:true },
+  rem_al_huma:            { name:'アル・ヒューマ',         icon:'💥', spCost:2,    power:15, type:'physical', target:'single', hits:4, animation:'ice', effect:'freeze', effectChance:1, effectTurns:3 },
   // -- 菜月昴 --
-  subaru_basic:       { name:'拳打',              icon:'🖤', noSP:true,  power:7,  type:'physical', target:'single', hits:1, animation:'punch' },
-  subaru_return:      { name:'死に戻り',          icon:'🖤', spCost:1,    power:0,   type:'heal',     target:'self',   healPower:30, animation:'heal' },
-  subaru_shadow:      { name:'シャマク',          icon:'🌑', spCost:1,    power:31, type:'magic',    target:'single', hits:1, animation:'dark', effect:'atk_down', effectChance:1, effectTurns:1 },
+  subaru_basic:       { name:'拳打',              icon:'🔄', noSP:true,  power:7,  type:'physical', target:'single', hits:1, animation:'punch' },
+  // 見えざる手は昴唯一の固有能力。掴んで締め上げる絵なので気絶を持たせている。
+  // 威力20はSP1単体＋気絶の中で最低（次に低いのはナミの22）。戦闘力の低さを残す
+  subaru_hand:        { name:'見えざる手',        icon:'🔄', spCost:1,    power:20, type:'magic',    target:'single', hits:1, animation:'dark', effect:'stun', effectChance:1, effectTurns:1 },
+  subaru_shadow:      { name:'シャマク',          icon:'🌑', spCost:1,    power:0,  type:'support',  target:'all',    effect:'atk_down', effectChance:1, effectTurns:3, animation:'dark' },
   // -- ベアトリス --
-  beatrice_basic:         { name:'ミーニャ',              icon:'📚', noSP:true,  power:5,  type:'magic',    target:'single', hits:1, animation:'beam' },
-  beatrice_shamak:        { name:'エル・ミーニャ',        icon:'📚', spCost:1,    power:4, type:'magic',    target:'single', hits:8, animation:'dark' },
-  beatrice_spirit:        { name:'アル・シャマク',        icon:'🌑', spCost:2,    power:61, type:'magic',   target:'single', hits:1, animation:'explosion', effect:'def_down', effectChance:1, effectTurns:2 },
+  beatrice_basic:         { name:'ミーニャ',              icon:'📚', noSP:true,  power:12, type:'magic',    target:'single', hits:1, animation:'beam' },
+  beatrice_el_minya:      { name:'エル・ミーニャ',        icon:'📚', spCost:1,    power:4, type:'magic',    target:'single', hits:8, animation:'dark' },
+  // 異空間送り。攻防ダウンは3Tだが、気絶だけ1T（全体気絶はどれも1Tで揃えている）
+  beatrice_al_shamak:     { name:'アル・シャマク',        icon:'🌑', spCost:2,    power:0,  type:'support', target:'all',    animation:'dark', effect:'def_down', effectChance:1, effectTurns:3, alsoEffect2:'atk_down', alsoEffect3:'stun', alsoEffect3Turns:1 },
   // -- ラム --
-  ram_basic:              { name:'フーラ',                icon:'🌸', noSP:true,  power:10,  type:'magic',    target:'single', hits:1, animation:'beam' },
-  ram_senrigan:           { name:'千里眼',                icon:'👁️', spCost:1,    power:0,   type:'support',  target:'all_ally', effect:'atk_up', effectChance:1, effectTurns:3, animation:'buff' },
-  ram_last:               { name:'エル・フーラ',          icon:'💥', spCost:2,    power:61, type:'magic',    target:'single', hits:1, animation:'explosion' },
+  ram_basic:              { name:'フーラ',                icon:'🌸', noSP:true,  power:11, type:'magic',    target:'single', hits:1, animation:'beam' },
+  ram_el_fula:            { name:'エル・フーラ',          icon:'🌸', spCost:1,    power:34, type:'magic',    target:'single', hits:1, animation:'beam' },
+  // 折れた角を一瞬だけ取り戻す。代償の自傷20%はクラピカ・七海・京子と同じ最大値
+  ram_oni:                { name:'瞬間的な鬼化',          icon:'💥', spCost:2,    power:62, type:'physical', target:'single', hits:1, animation:'slash_heavy', execute:true, recoilPct:0.20, effect:'def_down', effectChance:1, effectTurns:2 },
   // -- ラインハルト --
-  reinhard_basic:  { name:'剣聖の一閃',           icon:'🦁', noSP:true,  power:14, type:'physical', target:'single', hits:1, animation:'slash' },
+  reinhard_basic:  { name:'体術',                 icon:'⚜️', noSP:true,  power:14, type:'physical', target:'single', hits:1, animation:'punch' },
   reinhard_guard:  { name:'剣聖の加護',           icon:'⬆️', spCost:1,    power:0,   type:'support',  target:'self',   effect:'atk_up', effectChance:1, effectTurns:4, animation:'buff', alsoEffect2:'def_up' },
-  reinhard_dragon: { name:'龍剣レイド・抜剣',     icon:'💥', spCost:2,    power:64, type:'physical', target:'single', hits:1, animation:'slash_heavy', execute:true },
+  // 抜けば世界が滅ぶ剣。SP3の単体技は9人全員が威力100で揃っている
+  reinhard_dragon: { name:'龍剣レイド・抜剣',     icon:'💥', spCost:3,    power:100, type:'physical', target:'single', hits:1, animation:'slash_heavy', bossKiller:true, shieldBreak:true },
+  // -- ガーフィール --
+  garfiel_basic:   { name:'殴る',                 icon:'🐅', noSP:true,  power:12, type:'physical', target:'single', hits:1, animation:'punch' },
+  garfiel_beast:   { name:'獣化',                 icon:'🐅', spCost:1,    power:0,   type:'support',  target:'self',   effect:'atk_up', effectChance:1, effectTurns:4, animation:'buff', alsoEffect2:'def_up' },
+  garfiel_smash:   { name:'渾身の一撃',           icon:'💥', spCost:2,    power:62, type:'physical', target:'single', hits:1, animation:'punch_heavy', shieldBreak:true },
 
   // ============================================================
   // ポケモン

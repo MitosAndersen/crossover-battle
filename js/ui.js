@@ -547,14 +547,26 @@ const UI = (() => {
       : ({ single: singleLabel, self:'自分', all_ally:'味方全体', dead_ally:'倒れた仲間' }[skill.target] || '');
   }
 
+  // alsoEffect2/3 の持続。battle.js の extraEffectPairs と同じ規則で、
+  // alsoEffect2Turns / alsoEffect3Turns があればそちらを優先する。
+  // 【片方だけ直さないこと】ここは表示、battle.js は実挙動。
+  // 規則がずれると「気絶3T」と書いてあるのに1Tで切れる、といった食い違いになる
+  function extraEffectTurnPairs(skill, fallback = 3) {
+    return [
+      [skill.alsoEffect2, skill.alsoEffect2Turns || skill.effectTurns || fallback],
+      [skill.alsoEffect3, skill.alsoEffect3Turns || skill.effectTurns || fallback]
+    ].filter(pair => !!pair[0]);
+  }
+
   function buildSkillEffectLines(skill) {
     const lines = [];
 
     if (skill.type === 'heal') {
       lines.push(`💚回復：${skill.healPower || 20}`);
       if (skill.shieldOnHeal) lines.push(`🛡️シールド付与（+${skill.shieldOnHeal}）`);
-      [skill.effect, skill.alsoEffect2, skill.alsoEffect3].forEach(ef => {
-        if (ef) lines.push(`${EFFECT_LABELS[ef] || ef}（${skill.effectTurns || 3}T）`);
+      if (skill.effect) lines.push(`${EFFECT_LABELS[skill.effect] || skill.effect}（${skill.effectTurns || 3}T）`);
+      extraEffectTurnPairs(skill).forEach(([ef, turns]) => {
+        lines.push(`${EFFECT_LABELS[ef] || ef}（${turns}T）`);
       });
       if (skill.selfEffect) {
         lines.push(`自身に${EFFECT_LABELS[skill.selfEffect] || skill.selfEffect}（${skill.selfEffectTurns || 2}T）`);
@@ -582,17 +594,18 @@ const UI = (() => {
         if (skill.alsoEffect2) lines.push(EFFECT_LABELS[skill.alsoEffect2] || skill.alsoEffect2);
       } else if (skill.effect === 'shield') {
         lines.push(`🛡️シールド（HP+${skill.shieldPower}）`);
-        [skill.alsoEffect2, skill.alsoEffect3].forEach(ef => {
-          if (ef) lines.push(`${EFFECT_LABELS[ef] || ef}（${skill.effectTurns || 3}T）`);
+        extraEffectTurnPairs(skill).forEach(([ef, turns]) => {
+          lines.push(`${EFFECT_LABELS[ef] || ef}（${turns}T）`);
         });
       } else if (skill.effect) {
         const lbl   = EFFECT_LABELS[skill.effect] || skill.effect;
         const note  = skill.effect === 'stun' ? '・ボスには無効' : '';
         const turns = skill.effectTurns ? `${skill.effectTurns}T` : '';
         lines.push(turns || note ? `${lbl}（${turns}${note}）` : lbl);
-        const subTurns = skill.effectTurns || 2;
-        if (skill.alsoEffect2) lines.push(`${EFFECT_LABELS[skill.alsoEffect2] || skill.alsoEffect2}（${subTurns}T）`);
-        if (skill.alsoEffect3) lines.push(`${EFFECT_LABELS[skill.alsoEffect3] || skill.alsoEffect3}（${subTurns}T）`);
+        extraEffectTurnPairs(skill, 2).forEach(([ef, exTurns]) => {
+          const exNote = ef === 'stun' ? '・ボスには無効' : '';
+          lines.push(`${EFFECT_LABELS[ef] || ef}（${exTurns}T${exNote}）`);
+        });
       }
     }
 
@@ -603,10 +616,9 @@ const UI = (() => {
       lines.push(`${lbl}（${turns}T${note}）`);
     }
     if (skill.power > 0) {
-      [skill.alsoEffect2, skill.alsoEffect3].forEach(extraEf => {
-        if (!extraEf) return;
+      extraEffectTurnPairs(skill, 2).forEach(([extraEf, extraTurns]) => {
         const note = extraEf === 'stun' ? '・ボスには無効' : '';
-        lines.push(`${EFFECT_LABELS[extraEf] || extraEf}（${skill.effectTurns || 2}T${note}）`);
+        lines.push(`${EFFECT_LABELS[extraEf] || extraEf}（${extraTurns}T${note}）`);
       });
     }
 

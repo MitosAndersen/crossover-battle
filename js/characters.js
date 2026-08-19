@@ -61,6 +61,7 @@ const JOIN_QUOTES = {
   beatrice: '仕方ないから、ベティーが力を貸してあげるかしら。',
   ram: 'ラムの本気、見せてあげます。光栄に思いなさい。',
   reinhard: '剣聖ラインハルト・ヴァン・アストレア。あなたの剣となりましょう。',
+  garfiel: '考えるよりガングリオン、ってなあ',
 
   // -- ポケモン --
   pikachu: 'ピカピ！',
@@ -244,7 +245,7 @@ const CHAR_RARITY = {
   // -- SAO --
   kirito:3, asuna:2, sinon:2, yuuki:2, leafa:2, alice:2,
   // -- Re:ゼロ --
-  emilia:3, beatrice:1, ram:1, rem:2, subaru:2, reinhard:2,
+  emilia:3, beatrice:2, ram:2, rem:2, subaru:2, reinhard:3, garfiel:2,
   // -- ポケモン --
   pikachu:3, mewtwo:3, lucario:2, charizard:2, gengar:2, goodra:2, ampharos:2,
   // -- 鋼の錬金術師 --
@@ -357,13 +358,14 @@ const ALLY_DATA = [
   { id:'yuuki',      name:'ユウキ',                  origin:'SAO',                  emoji:'🗡️', maxHp:73,  role:'attacker', gender:'女', job:'剣士',         skillIds:['yuuki_basic','yuuki_11hit','yuuki_sword'],                              color:'#cc44aa' },
   { id:'leafa',          name:'リーファ',                  origin:'SAO',                   emoji:'🌿', maxHp:76,  role:'support',  gender:'女', job:'剣士',         skillIds:['leafa_basic','leafa_heal','leafa_gale'],                                 color:'#228844' },
   { id:'alice',      name:'アリス・シンセシス・サーティ', origin:'SAO',                   emoji:'🏵️', maxHp:90,  role:'tank',     gender:'女', job:'整合騎士',      skillIds:['alice_basic','alice_enhance','alice_release'],                           color:'#d4a017' },
-  // -- Re:ゼロ (6) --
+  // -- Re:ゼロ (7) --
   { id:'emilia',     name:'エミリア',              origin:'Re:ゼロ',               emoji:'❄️', maxHp:75,  role:'support',  gender:'女', job:'精霊使い',      skillIds:['ice_arrow','ice_blade','emilia_cocytus'],                       color:'#88ccff' },
-  { id:'rem',        name:'レム',                  origin:'Re:ゼロ',               emoji:'💙', maxHp:84,  role:'attacker', gender:'女', job:'メイド',        skillIds:['maid_punch','oni_form','morning_star'],                    color:'#2244cc' },
-  { id:'subaru',    name:'菜月昴',               origin:'Re:ゼロ',              emoji:'🔄', maxHp:80,  role:'tank',     gender:'男', job:'召喚者',       skillIds:['subaru_basic','subaru_return','subaru_shadow'],            color:'#334488' },
-  { id:'beatrice',     name:'ベアトリス',             origin:'Re:ゼロ',              emoji:'🚪', maxHp:68,  role:'support',  gender:'女', job:'精霊',         skillIds:['beatrice_basic','beatrice_shamak','beatrice_spirit'],       color:'#ffaadd' },
-  { id:'ram',          name:'ラム',                   origin:'Re:ゼロ',              emoji:'🌸', maxHp:76,  role:'support',  gender:'女', job:'メイド',        skillIds:['ram_basic','ram_senrigan','ram_last'],                           color:'#ff88bb' },
-  { id:'reinhard',   name:'ラインハルト',           origin:'Re:ゼロ',              emoji:'🦁', maxHp:96,  role:'tank',     gender:'男', job:'剣聖',         skillIds:['reinhard_basic','reinhard_guard','reinhard_dragon'],        color:'#cc3344' },
+  { id:'rem',        name:'レム',                  origin:'Re:ゼロ',               emoji:'💙', maxHp:84,  role:'attacker', gender:'女', job:'メイド',        skillIds:['rem_basic','rem_swing','rem_al_huma'],                    color:'#2244cc' },
+  { id:'subaru',    name:'菜月昴',               origin:'Re:ゼロ',              emoji:'🔄', maxHp:80,  role:'tank',     gender:'男', job:'召喚者',       skillIds:['subaru_basic','subaru_hand','subaru_shadow'],            color:'#334488' },
+  { id:'beatrice',     name:'ベアトリス',             origin:'Re:ゼロ',              emoji:'🚪', maxHp:68,  role:'support',  gender:'女', job:'精霊',         skillIds:['beatrice_basic','beatrice_el_minya','beatrice_al_shamak'],       color:'#ffaadd' },
+  { id:'ram',          name:'ラム',                   origin:'Re:ゼロ',              emoji:'🌸', maxHp:76,  role:'support',  gender:'女', job:'メイド',        skillIds:['ram_basic','ram_el_fula','ram_oni'],                           color:'#ff88bb' },
+  { id:'reinhard',   name:'ラインハルト',           origin:'Re:ゼロ',              emoji:'⚜️', maxHp:96,  role:'tank',     gender:'男', job:'剣聖',         skillIds:['reinhard_basic','reinhard_guard','reinhard_dragon'],        color:'#cc3344' },
+  { id:'garfiel',    name:'ガーフィール',           origin:'Re:ゼロ',              emoji:'🐅', maxHp:94,  role:'tank',     gender:'男', job:'聖域の守護者',   skillIds:['garfiel_basic','garfiel_beast','garfiel_smash'],           color:'#c9a227' },
   // -- ポケモン (5) --
   { id:'pikachu',    name:'ピカチュウ',            origin:'ポケモン',              emoji:'⚡', maxHp:63,  role:'striker',  gender:'不明', job:'ポケモン',    skillIds:['quick_attack','thunderbolt','volt_tackle'],                    color:'#ffee00' },
   { id:'mewtwo',     name:'ミュウツー',               origin:'ポケモン',              emoji:'🧬', maxHp:88,  role:'attacker', gender:'不明', job:'ポケモン',    skillIds:['mewtwo_basic','mewtwo_psycho','mewtwo_psystrike'],       color:'#8866cc' },
